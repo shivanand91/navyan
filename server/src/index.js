@@ -43,7 +43,7 @@ const createOriginMatcher = (value) => {
 
 const allowedOrigins = [
   ...(process.env.ALLOWED_ORIGINS || "").split(","),
-  process.env.CLIENT_URL || "https://navyan-6zz6.vercel.app"
+  process.env.CLIENT_URL || "https://www.navyan.online"
 ]
   .map(normalizeOrigin)
   .filter(Boolean);
