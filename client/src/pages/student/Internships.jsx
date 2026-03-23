@@ -21,6 +21,16 @@ const durationFallbackLabels = {
   "3-months": "3 months",
   "6-months": "6 months"
 };
+const blockingStatuses = new Set([
+  "Applied",
+  "Under Review",
+  "Shortlisted",
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested"
+]);
 
 const getDurationLabel = (duration) => duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
 
@@ -37,6 +47,7 @@ const isValidUpiUtr = (value) => /^\d{12}$/.test(normalizeUtr(value));
 
 export default function StudentInternships() {
   const [internships, setInternships] = useState([]);
+  const [blockingApplication, setBlockingApplication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submittingId, setSubmittingId] = useState(null);
   const [paymentLoadingId, setPaymentLoadingId] = useState(null);
@@ -51,8 +62,16 @@ export default function StudentInternships() {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await api.get("/internships");
-        setInternships(data.internships || []);
+        const [{ data: internshipData }, { data: applicationData }] = await Promise.all([
+          api.get("/internships"),
+          api.get("/applications/me")
+        ]);
+        setInternships(internshipData.internships || []);
+        setBlockingApplication(
+          (applicationData.applications || []).find((application) =>
+            blockingStatuses.has(application.status)
+          ) || null
+        );
       } catch (error) {
         console.error(error);
       } finally {
@@ -88,6 +107,7 @@ export default function StudentInternships() {
     }),
     [internships]
   );
+  const applicationsLocked = Boolean(blockingApplication);
 
   const keyFor = (internshipId, durationKey) => `${internshipId}:${durationKey}`;
 
@@ -110,6 +130,15 @@ export default function StudentInternships() {
   };
 
   const generatePaymentQr = async (internshipId, durationKey) => {
+    if (applicationsLocked) {
+      toast.error(
+        `You already have an active application for ${
+          blockingApplication?.internship?.title || "another internship"
+        }. You can apply again only after that internship is completed or closed.`
+      );
+      return;
+    }
+
     const key = keyFor(internshipId, durationKey);
     setPaymentLoadingId(key);
     try {
@@ -130,6 +159,16 @@ export default function StudentInternships() {
   const onApply = async (internshipId, durationKey, isPaid) => {
     const key = keyFor(internshipId, durationKey);
     const values = forms[key] || {};
+
+    if (applicationsLocked) {
+      toast.error(
+        `You can apply to only one internship at a time. Complete ${
+          blockingApplication?.internship?.title || "your current internship"
+        } first, then apply to the next one.`
+      );
+      return;
+    }
+
     setSubmittingId(key);
     try {
       const payload = {
@@ -161,12 +200,20 @@ export default function StudentInternships() {
         payload.utrNumber = normalizeUtr(values.utrNumber);
       }
 
-      await api.post("/applications", payload);
+      const { data } = await api.post("/applications", payload);
       toast.success(
         isPaid
           ? "Application submitted. Payment verification is now pending admin review."
           : "Application submitted successfully."
       );
+      setBlockingApplication({
+        ...(data.application || {}),
+        internship: {
+          _id: activeInternship?._id,
+          title: activeInternship?.title
+        },
+        status: data.application?.status || "Under Review"
+      });
       setForms((prev) => ({ ...prev, [key]: {} }));
       setPaymentSessions((prev) => {
         const next = { ...prev };
@@ -176,8 +223,12 @@ export default function StudentInternships() {
       setActiveInternship(null);
     } catch (error) {
       console.error(error);
+      const activeWorkflowTitle = error?.response?.data?.activeWorkflow?.internshipTitle;
       toast.error(
         error?.response?.data?.message ||
+        (activeWorkflowTitle
+          ? `You already have an active workflow for ${activeWorkflowTitle}.`
+          : null) ||
           "Could not submit application. Make sure your profile is complete and you haven’t already applied."
       );
     } finally {
@@ -211,6 +262,17 @@ export default function StudentInternships() {
             pick a duration, and submit a guided application from a single modal.
           </p>
         </div>
+
+        {applicationsLocked ? (
+          <div className="rounded-[24px] border border-amber-200 bg-amber-50/80 px-5 py-4 text-sm text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+            You already have an active internship workflow for{" "}
+            <span className="font-semibold">
+              {blockingApplication?.internship?.title || "your current internship"}
+            </span>{" "}
+            with status <span className="font-semibold">{blockingApplication?.status}</span>. You
+            can apply to a new internship only after this one is completed or closed.
+          </div>
+        ) : null}
 
         <div className="grid gap-4 xl:grid-cols-3">
           <div className="navyan-card p-5">
@@ -380,6 +442,12 @@ export default function StudentInternships() {
                     verification before the application can move forward.
                   </p>
 
+                  {applicationsLocked ? (
+                    <div className="mt-4 rounded-[20px] border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs leading-6 text-amber-100">
+                      New applications are locked while your current internship workflow is active.
+                    </div>
+                  ) : null}
+
                   <div className="mt-4 space-y-2">
                     {(activeInternship.durations || []).map((duration) => (
                       <button
@@ -463,7 +531,7 @@ export default function StudentInternships() {
                           type="button"
                           variant="outline"
                           className="w-full"
-                          disabled={paymentLoadingId === currentKey}
+                          disabled={paymentLoadingId === currentKey || applicationsLocked}
                           onClick={() => generatePaymentQr(activeInternship._id, currentDuration.key)}
                         >
                           {paymentLoadingId === currentKey ? "Generating QR..." : "Generate payment QR"}
@@ -533,6 +601,7 @@ export default function StudentInternships() {
                             type="button"
                             className="w-full"
                             disabled={
+                              applicationsLocked ||
                               submittingId === currentKey ||
                               remainingWaitSeconds > 0 ||
                               !isValidUpiUtr(forms[currentKey]?.utrNumber)
@@ -547,7 +616,7 @@ export default function StudentInternships() {
                             type="button"
                             variant="outline"
                             className="w-full"
-                            disabled={paymentLoadingId === currentKey}
+                            disabled={paymentLoadingId === currentKey || applicationsLocked}
                             onClick={() => generatePaymentQr(activeInternship._id, currentDuration.key)}
                           >
                             Generate fresh QR
@@ -576,7 +645,7 @@ export default function StudentInternships() {
                     <Button
                       type="button"
                       className="mt-5 w-full"
-                      disabled={submittingId === currentKey}
+                      disabled={submittingId === currentKey || applicationsLocked}
                       onClick={() => onApply(activeInternship._id, currentDuration.key, false)}
                     >
                       {submittingId === currentKey ? "Submitting..." : "Apply with this duration"}

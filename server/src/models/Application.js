@@ -12,6 +12,16 @@ const STATUSES = [
   "Completed",
   "Rejected"
 ];
+const ACTIVE_LOCK_STATUSES = [
+  "Applied",
+  "Under Review",
+  "Shortlisted",
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested"
+];
 
 const applicationSchema = new mongoose.Schema(
   {
@@ -30,7 +40,7 @@ const applicationSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: STATUSES,
-      default: "Applied",
+      default: "Under Review",
       index: true
     },
     internalNotes: String,
@@ -71,5 +81,14 @@ const applicationSchema = new mongoose.Schema(
 );
 
 applicationSchema.index({ user: 1, internship: 1, durationKey: 1 }, { unique: true });
+applicationSchema.index(
+  { user: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ACTIVE_LOCK_STATUSES }
+    }
+  }
+);
 
 export const Application = mongoose.model("Application", applicationSchema);

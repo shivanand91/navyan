@@ -1,6 +1,7 @@
 import { Application } from "../models/Application.js";
 import { Submission } from "../models/Submission.js";
 import { ensureCertificateForApplication } from "../services/certificateService.js";
+import { sendApplicationStatusEmail } from "../services/emailService.js";
 import { getTimelineState, syncApplicationLifecycle } from "../services/applicationLifecycleService.js";
 
 const ensureStudentApplication = async (applicationId, userId) => {
@@ -124,6 +125,8 @@ export const adminReviewSubmission = async (req, res, next) => {
     submission.adminNotes = adminNotes ?? submission.adminNotes;
 
     const application = submission.application;
+    const previousStatus = application.status;
+    let generatedCertificate = null;
 
     if (action === "request-revision") {
       submission.reviewStatus = "Revision Requested";
@@ -133,7 +136,7 @@ export const adminReviewSubmission = async (req, res, next) => {
       submission.reviewStatus = "Completed";
       submission.revisionRequested = false;
       application.status = "Completed";
-      await ensureCertificateForApplication(application);
+      generatedCertificate = await ensureCertificateForApplication(application);
     } else if (action === "reject") {
       submission.reviewStatus = "Rejected";
       application.status = "Rejected";
@@ -143,6 +146,14 @@ export const adminReviewSubmission = async (req, res, next) => {
 
     await submission.save();
     await application.save();
+    await sendApplicationStatusEmail({
+      user: application.user,
+      internship: application.internship,
+      durationKey: application.durationKey,
+      status: application.status,
+      previousStatus,
+      certificateUrl: generatedCertificate?.pdfUrl
+    });
 
     res.json({ submission });
   } catch (err) {

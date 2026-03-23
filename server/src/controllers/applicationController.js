@@ -8,6 +8,14 @@ import { uploadBuffer } from "../services/cloudinaryUpload.js";
 import { getProfileCompletion } from "../utils/profileCompletion.js";
 import { ensureCertificateForApplication } from "../services/certificateService.js";
 import {
+  buildBlockingWorkflowResponse,
+  findBlockingWorkflow
+} from "../services/applicationAccessService.js";
+import {
+  sendApplicationReceivedEmail,
+  sendApplicationStatusEmail
+} from "../services/emailService.js";
+import {
   getTimelineState,
   syncApplicationLifecycle
 } from "../services/applicationLifecycleService.js";
@@ -21,6 +29,32 @@ const createPaymentReference = (internshipId, durationKey) =>
   `NAVPAY-${durationKey.toUpperCase()}-${String(internshipId).slice(-4).toUpperCase()}-${Date.now()}`;
 
 const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").trim();
+
+const buildApplicationGroups = (applications) =>
+  Object.values(
+    applications.reduce((groups, application) => {
+      const categoryLabel =
+        application.internship?.role || application.internship?.title || "Uncategorized";
+      const categoryKey = categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+      if (!groups[categoryKey]) {
+        groups[categoryKey] = {
+          categoryKey,
+          categoryLabel,
+          applicationCount: 0,
+          statusCounts: {},
+          applications: []
+        };
+      }
+
+      groups[categoryKey].applications.push(application);
+      groups[categoryKey].applicationCount += 1;
+      groups[categoryKey].statusCounts[application.status] =
+        (groups[categoryKey].statusCounts[application.status] || 0) + 1;
+
+      return groups;
+    }, {})
+  ).sort((left, right) => left.categoryLabel.localeCompare(right.categoryLabel));
 
 export const createPaymentIntent = async (req, res, next) => {
   try {
@@ -45,6 +79,11 @@ export const createPaymentIntent = async (req, res, next) => {
       return res.status(400).json({
         message: "You already have an application or payment review for this internship duration"
       });
+    }
+
+    const blockingWorkflow = await findBlockingWorkflow(userId);
+    if (blockingWorkflow) {
+      return res.status(400).json(buildBlockingWorkflowResponse(blockingWorkflow));
     }
 
     const { duration, amount, isPaid } = getDurationPricing(internship, durationKey);
@@ -96,6 +135,12 @@ export const createPaymentIntent = async (req, res, next) => {
         "Complete payment, wait briefly for the payment app to generate the UTR, then submit the 12-digit reference number."
     });
   } catch (err) {
+    if (err?.code === 11000) {
+      const blockingWorkflow = await findBlockingWorkflow(req.user._id);
+      return res.status(400).json(
+        buildBlockingWorkflowResponse(blockingWorkflow)
+      );
+    }
     next(err);
   }
 };
@@ -136,6 +181,11 @@ export const applyToInternship = async (req, res, next) => {
       return res
         .status(400)
         .json({ message: "You already have an application for this internship" });
+    }
+
+    const blockingWorkflow = await findBlockingWorkflow(userId);
+    if (blockingWorkflow) {
+      return res.status(400).json(buildBlockingWorkflowResponse(blockingWorkflow));
     }
 
     let payment = {
@@ -213,6 +263,7 @@ export const applyToInternship = async (req, res, next) => {
       internship: internshipId,
       durationKey,
       motivation,
+      status: "Under Review",
       payment
     });
 
@@ -222,8 +273,20 @@ export const applyToInternship = async (req, res, next) => {
       });
     }
 
+    await sendApplicationReceivedEmail({
+      user: req.user,
+      internship,
+      durationKey
+    });
+
     res.status(201).json({ application });
   } catch (err) {
+    if (err?.code === 11000) {
+      const blockingWorkflow = await findBlockingWorkflow(req.user._id);
+      return res.status(400).json(
+        buildBlockingWorkflowResponse(blockingWorkflow)
+      );
+    }
     next(err);
   }
 };
@@ -297,6 +360,7 @@ export const adminListApplications = async (req, res, next) => {
             application.user?.fullName,
             application.user?.email,
             application.internship?.title,
+            application.internship?.role,
             application.durationKey,
             application.status
           ]
@@ -308,7 +372,10 @@ export const adminListApplications = async (req, res, next) => {
         })
       : applications;
 
-    res.json({ applications: filteredApplications });
+    res.json({
+      applications: filteredApplications,
+      groups: buildApplicationGroups(filteredApplications)
+    });
   } catch (err) {
     next(err);
   }
@@ -328,6 +395,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     const prevStatus = application.status;
+    let generatedCertificate = null;
     if (internalNotes !== undefined) application.internalNotes = internalNotes;
 
     if (paymentDecision) {
@@ -436,10 +504,22 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     if (status === "Completed") {
-      await ensureCertificateForApplication(application);
+      generatedCertificate = await ensureCertificateForApplication(application);
     }
 
     await application.save();
+
+    if (application.status !== prevStatus) {
+      await sendApplicationStatusEmail({
+        user: application.user,
+        internship: application.internship,
+        durationKey: application.durationKey,
+        status: application.status,
+        previousStatus: prevStatus,
+        offerLetterUrl: application.offerLetter?.url,
+        certificateUrl: generatedCertificate?.pdfUrl || application.certificate?.pdfUrl
+      });
+    }
 
     res.json({ application });
   } catch (err) {

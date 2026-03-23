@@ -45,6 +45,16 @@ paymentAttemptSchema.index(
   { user: 1, internship: 1, durationKey: 1, status: 1 },
   { partialFilterExpression: { status: { $in: ["Initiated", "Submitted", "PendingVerification"] } } }
 );
+paymentAttemptSchema.index(
+  { user: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ["Initiated", "Submitted", "PendingVerification"] },
+      application: null
+    }
+  }
+);
 
 paymentAttemptSchema.index({ utrNumber: 1 });
 
