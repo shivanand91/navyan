@@ -49,6 +49,30 @@ const allowedOrigins = [
 
 const originMatchers = [...new Set(allowedOrigins)].map(createOriginMatcher).filter(Boolean);
 
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+    const isAllowed =
+      originMatchers.length === 0 ||
+      originMatchers.some((matcher) => matcher(normalizedOrigin));
+
+    if (isAllowed) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+};
+
 const trustProxySetting = (() => {
   const configured = process.env.TRUST_PROXY;
 
@@ -67,29 +91,8 @@ app.set("trust proxy", trustProxySetting);
 
 // Security & core middleware
 app.use(helmet());
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-
-      const normalizedOrigin = normalizeOrigin(origin);
-      const isAllowed =
-        originMatchers.length === 0 ||
-        originMatchers.some((matcher) => matcher(normalizedOrigin));
-
-      if (isAllowed) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error(`Origin not allowed by CORS: ${origin}`));
-    },
-    credentials: true
-  })
-);
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
