@@ -11,6 +11,7 @@
     "start": "npm run start --prefix server",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
-    "seed:admin": "npm run seed:admin --prefix server"
+    "seed:admin": "npm run seed:admin --prefix server",
+    "verify:email": "npm run verify:email --prefix server"
   }
 }
