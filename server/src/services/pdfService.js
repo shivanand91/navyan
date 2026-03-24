@@ -334,7 +334,7 @@ export const createOfferLetterHtml = async ({
 
         <div class="headline">
           <div>
-            <h1 class="title">Formal confirmation of your internship engagement with ${escapeHtml(
+            <h1 class="title">Formal confirmation of your internship with ${escapeHtml(
               organizationName
             )}</h1>
             <div class="subtitle">
