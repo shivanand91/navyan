@@ -2,7 +2,23 @@ import { Application } from "../models/Application.js";
 import { Submission } from "../models/Submission.js";
 import { ensureCertificateForApplication } from "../services/certificateService.js";
 import { sendApplicationStatusEmail } from "../services/emailService.js";
-import { getTimelineState, syncApplicationLifecycle } from "../services/applicationLifecycleService.js";
+import { syncApplicationLifecycle } from "../services/applicationLifecycleService.js";
+
+const SUBMISSION_ALLOWED_STATUSES = [
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested"
+];
+const REQUIRED_PROJECT_COUNT = 3;
+
+const normalizeProjectEntries = (projects = []) =>
+  Array.from({ length: REQUIRED_PROJECT_COUNT }, (_, index) => ({
+    projectName: String(projects[index]?.projectName || "").trim(),
+    codeLink: String(projects[index]?.codeLink || "").trim(),
+    liveDemoLink: String(projects[index]?.liveDemoLink || "").trim()
+  }));
 
 const ensureStudentApplication = async (applicationId, userId) => {
   const application = await Application.findOne({
@@ -38,7 +54,18 @@ export const listMySubmissionHistory = async (req, res, next) => {
 export const submitProject = async (req, res, next) => {
   try {
     const { applicationId } = req.params;
-    const { projectTitle, codeLink, liveDemoLink, driveLink, notes, confirmation } = req.body;
+    const {
+      studentName,
+      taskName,
+      taskNumber,
+      projectTitle,
+      codeLink,
+      liveDemoLink,
+      projects,
+      driveLink,
+      notes,
+      confirmation
+    } = req.body;
 
     const application = await ensureStudentApplication(applicationId, req.user._id);
     if (!application) {
@@ -46,18 +73,49 @@ export const submitProject = async (req, res, next) => {
     }
 
     syncApplicationLifecycle(application);
-    const timeline = getTimelineState(application);
-    const canSubmit =
-      application.status === "Revision Requested" || timeline?.submissionWindowOpen;
+    const canSubmit = SUBMISSION_ALLOWED_STATUSES.includes(application.status);
 
     if (!canSubmit) {
       return res.status(400).json({
-        message: "Submission window is not open yet. It opens 5 days before internship end date."
+        message: "Task submission becomes available after you are selected for the internship."
       });
     }
 
-    if (!projectTitle || !codeLink || !confirmation) {
-      return res.status(400).json({ message: "Project title, code link, and confirmation are required" });
+    const resolvedStudentName = String(
+      studentName || application.user?.profile?.fullName || application.user?.fullName || ""
+    ).trim();
+    const resolvedTaskName = String(
+      taskName || projectTitle || application.internship?.role || application.internship?.title || ""
+    ).trim();
+    const resolvedTaskNumber = String(
+      taskNumber || `TASK-${String(application._id).slice(-5).toUpperCase()}`
+    ).trim();
+    const normalizedProjects = normalizeProjectEntries(
+      Array.isArray(projects) && projects.length
+        ? projects
+        : [
+            {
+              projectName: projectTitle,
+              codeLink,
+              liveDemoLink
+            }
+          ]
+    );
+    const hasAllProjects = normalizedProjects.every(
+      (project) => project.projectName && project.codeLink
+    );
+
+    if (
+      !resolvedStudentName ||
+      !resolvedTaskName ||
+      !resolvedTaskNumber ||
+      !confirmation ||
+      !hasAllProjects
+    ) {
+      return res.status(400).json({
+        message:
+          "Student name, task name, task number, and all 3 project entries with code links are required"
+      });
     }
 
     const latestSubmission = await Submission.findOne({ application: application._id }).sort({
@@ -67,9 +125,13 @@ export const submitProject = async (req, res, next) => {
     const submission = await Submission.create({
       application: application._id,
       attemptNumber: (latestSubmission?.attemptNumber || 0) + 1,
-      projectTitle,
-      codeLink,
-      liveDemoLink,
+      studentName: resolvedStudentName,
+      taskName: resolvedTaskName,
+      taskNumber: resolvedTaskNumber,
+      projectTitle: normalizedProjects[0].projectName,
+      codeLink: normalizedProjects[0].codeLink,
+      liveDemoLink: normalizedProjects[0].liveDemoLink,
+      projects: normalizedProjects,
       driveLink,
       notes,
       reviewStatus: "Submitted"
@@ -152,6 +214,7 @@ export const adminReviewSubmission = async (req, res, next) => {
       durationKey: application.durationKey,
       status: application.status,
       previousStatus,
+      taskPdfUrl: application.internshipMeta?.taskPdfUrl,
       certificateUrl: generatedCertificate?.pdfUrl
     });
 

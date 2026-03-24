@@ -85,7 +85,7 @@ export default function Login() {
                 Access your Navyan workspace
               </h2>
               <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                Use your student or admin credentials to continue where you left off.
+                Use your student credentials to continue where you left off.
               </p>
             </div>
 

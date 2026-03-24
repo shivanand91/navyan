@@ -19,12 +19,54 @@ const statusOrder = [
   "Rejected"
 ];
 
+const WORKFLOW_TABS = [
+  { key: "new", label: "New", description: "Fresh applications awaiting the first pass." },
+  { key: "review", label: "Review", description: "Needs admin review or revision follow-up." },
+  { key: "inprogress", label: "In Progress", description: "Selected candidates in active execution." },
+  { key: "completed", label: "Completed", description: "Closed workflows and finished internships." }
+];
+
+const TASK_BRIEF_VISIBLE_STATUSES = new Set([
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested",
+  "Completed"
+]);
+
+const getWorkflowBucket = (application) => {
+  if (["Completed", "Rejected"].includes(application.status)) {
+    return "completed";
+  }
+
+  if (["Selected", "In Progress", "Submission Pending"].includes(application.status)) {
+    return "inprogress";
+  }
+
+  if (
+    ["Shortlisted", "Submitted", "Revision Requested"].includes(application.status) ||
+    application.payment?.status === "Pending"
+  ) {
+    return "review";
+  }
+
+  return "new";
+};
+
+const summarizeStatuses = (applications) =>
+  applications.reduce((counts, application) => {
+    counts[application.status] = (counts[application.status] || 0) + 1;
+    return counts;
+  }, {});
+
 export default function AdminApplications() {
   const [applications, setApplications] = useState([]);
   const [groups, setGroups] = useState([]);
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
   const [notesById, setNotesById] = useState({});
+  const [activeWorkflowKey, setActiveWorkflowKey] = useState("new");
 
   const load = async () => {
     try {
@@ -114,6 +156,34 @@ export default function AdminApplications() {
     return Object.values(grouped);
   }, [applications, groups]);
 
+  const workflowTabs = useMemo(
+    () =>
+      WORKFLOW_TABS.map((tab) => ({
+        ...tab,
+        count: applications.filter((application) => getWorkflowBucket(application) === tab.key).length
+      })),
+    [applications]
+  );
+
+  const visibleGroups = useMemo(
+    () =>
+      groupedApplications
+        .map((group) => {
+          const filteredApplications = group.applications.filter(
+            (application) => getWorkflowBucket(application) === activeWorkflowKey
+          );
+
+          return {
+            ...group,
+            applications: filteredApplications,
+            applicationCount: filteredApplications.length,
+            statusCounts: summarizeStatuses(filteredApplications)
+          };
+        })
+        .filter((group) => group.applicationCount > 0),
+    [activeWorkflowKey, groupedApplications]
+  );
+
   const renderApplicationCard = (app) => {
     const paymentStatus = app.payment?.status;
     const requiresPaymentReview = paymentStatus && paymentStatus !== "Not Required";
@@ -175,6 +245,16 @@ export default function AdminApplications() {
                   className="text-primary"
                 >
                   Portfolio
+                </a>
+              )}
+              {TASK_BRIEF_VISIBLE_STATUSES.has(app.status) && app.internshipMeta?.taskPdfUrl && (
+                <a
+                  href={app.internshipMeta.taskPdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary"
+                >
+                  Task brief
                 </a>
               )}
             </div>
@@ -301,10 +381,10 @@ export default function AdminApplications() {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Applications by category
+            Applications by workflow
           </h1>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            Review candidates in grouped category sections instead of one mixed list.
+            Review candidates through focused workflow buckets instead of one long mixed queue.
           </p>
         </div>
         <div className="flex gap-2">
@@ -330,38 +410,79 @@ export default function AdminApplications() {
           </CardContent>
         </Card>
       ) : (
-        groupedApplications.map((group) => (
-          <Card key={group.categoryKey}>
-            <CardHeader className="space-y-3">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Category
+        <>
+          <div className="overflow-x-auto pb-1">
+            <div className="inline-flex min-w-full gap-2 rounded-[24px] border border-slate-200 bg-white/70 p-2 dark:border-white/8 dark:bg-white/5">
+              {workflowTabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveWorkflowKey(tab.key)}
+                  className={`rounded-2xl px-4 py-2 text-left transition ${
+                    activeWorkflowKey === tab.key
+                      ? "bg-[#d4a85f] text-[#111418] shadow-[0_10px_30px_rgba(212,168,95,0.22)]"
+                      : "bg-transparent text-slate-600 hover:bg-slate-100 dark:text-[#b7c0cc] dark:hover:bg-white/6"
+                  }`}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-75">
+                    {tab.label}
                   </p>
-                  <CardTitle className="mt-1 text-base">{group.categoryLabel}</CardTitle>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                    {group.applicationCount} application{group.applicationCount === 1 ? "" : "s"}
+                  <p className="mt-1 text-sm font-semibold">
+                    {tab.count} application
+                    {tab.count === 1 ? "" : "s"}
                   </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {statusOrder
-                    .filter((status) => group.statusCounts?.[status])
-                    .map((status) => (
-                      <span
-                        key={status}
-                        className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
-                      >
-                        {status}: {group.statusCounts[status]}
-                      </span>
-                    ))}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3 text-xs">
-              {group.applications.map(renderApplicationCard)}
-            </CardContent>
-          </Card>
-        ))
+                  <p className="mt-1 max-w-[16rem] text-[11px] opacity-75">{tab.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {visibleGroups.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">No applications in this bucket</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-slate-500 dark:text-slate-400">
+                  No candidates are currently in the {workflowTabs.find((tab) => tab.key === activeWorkflowKey)?.label?.toLowerCase()} queue.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            visibleGroups.map((group) => (
+              <Card key={group.categoryKey}>
+                <CardHeader className="space-y-3">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Role
+                      </p>
+                      <CardTitle className="mt-1 text-base">{group.categoryLabel}</CardTitle>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                        {group.applicationCount} application{group.applicationCount === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {statusOrder
+                        .filter((status) => group.statusCounts?.[status])
+                        .map((status) => (
+                          <span
+                            key={status}
+                            className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
+                          >
+                            {status}: {group.statusCounts[status]}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 text-xs">
+                  {group.applications.map(renderApplicationCard)}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </>
       )}
     </div>
   );

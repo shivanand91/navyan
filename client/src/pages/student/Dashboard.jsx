@@ -20,6 +20,15 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { MetricCard } from "@/components/premium/MetricCard";
 import { RevealInView } from "@/components/premium/RevealInView";
 
+const TASK_LINK_VISIBLE_STATUSES = [
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested",
+  "Completed"
+];
+
 export default function StudentDashboard() {
   const [applications, setApplications] = useState([]);
   const [completion, setCompletion] = useState({ percentage: 0 });
@@ -269,7 +278,8 @@ export default function StudentDashboard() {
                           </Button>
                         </a>
                       ) : null}
-                      {application.internshipMeta?.taskPdfUrl ? (
+                      {TASK_LINK_VISIBLE_STATUSES.includes(application.status) &&
+                      application.internshipMeta?.taskPdfUrl ? (
                         <a href={application.internshipMeta.taskPdfUrl} target="_blank" rel="noreferrer">
                           <Button size="sm" variant="ghost">
                             Task PDF

@@ -20,6 +20,10 @@ import {
   syncApplicationLifecycle
 } from "../services/applicationLifecycleService.js";
 import { buildUpiPaymentPayload, getDurationPricing } from "../services/paymentService.js";
+import {
+  resolveAssignedTaskPdfUrl,
+  shouldExposeAssignedTask
+} from "../services/taskAssignmentService.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
 const PAYMENT_INTENT_TTL_MINUTES = 30;
@@ -90,6 +94,7 @@ export const createPaymentIntent = async (req, res, next) => {
     if (!duration) {
       return res.status(400).json({ message: "Invalid duration selected" });
     }
+
     if (!isPaid) {
       return res.status(400).json({ message: "Payment is not required for this duration" });
     }
@@ -302,7 +307,24 @@ export const listMyApplications = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     for (const application of applications) {
-      const changed = syncApplicationLifecycle(application);
+      let changed = syncApplicationLifecycle(application);
+      const shouldAssignTask = shouldExposeAssignedTask(application);
+      const taskPdfUrl = shouldAssignTask
+        ? resolveAssignedTaskPdfUrl({
+            internship: application.internship,
+            durationKey: application.durationKey,
+            existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
+          })
+        : "";
+
+      if (shouldAssignTask && taskPdfUrl && application.internshipMeta?.taskPdfUrl !== taskPdfUrl) {
+        application.internshipMeta = {
+          ...(application.internshipMeta || {}),
+          taskPdfUrl
+        };
+        changed = true;
+      }
+
       if (changed) {
         await application.save();
       }
@@ -316,6 +338,7 @@ export const listMyApplications = async (req, res, next) => {
 
         return {
           ...application.toObject(),
+          studentName: req.user?.profile?.fullName || req.user?.fullName || "Student",
           timeline: getTimelineState(application),
           submissions
         };
@@ -345,7 +368,24 @@ export const adminListApplications = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     for (const application of applications) {
-      const changed = syncApplicationLifecycle(application);
+      let changed = syncApplicationLifecycle(application);
+      const shouldAssignTask = shouldExposeAssignedTask(application);
+      const taskPdfUrl = shouldAssignTask
+        ? resolveAssignedTaskPdfUrl({
+            internship: application.internship,
+            durationKey: application.durationKey,
+            existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
+          })
+        : "";
+
+      if (shouldAssignTask && taskPdfUrl && application.internshipMeta?.taskPdfUrl !== taskPdfUrl) {
+        application.internshipMeta = {
+          ...(application.internshipMeta || {}),
+          taskPdfUrl
+        };
+        changed = true;
+      }
+
       if (changed) {
         await application.save();
       }
@@ -466,7 +506,11 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         ...(application.internshipMeta || {}),
         startDate,
         endDate,
-        taskPdfUrl: durationOption?.taskPdfUrl || application.internshipMeta?.taskPdfUrl
+        taskPdfUrl: resolveAssignedTaskPdfUrl({
+          internship,
+          durationKey: application.durationKey,
+          existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
+        })
       };
 
       const offerId = `NAV-OFFER-${new Date().getFullYear()}-${String(application._id).slice(-6).toUpperCase()}`;
@@ -517,6 +561,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         status: application.status,
         previousStatus: prevStatus,
         offerLetterUrl: application.offerLetter?.url,
+        taskPdfUrl: application.internshipMeta?.taskPdfUrl,
         certificateUrl: generatedCertificate?.pdfUrl || application.certificate?.pdfUrl
       });
     }

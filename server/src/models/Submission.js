@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const projectItemSchema = new mongoose.Schema(
+  {
+    projectName: { type: String, required: true },
+    codeLink: { type: String, required: true },
+    liveDemoLink: String
+  },
+  { _id: false }
+);
+
 const submissionSchema = new mongoose.Schema(
   {
     application: {
@@ -8,9 +17,13 @@ const submissionSchema = new mongoose.Schema(
       required: true
     },
     attemptNumber: { type: Number, default: 1 },
+    studentName: { type: String, required: true },
+    taskName: { type: String, required: true },
+    taskNumber: { type: String, required: true },
     projectTitle: { type: String, required: true },
     codeLink: { type: String, required: true },
     liveDemoLink: String,
+    projects: [projectItemSchema],
     driveLink: String,
     notes: String,
     submittedAt: { type: Date, default: Date.now },

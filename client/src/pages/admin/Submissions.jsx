@@ -72,7 +72,7 @@ export default function AdminSubmissions() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {item.application?.user?.fullName || "Student"} ·{" "}
+                      {item.studentName || item.application?.user?.fullName || "Student"} ·{" "}
                       <span className="text-slate-500 dark:text-slate-400">
                         {item.application?.internship?.title || "Internship"}
                       </span>
@@ -82,20 +82,48 @@ export default function AdminSubmissions() {
                       {new Date(item.submittedAt).toLocaleDateString()} ·{" "}
                       {item.application?.durationKey}
                     </p>
-                    <div className="flex flex-wrap gap-3 pt-2 text-xs">
-                      <a href={item.codeLink} target="_blank" rel="noreferrer" className="text-primary">
-                        Code
-                      </a>
-                      {item.liveDemoLink && (
-                        <a
-                          href={item.liveDemoLink}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-primary"
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Task: {item.taskName || item.projectTitle} · Task No: {item.taskNumber || "Not added"}
+                    </p>
+                    <div className="space-y-2 pt-2 text-xs">
+                      {(item.projects?.length ? item.projects : [
+                        {
+                          projectName: item.projectTitle,
+                          codeLink: item.codeLink,
+                          liveDemoLink: item.liveDemoLink
+                        }
+                      ]).map((project, index) => (
+                        <div
+                          key={`${item._id}-project-${index}`}
+                          className="rounded-2xl border border-slate-200/80 bg-white/60 px-3 py-2 dark:border-white/8 dark:bg-white/5"
                         >
-                          Live demo
-                        </a>
-                      )}
+                          <p className="font-medium text-slate-800 dark:text-slate-100">
+                            Project {index + 1}: {project.projectName || `Project ${index + 1}`}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-3">
+                            {project.codeLink && (
+                              <a
+                                href={project.codeLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary"
+                              >
+                                Code
+                              </a>
+                            )}
+                            {project.liveDemoLink && (
+                              <a
+                                href={project.liveDemoLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary"
+                              >
+                                Live demo
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                       {item.driveLink && (
                         <a href={item.driveLink} target="_blank" rel="noreferrer" className="text-primary">
                           Drive files

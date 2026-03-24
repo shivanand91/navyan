@@ -5,17 +5,83 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { ModalShell } from "@/components/premium/ModalShell";
 import { toast } from "sonner";
+
+const TASK_WORKSPACE_STATUSES = [
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested"
+];
+
+const TASK_LINK_VISIBLE_STATUSES = [...TASK_WORKSPACE_STATUSES, "Completed"];
+const PROJECT_SLOT_COUNT = 3;
+
+const buildDefaultTaskNumber = (application) =>
+  `TASK-${String(application?._id || "").slice(-5).toUpperCase()}`;
+
+const buildDefaultProjects = (application) => {
+  const latestSubmission = application?.submissions?.[0];
+  const sourceProjects =
+    latestSubmission?.projects?.length
+      ? latestSubmission.projects
+      : [
+          {
+            projectName: latestSubmission?.projectTitle || "",
+            codeLink: latestSubmission?.codeLink || "",
+            liveDemoLink: latestSubmission?.liveDemoLink || ""
+          }
+        ];
+
+  return Array.from({ length: PROJECT_SLOT_COUNT }, (_, index) => ({
+    projectName: sourceProjects[index]?.projectName || "",
+    codeLink: sourceProjects[index]?.codeLink || "",
+    liveDemoLink: sourceProjects[index]?.liveDemoLink || ""
+  }));
+};
+
+const buildDefaultFormState = (application) => {
+  const latestSubmission = application?.submissions?.[0];
+
+  return {
+    studentName: application?.studentName || latestSubmission?.studentName || "",
+    taskName:
+      latestSubmission?.taskName ||
+      latestSubmission?.projectTitle ||
+      application?.internship?.role ||
+      application?.internship?.title ||
+      "",
+    taskNumber: latestSubmission?.taskNumber || buildDefaultTaskNumber(application),
+    projects: buildDefaultProjects(application),
+    driveLink: "",
+    notes: ""
+  };
+};
 
 export default function Applications() {
   const [applications, setApplications] = useState([]);
   const [forms, setForms] = useState({});
   const [busyId, setBusyId] = useState(null);
+  const [activeSubmissionId, setActiveSubmissionId] = useState(null);
 
   const load = async () => {
     try {
       const { data } = await api.get("/applications/me");
-      setApplications(data.applications || []);
+      const nextApplications = data.applications || [];
+      setApplications(nextApplications);
+      setForms((prev) =>
+        Object.fromEntries(
+          nextApplications.map((application) => [
+            application._id,
+            {
+              ...buildDefaultFormState(application),
+              ...(prev[application._id] || {})
+            }
+          ])
+        )
+      );
     } catch (e) {
       console.error(e);
     }
@@ -25,6 +91,29 @@ export default function Applications() {
     load();
   }, []);
 
+  const activeSubmissionApplication = applications.find(
+    (application) => application._id === activeSubmissionId
+  );
+
+  const updateFormField = (applicationId, key, value) => {
+    setForms((prev) => ({
+      ...prev,
+      [applicationId]: { ...prev[applicationId], [key]: value }
+    }));
+  };
+
+  const updateProjectField = (applicationId, projectIndex, key, value) => {
+    setForms((prev) => ({
+      ...prev,
+      [applicationId]: {
+        ...prev[applicationId],
+        projects: (prev[applicationId]?.projects || []).map((project, index) =>
+          index === projectIndex ? { ...project, [key]: value } : project
+        )
+      }
+    }));
+  };
+
   const submitProject = async (applicationId) => {
     setBusyId(applicationId);
     try {
@@ -32,8 +121,8 @@ export default function Applications() {
         ...forms[applicationId],
         confirmation: true
       });
-      toast.success("Project submitted successfully.");
-      setForms((prev) => ({ ...prev, [applicationId]: {} }));
+      toast.success("Task submission saved successfully.");
+      setActiveSubmissionId(null);
       load();
     } catch (error) {
       console.error(error);
@@ -95,14 +184,15 @@ export default function Applications() {
                   <StatusBadge status={app.status} />
                 </div>
 
-                {(app.offerLetter?.url || app.internshipMeta?.taskPdfUrl) && (
+                {(app.offerLetter?.url ||
+                  (TASK_LINK_VISIBLE_STATUSES.includes(app.status) && app.internshipMeta?.taskPdfUrl)) && (
                   <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
                     {app.offerLetter?.url && (
                       <a href={app.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary">
                         Offer letter
                       </a>
                     )}
-                    {app.internshipMeta?.taskPdfUrl && (
+                    {TASK_LINK_VISIBLE_STATUSES.includes(app.status) && app.internshipMeta?.taskPdfUrl && (
                       <a
                         href={app.internshipMeta.taskPdfUrl}
                         target="_blank"
@@ -144,74 +234,21 @@ export default function Applications() {
                   </div>
                 )}
 
-                {(app.timeline?.submissionWindowOpen || app.status === "Revision Requested") && (
-                  <div className="mt-4 space-y-3 rounded-3xl border border-[#e4d4ad] bg-[#f8efdd]/65 p-4 dark:border-[#4b3f29] dark:bg-[#2b2417]/40">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Final submission</p>
-                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        Submit your final project links. Revision requests allow resubmission.
-                      </p>
+                {TASK_WORKSPACE_STATUSES.includes(app.status) && (
+                  <div className="mt-4 rounded-3xl border border-[#e4d4ad] bg-[#f8efdd]/65 p-4 dark:border-[#4b3f29] dark:bg-[#2b2417]/40">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          Task submission workspace
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          Open a dedicated modal and submit all 3 project links together.
+                        </p>
+                      </div>
+                      <Button size="sm" onClick={() => setActiveSubmissionId(app._id)}>
+                        Open submission workspace
+                      </Button>
                     </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <Input
-                        placeholder="Project title"
-                        value={forms[app._id]?.projectTitle || ""}
-                        onChange={(event) =>
-                          setForms((prev) => ({
-                            ...prev,
-                            [app._id]: { ...prev[app._id], projectTitle: event.target.value }
-                          }))
-                        }
-                      />
-                      <Input
-                        placeholder="GitHub / code link"
-                        value={forms[app._id]?.codeLink || ""}
-                        onChange={(event) =>
-                          setForms((prev) => ({
-                            ...prev,
-                            [app._id]: { ...prev[app._id], codeLink: event.target.value }
-                          }))
-                        }
-                      />
-                      <Input
-                        placeholder="Live demo link (optional)"
-                        value={forms[app._id]?.liveDemoLink || ""}
-                        onChange={(event) =>
-                          setForms((prev) => ({
-                            ...prev,
-                            [app._id]: { ...prev[app._id], liveDemoLink: event.target.value }
-                          }))
-                        }
-                      />
-                      <Input
-                        placeholder="Drive / ZIP link (optional)"
-                        value={forms[app._id]?.driveLink || ""}
-                        onChange={(event) =>
-                          setForms((prev) => ({
-                            ...prev,
-                            [app._id]: { ...prev[app._id], driveLink: event.target.value }
-                          }))
-                        }
-                      />
-                    </div>
-                    <Textarea
-                      rows={3}
-                      placeholder="Project notes or explanation"
-                      value={forms[app._id]?.notes || ""}
-                      onChange={(event) =>
-                        setForms((prev) => ({
-                          ...prev,
-                          [app._id]: { ...prev[app._id], notes: event.target.value }
-                        }))
-                      }
-                    />
-                    <Button
-                      size="sm"
-                      disabled={busyId === app._id}
-                      onClick={() => submitProject(app._id)}
-                    >
-                      {busyId === app._id ? "Submitting..." : "Submit project"}
-                    </Button>
                   </div>
                 )}
 
@@ -221,13 +258,61 @@ export default function Applications() {
                     {app.submissions.map((submission) => (
                       <div
                         key={submission._id}
-                        className="flex flex-col gap-1 rounded-2xl border border-slate-200 px-3 py-2 text-[11px] text-slate-500 dark:border-[#2a2a36] dark:text-slate-400 md:flex-row md:items-center md:justify-between"
+                        className="flex flex-col gap-2 rounded-2xl border border-slate-200 px-3 py-3 text-[11px] text-slate-500 dark:border-[#2a2a36] dark:text-slate-400"
                       >
-                        <span>
-                          Attempt {submission.attemptNumber} ·{" "}
-                          {new Date(submission.submittedAt).toLocaleDateString()}
-                        </span>
-                        <StatusBadge status={submission.reviewStatus} />
+                        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                          <span>
+                            Attempt {submission.attemptNumber} ·{" "}
+                            {new Date(submission.submittedAt).toLocaleDateString()}
+                          </span>
+                          <StatusBadge status={submission.reviewStatus} />
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          <span>Task: {submission.taskName || submission.projectTitle}</span>
+                          <span>Task no: {submission.taskNumber || "Not added"}</span>
+                        </div>
+                        <div className="grid gap-2 md:grid-cols-3">
+                          {(submission.projects?.length
+                            ? submission.projects
+                            : [
+                                {
+                                  projectName: submission.projectTitle,
+                                  codeLink: submission.codeLink,
+                                  liveDemoLink: submission.liveDemoLink
+                                }
+                              ]).map((project, index) => (
+                            <div
+                              key={`${submission._id}-project-${index}`}
+                              className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 dark:border-white/8 dark:bg-white/5"
+                            >
+                              <p className="font-medium text-slate-700 dark:text-slate-100">
+                                Project {index + 1}: {project.projectName || `Project ${index + 1}`}
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-3">
+                                {project.codeLink && (
+                                  <a
+                                    href={project.codeLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-primary"
+                                  >
+                                    Code link
+                                  </a>
+                                )}
+                                {project.liveDemoLink && (
+                                  <a
+                                    href={project.liveDemoLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-primary"
+                                  >
+                                    Live demo
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -237,6 +322,172 @@ export default function Applications() {
           )}
         </CardContent>
       </Card>
+
+      <ModalShell
+        open={Boolean(activeSubmissionApplication)}
+        onClose={() => setActiveSubmissionId(null)}
+        title={activeSubmissionApplication ? `Submit projects for ${activeSubmissionApplication.internship?.title || "internship"}` : ""}
+        description="Add all 3 project entries together. Each project needs a name and code link. Live demo is optional."
+        className="max-w-5xl"
+      >
+        {activeSubmissionApplication ? (
+          <div className="space-y-5">
+            <div className="grid gap-3 md:grid-cols-3">
+              <FieldCard label="Student name">
+                <Input
+                  value={forms[activeSubmissionApplication._id]?.studentName || ""}
+                  onChange={(event) =>
+                    updateFormField(
+                      activeSubmissionApplication._id,
+                      "studentName",
+                      event.target.value
+                    )
+                  }
+                />
+              </FieldCard>
+              <FieldCard label="Task name">
+                <Input
+                  value={forms[activeSubmissionApplication._id]?.taskName || ""}
+                  onChange={(event) =>
+                    updateFormField(
+                      activeSubmissionApplication._id,
+                      "taskName",
+                      event.target.value
+                    )
+                  }
+                />
+              </FieldCard>
+              <FieldCard label="Task number">
+                <Input
+                  value={forms[activeSubmissionApplication._id]?.taskNumber || ""}
+                  onChange={(event) =>
+                    updateFormField(
+                      activeSubmissionApplication._id,
+                      "taskNumber",
+                      event.target.value
+                    )
+                  }
+                />
+              </FieldCard>
+            </div>
+
+            {activeSubmissionApplication.internshipMeta?.taskPdfUrl ? (
+              <a
+                href={activeSubmissionApplication.internshipMeta.taskPdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex text-sm font-medium text-primary"
+              >
+                Open assigned task brief
+              </a>
+            ) : null}
+
+            <div className="grid gap-4 xl:grid-cols-3">
+              {(forms[activeSubmissionApplication._id]?.projects || []).map((project, index) => (
+                <div
+                  key={`${activeSubmissionApplication._id}-editor-project-${index}`}
+                  className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 dark:border-white/8 dark:bg-white/5"
+                >
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    Project {index + 1}
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    <Input
+                      placeholder={`Project ${index + 1} name`}
+                      value={project.projectName || ""}
+                      onChange={(event) =>
+                        updateProjectField(
+                          activeSubmissionApplication._id,
+                          index,
+                          "projectName",
+                          event.target.value
+                        )
+                      }
+                    />
+                    <Input
+                      placeholder="GitHub / code link"
+                      value={project.codeLink || ""}
+                      onChange={(event) =>
+                        updateProjectField(
+                          activeSubmissionApplication._id,
+                          index,
+                          "codeLink",
+                          event.target.value
+                        )
+                      }
+                    />
+                    <Input
+                      placeholder="Live demo link (optional)"
+                      value={project.liveDemoLink || ""}
+                      onChange={(event) =>
+                        updateProjectField(
+                          activeSubmissionApplication._id,
+                          index,
+                          "liveDemoLink",
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <FieldCard label="Drive / ZIP link">
+                <Input
+                  placeholder="Optional final files link"
+                  value={forms[activeSubmissionApplication._id]?.driveLink || ""}
+                  onChange={(event) =>
+                    updateFormField(
+                      activeSubmissionApplication._id,
+                      "driveLink",
+                      event.target.value
+                    )
+                  }
+                />
+              </FieldCard>
+              <FieldCard label="Notes">
+                <Textarea
+                  rows={4}
+                  placeholder="Any project explanation or submission notes"
+                  value={forms[activeSubmissionApplication._id]?.notes || ""}
+                  onChange={(event) =>
+                    updateFormField(
+                      activeSubmissionApplication._id,
+                      "notes",
+                      event.target.value
+                    )
+                  }
+                />
+              </FieldCard>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                disabled={busyId === activeSubmissionApplication._id}
+                onClick={() => submitProject(activeSubmissionApplication._id)}
+              >
+                {busyId === activeSubmissionApplication._id ? "Submitting..." : "Submit all projects"}
+              </Button>
+              <Button variant="outline" onClick={() => setActiveSubmissionId(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </ModalShell>
+    </div>
+  );
+}
+
+function FieldCard({ label, children }) {
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+        {label}
+      </p>
+      {children}
     </div>
   );
 }

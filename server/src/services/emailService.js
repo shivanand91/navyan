@@ -256,7 +256,8 @@ const buildEmailLayout = ({
   intro,
   summaryRows,
   nextStep,
-  primaryAction
+  primaryAction,
+  secondaryAction
 }) => `<!doctype html>
 <html>
   <body style="margin:0;background:#0b0d10;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f5f7fa;">
@@ -291,6 +292,15 @@ const buildEmailLayout = ({
               ? `<div style="margin-top:22px;">
               <a href="${primaryAction.href}" style="display:inline-block;padding:13px 20px;border-radius:16px;background:#d4a85f;color:#111418;font-size:14px;font-weight:700;text-decoration:none;">
                 ${primaryAction.label}
+              </a>
+            </div>`
+              : ""
+          }
+          ${
+            secondaryAction
+              ? `<div style="margin-top:12px;">
+              <a href="${secondaryAction.href}" style="display:inline-block;padding:12px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:#1a2027;color:#f5f7fa;font-size:14px;font-weight:600;text-decoration:none;">
+                ${secondaryAction.label}
               </a>
             </div>`
               : ""
@@ -373,6 +383,7 @@ export const sendApplicationStatusEmail = async ({
   status,
   previousStatus,
   offerLetterUrl,
+  taskPdfUrl,
   certificateUrl
 }) => {
   const recipient = getRecipientEmail(user);
@@ -391,12 +402,32 @@ export const sendApplicationStatusEmail = async ({
     href: dashboardUrl,
     label: "Open dashboard"
   };
+  let secondaryAction = null;
 
-  if (status === "Selected" && offerLetterUrl) {
-    action = {
-      href: offerLetterUrl,
-      label: "View offer letter"
-    };
+  if (status === "Selected") {
+    if (offerLetterUrl) {
+      action = {
+        href: offerLetterUrl,
+        label: "View offer letter"
+      };
+    }
+
+    if (taskPdfUrl) {
+      secondaryAction = offerLetterUrl
+        ? {
+            href: taskPdfUrl,
+            label: "Open task brief"
+          }
+        : {
+            href: taskPdfUrl,
+            label: "Open task brief"
+          };
+
+      if (!offerLetterUrl) {
+        action = secondaryAction;
+        secondaryAction = null;
+      }
+    }
   }
 
   if (status === "Completed" && certificateUrl) {
@@ -422,7 +453,8 @@ export const sendApplicationStatusEmail = async ({
         { label: "Current status", value: status }
       ],
       nextStep: meta.nextStep,
-      primaryAction: action
+      primaryAction: action,
+      secondaryAction
     })
   });
 };

@@ -5,17 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
+const createEmptyForm = () => ({
+  title: "",
+  slug: "",
+  shortDescription: "",
+  role: "",
+  mode: "remote"
+});
+
 export default function AdminInternships() {
   const [internships, setInternships] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    slug: "",
-    shortDescription: "",
-    role: "",
-    mode: "remote"
-  });
+  const [form, setForm] = useState(createEmptyForm());
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   const load = async () => {
     try {
@@ -34,28 +37,55 @@ export default function AdminInternships() {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  const handleCreate = async (e) => {
+  const resetForm = () => {
+    setForm(createEmptyForm());
+    setEditingId(null);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.post("/internships/admin", {
-        ...form,
-        shortDescription: form.shortDescription,
-        isPublished: true,
-        durations: [
-          { key: "4-weeks", label: "4 weeks", isPaid: false },
-          { key: "3-months", label: "3 months", isPaid: true },
-          { key: "6-months", label: "6 months", isPaid: true }
-        ]
-      });
-      toast.success("Internship created.");
-      setForm({ title: "", slug: "", shortDescription: "", role: "", mode: "remote" });
+      if (editingId) {
+        await api.put(`/internships/admin/${editingId}`, {
+          ...form,
+          shortDescription: form.shortDescription
+        });
+        toast.success("Internship updated.");
+      } else {
+        await api.post("/internships/admin", {
+          ...form,
+          shortDescription: form.shortDescription,
+          isPublished: true,
+          durations: [
+            { key: "4-weeks", label: "4 weeks", isPaid: false },
+            { key: "3-months", label: "3 months", isPaid: true },
+            { key: "6-months", label: "6 months", isPaid: true }
+          ]
+        });
+        toast.success("Internship created.");
+      }
+      resetForm();
       load();
     } catch (e) {
       console.error(e);
-      toast.error("Could not create internship.");
+      toast.error(editingId ? "Could not update internship." : "Could not create internship.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleEdit = (internship) => {
+    setEditingId(internship._id);
+    setForm({
+      title: internship.title || "",
+      slug: internship.slug || "",
+      shortDescription: internship.shortDescription || "",
+      role: internship.role || "",
+      mode: internship.mode || "remote"
+    });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -94,7 +124,7 @@ export default function AdminInternships() {
       </div>
 
       <form
-        onSubmit={handleCreate}
+        onSubmit={handleSubmit}
         className="navyan-card grid gap-4 p-5 md:grid-cols-4 text-xs"
       >
         <Field label="Title">
@@ -119,9 +149,22 @@ export default function AdminInternships() {
           </Field>
         </div>
         <div className="md:col-span-1 flex items-end">
-          <Button type="submit" disabled={saving} className="w-full">
-            {saving ? "Creating..." : "Create internship"}
-          </Button>
+          <div className="flex w-full gap-2">
+            <Button type="submit" disabled={saving} className="w-full">
+              {saving
+                ? editingId
+                  ? "Updating..."
+                  : "Creating..."
+                : editingId
+                  ? "Update internship"
+                  : "Create internship"}
+            </Button>
+            {editingId ? (
+              <Button type="button" variant="outline" onClick={resetForm}>
+                Cancel
+              </Button>
+            ) : null}
+          </div>
         </div>
       </form>
 
@@ -148,6 +191,14 @@ export default function AdminInternships() {
                   <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-700">
                     {i.isPublished ? "Published" : "Draft"}
                   </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(i)}
+                  >
+                    Edit
+                  </Button>
                   <Button
                     type="button"
                     size="sm"
