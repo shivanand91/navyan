@@ -56,20 +56,20 @@ const getLogoDataUri = async () => {
 
 const getSignatureDataUri = (name, tone = "#1f1728") =>
   createSvgDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="420" height="120" viewBox="0 0 420 120">
+    <svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120">
       <defs>
         <linearGradient id="ink" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="${tone}" />
           <stop offset="100%" stop-color="#6d28d9" />
         </linearGradient>
       </defs>
-      <path d="M26 92 C72 54, 128 44, 186 64 S310 104, 394 70" fill="none" stroke="rgba(212,168,95,0.22)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M24 92 C88 50, 170 42, 252 64 S416 104, 534 70" fill="none" stroke="rgba(212,168,95,0.22)" stroke-width="5" stroke-linecap="round"/>
       <text
-        x="16"
+        x="14"
         y="78"
         fill="url(#ink)"
         font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
-        font-size="48"
+        font-size="46"
         font-weight="600"
         letter-spacing="1"
       >${escapeHtml(name)}</text>
@@ -283,8 +283,9 @@ export const createOfferLetterHtml = async ({
           gap: 18px;
         }
         .signature {
-          width: 148px;
+          width: 168px;
           height: auto;
+          max-width: 100%;
         }
         .sig-line {
           margin-top: 2px;
