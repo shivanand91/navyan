@@ -1,6 +1,6 @@
 import { spawnSync } from "child_process";
 import { existsSync } from "fs";
-import htmlPdfNode from "html-pdf-node";
+import puppeteer from "puppeteer";
 
 const normalizeBrowserValue = (value) =>
   typeof value === "string" ? value.trim().replace(/^['"]|['"]$/g, "") : "";
@@ -51,6 +51,14 @@ const PDF_BROWSER_CANDIDATES = [
   "chromium-browser"
 ];
 
+const PDF_BROWSER_ARGS = [
+  "--no-sandbox",
+  "--disable-setuid-sandbox",
+  "--disable-dev-shm-usage",
+  "--disable-gpu",
+  "--no-zygote"
+];
+
 const resolvePdfBrowserPath = () => {
   for (const candidate of PDF_BROWSER_CANDIDATES) {
     const resolvedPath = resolveBrowserCandidate(candidate);
@@ -63,8 +71,17 @@ const resolvePdfBrowserPath = () => {
   return null;
 };
 
-const ensurePdfBrowserPath = () => {
-  const browserPath = resolvePdfBrowserPath();
+const resolveBundledPuppeteerPath = () => {
+  try {
+    const executablePath = puppeteer.executablePath?.();
+    return executablePath && existsSync(executablePath) ? executablePath : null;
+  } catch {
+    return null;
+  }
+};
+
+const resolveLaunchExecutablePath = () => {
+  const browserPath = resolvePdfBrowserPath() || resolveBundledPuppeteerPath();
 
   if (browserPath) {
     process.env.PUPPETEER_EXECUTABLE_PATH = browserPath;
@@ -74,11 +91,11 @@ const ensurePdfBrowserPath = () => {
 };
 
 export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
-  const browserPath = ensurePdfBrowserPath();
-  const file = { content: html };
+  const browserPath = resolveLaunchExecutablePath();
   const options = {
     format: "A4",
     printBackground: true,
+    preferCSSPageSize: true,
     margin: {
       top: "12mm",
       right: "10mm",
@@ -87,12 +104,33 @@ export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
     },
     ...optionOverrides
   };
+  const launchOptions = {
+    headless: true,
+    args: PDF_BROWSER_ARGS
+  };
+
+  if (browserPath) {
+    launchOptions.executablePath = browserPath;
+  } else {
+    throw new Error(
+      "PDF generation could not find a Chrome/Chromium browser. Set PDF_BROWSER_PATH to a valid Chrome/Chromium executable on the server."
+    );
+  }
+
+  let browser;
 
   try {
-    const buffer = await htmlPdfNode.generatePdf(file, options);
+    browser = await puppeteer.launch(launchOptions);
+    const page = await browser.newPage();
+    await page.emulateMediaType("screen");
+    await page.setContent(html, {
+      waitUntil: "networkidle0"
+    });
+
+    const buffer = await page.pdf(options);
     return buffer;
   } catch (error) {
-    if (String(error?.message || "").includes("Could not find expected browser")) {
+    if (String(error?.message || "").includes("Failed to launch the browser process")) {
       throw new Error(
         browserPath
           ? `PDF generation could not launch the configured browser at ${browserPath}.`
@@ -101,5 +139,7 @@ export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
     }
 
     throw error;
+  } finally {
+    await browser?.close().catch(() => {});
   }
 };
