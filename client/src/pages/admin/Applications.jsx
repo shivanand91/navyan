@@ -93,7 +93,7 @@ export default function AdminApplications() {
   const handlePaymentDecision = async (id, paymentDecision) => {
     setUpdatingId(`${id}:payment:${paymentDecision}`);
     try {
-      await api.patch(`/applications/admin/${id}`, {
+      await api.post(`/applications/admin/${id}/action`, {
         paymentDecision,
         internalNotes: notesById[id]
       });
@@ -112,7 +112,7 @@ export default function AdminApplications() {
   const handleStatusChange = async (id, status) => {
     setUpdatingId(`${id}:status:${status}`);
     try {
-      await api.patch(`/applications/admin/${id}`, {
+      await api.post(`/applications/admin/${id}/action`, {
         status,
         internalNotes: notesById[id]
       });

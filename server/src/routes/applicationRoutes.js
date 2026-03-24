@@ -19,6 +19,8 @@ router.get("/:id/offer-letter", protect, getOfferLetterPdf);
 
 // Admin
 router.get("/admin", protect, requireAdmin, adminListApplications);
+router.post("/admin/:id/action", protect, requireAdmin, adminUpdateApplicationStatus);
+router.post("/admin/:id", protect, requireAdmin, adminUpdateApplicationStatus);
 router.patch("/admin/:id", protect, requireAdmin, adminUpdateApplicationStatus);
 
 export default router;
