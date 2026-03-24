@@ -196,7 +196,8 @@ export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
       waitUntil: "networkidle0"
     });
 
-    return await page.pdf(options);
+    const pdfBytes = await page.pdf(options);
+    return Buffer.from(pdfBytes);
   } catch (error) {
     const message = String(error?.message || "");
 
