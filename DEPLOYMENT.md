@@ -12,6 +12,8 @@ Recommended stack:
 - Database: MongoDB Atlas
 - File storage: Cloudinary
 
+If you do deploy the backend on Vercel, the PDF layer now uses bundled serverless Chromium automatically. You do not need to install system Chrome there, and `PDF_BROWSER_PATH` is only needed for non-serverless hosts.
+
 ## 1. Pre-deploy checklist
 
 - Use a managed MongoDB connection string in `MONGODB_URI`
@@ -62,6 +64,7 @@ Optional backend environment variables:
 - `SEED_ADMIN_PASSWORD=change_this_password`
 - `DOCUMENT_LOGO_URL=https://your-public-logo-url/logo.svg`
 - `DOCUMENT_LOGO_PATH=/absolute/path/to/logo.svg`
+- `PDF_BROWSER_PATH=/usr/bin/google-chrome` for non-serverless Linux hosts only
 - `CLOUDINARY_CLOUD_NAME=...`
 - `CLOUDINARY_API_KEY=...`
 - `CLOUDINARY_API_SECRET=...`

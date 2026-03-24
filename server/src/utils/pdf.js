@@ -1,7 +1,25 @@
 import "../config/env.js";
+import chromium from "@sparticuz/chromium";
 import { spawnSync } from "child_process";
 import { existsSync } from "fs";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+
+const PDF_DEFAULT_VIEWPORT = {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  isMobile: false,
+  hasTouch: false,
+  isLandscape: false
+};
+
+const PDF_BROWSER_ARGS = [
+  "--no-sandbox",
+  "--disable-setuid-sandbox",
+  "--disable-dev-shm-usage",
+  "--disable-gpu",
+  "--no-zygote"
+];
 
 const normalizeBrowserValue = (value) =>
   typeof value === "string" ? value.trim().replace(/^['"]|['"]$/g, "") : "";
@@ -54,14 +72,6 @@ const getPdfBrowserCandidates = () => [
   "chromium-browser"
 ];
 
-const PDF_BROWSER_ARGS = [
-  "--no-sandbox",
-  "--disable-setuid-sandbox",
-  "--disable-dev-shm-usage",
-  "--disable-gpu",
-  "--no-zygote"
-];
-
 const resolveBrowserPathFromEnvPath = () => {
   const systemPath = normalizeBrowserValue(process.env.PATH);
   if (!systemPath) return null;
@@ -86,39 +96,79 @@ const resolveBrowserPathFromEnvPath = () => {
   return null;
 };
 
-const resolvePdfBrowserPath = () => {
+const resolveLocalBrowserPath = () => {
   for (const candidate of getPdfBrowserCandidates()) {
     const resolvedPath = resolveBrowserCandidate(candidate);
-
     if (resolvedPath) {
+      process.env.PUPPETEER_EXECUTABLE_PATH = resolvedPath;
       return resolvedPath;
     }
   }
 
-  return resolveBrowserPathFromEnvPath();
-};
-
-const resolveBundledPuppeteerPath = () => {
-  try {
-    const executablePath = puppeteer.executablePath?.();
-    return executablePath && existsSync(executablePath) ? executablePath : null;
-  } catch {
-    return null;
-  }
-};
-
-const resolveLaunchExecutablePath = () => {
-  const browserPath = resolvePdfBrowserPath() || resolveBundledPuppeteerPath();
-
-  if (browserPath) {
-    process.env.PUPPETEER_EXECUTABLE_PATH = browserPath;
+  const resolvedFromPath = resolveBrowserPathFromEnvPath();
+  if (resolvedFromPath) {
+    process.env.PUPPETEER_EXECUTABLE_PATH = resolvedFromPath;
   }
 
-  return browserPath;
+  return resolvedFromPath;
+};
+
+const isServerlessChromiumRuntime = () =>
+  Boolean(
+    process.env.VERCEL ||
+      process.env.AWS_EXECUTION_ENV ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.AWS_LAMBDA_FUNCTION_VERSION ||
+      process.env.LAMBDA_TASK_ROOT
+  );
+
+const resolveLaunchConfig = async () => {
+  if (isServerlessChromiumRuntime()) {
+    chromium.setGraphicsMode = false;
+    const executablePath = await chromium.executablePath();
+
+    if (!executablePath) {
+      throw new Error(
+        "PDF generation could not prepare the serverless Chromium binary. Ensure @sparticuz/chromium is installed in the backend deployment."
+      );
+    }
+
+    return {
+      browserPath: executablePath,
+      launchOptions: {
+        executablePath,
+        args: puppeteer.defaultArgs({
+          args: chromium.args,
+          headless: "shell"
+        }),
+        defaultViewport: PDF_DEFAULT_VIEWPORT,
+        headless: "shell",
+        ignoreHTTPSErrors: true
+      }
+    };
+  }
+
+  const executablePath = resolveLocalBrowserPath();
+
+  if (!executablePath) {
+    throw new Error(
+      "PDF generation could not find a Chrome/Chromium browser. Set PDF_BROWSER_PATH to a valid Chrome/Chromium executable on the server."
+    );
+  }
+
+  return {
+    browserPath: executablePath,
+    launchOptions: {
+      executablePath,
+      args: PDF_BROWSER_ARGS,
+      defaultViewport: PDF_DEFAULT_VIEWPORT,
+      headless: true,
+      ignoreHTTPSErrors: true
+    }
+  };
 };
 
 export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
-  const browserPath = resolveLaunchExecutablePath();
   const options = {
     format: "A4",
     printBackground: true,
@@ -131,37 +181,34 @@ export const generatePdfBufferFromHtml = async (html, optionOverrides = {}) => {
     },
     ...optionOverrides
   };
-  const launchOptions = {
-    headless: true,
-    args: PDF_BROWSER_ARGS
-  };
-
-  if (browserPath) {
-    launchOptions.executablePath = browserPath;
-  } else {
-    throw new Error(
-      "PDF generation could not find a Chrome/Chromium browser. Set PDF_BROWSER_PATH to a valid Chrome/Chromium executable on the server."
-    );
-  }
 
   let browser;
+  let browserPath = "";
 
   try {
-    browser = await puppeteer.launch(launchOptions);
+    const launchConfig = await resolveLaunchConfig();
+    browserPath = launchConfig.browserPath;
+    browser = await puppeteer.launch(launchConfig.launchOptions);
+
     const page = await browser.newPage();
     await page.emulateMediaType("screen");
     await page.setContent(html, {
       waitUntil: "networkidle0"
     });
 
-    const buffer = await page.pdf(options);
-    return buffer;
+    return await page.pdf(options);
   } catch (error) {
-    if (String(error?.message || "").includes("Failed to launch the browser process")) {
+    const message = String(error?.message || "");
+
+    if (
+      message.includes("Could not find Chrome") ||
+      message.includes("Could not find expected browser") ||
+      message.includes("Failed to launch the browser process")
+    ) {
       throw new Error(
         browserPath
           ? `PDF generation could not launch the configured browser at ${browserPath}.`
-          : "PDF generation could not find a local Chrome/Chromium installation. Set PDF_BROWSER_PATH in the server environment if Chrome is installed in a custom location."
+          : "PDF generation could not initialize a Chromium runtime for this deployment."
       );
     }
 
