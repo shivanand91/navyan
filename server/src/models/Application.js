@@ -60,6 +60,7 @@ const applicationSchema = new mongoose.Schema(
     },
     offerLetter: {
       id: String,
+      accessToken: String,
       url: String,
       issuedAt: Date
     },
@@ -81,6 +82,10 @@ const applicationSchema = new mongoose.Schema(
 );
 
 applicationSchema.index({ user: 1, internship: 1, durationKey: 1 }, { unique: true });
+applicationSchema.index(
+  { "offerLetter.accessToken": 1 },
+  { unique: true, sparse: true }
+);
 applicationSchema.index(
   { user: 1 },
   {

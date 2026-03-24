@@ -2,6 +2,7 @@ import { Application } from "../models/Application.js";
 import { Internship } from "../models/Internship.js";
 import { PaymentAttempt } from "../models/PaymentAttempt.js";
 import { Submission } from "../models/Submission.js";
+import crypto from "crypto";
 import { addMonths, addWeeks, format } from "date-fns";
 import { createOfferLetterHtml, renderOfferLetterPdf } from "../services/pdfService.js";
 import { uploadBuffer } from "../services/cloudinaryUpload.js";
@@ -50,6 +51,25 @@ const getDurationLabel = (application) => {
         : "6 months")
   );
 };
+
+const createOfferLetterAccessToken = () => crypto.randomBytes(24).toString("hex");
+
+const ensureOfferLetterAccessToken = (application) => {
+  const existingToken = application.offerLetter?.accessToken;
+  if (existingToken) {
+    return existingToken;
+  }
+
+  application.offerLetter = {
+    ...(application.offerLetter || {}),
+    accessToken: createOfferLetterAccessToken()
+  };
+
+  return application.offerLetter.accessToken;
+};
+
+const getOfferLetterPublicPath = (application) =>
+  `/api/applications/offer-letter/${ensureOfferLetterAccessToken(application)}`;
 
 const getOfferLetterDocumentPayload = (application) => {
   const internship = application.internship;
@@ -389,6 +409,11 @@ export const listMyApplications = async (req, res, next) => {
         changed = true;
       }
 
+      if (application.offerLetter?.id && !application.offerLetter?.accessToken) {
+        ensureOfferLetterAccessToken(application);
+        changed = true;
+      }
+
       if (changed) {
         await application.save();
       }
@@ -408,7 +433,7 @@ export const listMyApplications = async (req, res, next) => {
                 url: normalizeServerDocumentUrl(
                   application.offerLetter?.url,
                   req,
-                  `/api/applications/${application._id}/offer-letter`
+                  getOfferLetterPublicPath(application)
                 )
               }
             : application.offerLetter,
@@ -470,6 +495,11 @@ export const adminListApplications = async (req, res, next) => {
         changed = true;
       }
 
+      if (application.offerLetter?.id && !application.offerLetter?.accessToken) {
+        ensureOfferLetterAccessToken(application);
+        changed = true;
+      }
+
       if (changed) {
         await application.save();
       }
@@ -505,7 +535,7 @@ export const adminListApplications = async (req, res, next) => {
               url: normalizeServerDocumentUrl(
                 application.offerLetter?.url,
                 req,
-                `/api/applications/${application._id}/offer-letter`
+                getOfferLetterPublicPath(application)
               )
             }
           : application.offerLetter,
@@ -594,7 +624,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
       const { offerId, startDate, endDate, htmlPayload } = getOfferLetterDocumentPayload(application);
       const fallbackOfferLetterUrl = buildServerUrl(
         req,
-        `/api/applications/${application._id}/offer-letter`
+        getOfferLetterPublicPath(application)
       );
 
       application.internshipMeta = {
@@ -610,6 +640,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
 
       application.offerLetter = {
         id: offerId,
+        accessToken: ensureOfferLetterAccessToken(application),
         url: fallbackOfferLetterUrl,
         issuedAt: new Date()
       };
@@ -681,6 +712,34 @@ export const getOfferLetterPdf = async (req, res, next) => {
     const isOwner = String(application.user?._id) === String(req.user?._id);
     if (!req.user || (!isOwner && req.user.role !== "admin")) {
       return res.status(403).json({ message: "Access denied" });
+    }
+
+    if (!application.offerLetter?.id && !OFFER_LETTER_VISIBLE_STATUSES.has(application.status)) {
+      return res.status(404).json({ message: "Offer letter not available yet" });
+    }
+
+    const { offerId, htmlPayload } = getOfferLetterDocumentPayload(application);
+    const html = await createOfferLetterHtml(htmlPayload);
+    const pdfBuffer = await renderOfferLetterPdf(html);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename=\"${offerId}.pdf\"`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getPublicOfferLetterPdf = async (req, res, next) => {
+  try {
+    const application = await Application.findOne({
+      "offerLetter.accessToken": req.params.accessToken
+    })
+      .populate("user")
+      .populate("internship");
+
+    if (!application) {
+      return res.status(404).json({ message: "Offer letter not found" });
     }
 
     if (!application.offerLetter?.id && !OFFER_LETTER_VISIBLE_STATUSES.has(application.status)) {
