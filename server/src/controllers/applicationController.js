@@ -497,6 +497,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status, internalNotes, paymentDecision } = req.body;
+    const warnings = [];
 
     const application = await Application.findById(id)
       .populate("user")
@@ -556,6 +557,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     if (prevStatus !== "Selected" && status === "Selected") {
       const internship = application.internship;
       const { offerId, startDate, endDate, htmlPayload } = getOfferLetterDocumentPayload(application);
+      const fallbackOfferLetterUrl = `${getServerOrigin()}/api/applications/${application._id}/offer-letter`;
 
       application.internshipMeta = {
         ...(application.internshipMeta || {}),
@@ -568,23 +570,32 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         })
       };
 
-      const html = await createOfferLetterHtml(htmlPayload);
-
-      const pdfBuffer = await renderOfferLetterPdf(html);
-
-      const uploaded = await uploadBuffer({
-        buffer: pdfBuffer,
-        mimetype: "application/pdf",
-        folder: "navyan/offer-letters",
-        publicId: offerId,
-        resourceType: "raw"
-      });
-
       application.offerLetter = {
         id: offerId,
-        url: uploaded.url || `${getServerOrigin()}/api/applications/${application._id}/offer-letter`,
+        url: fallbackOfferLetterUrl,
         issuedAt: new Date()
       };
+
+      try {
+        const html = await createOfferLetterHtml(htmlPayload);
+        const pdfBuffer = await renderOfferLetterPdf(html);
+        const uploaded = await uploadBuffer({
+          buffer: pdfBuffer,
+          mimetype: "application/pdf",
+          folder: "navyan/offer-letters",
+          publicId: offerId,
+          resourceType: "raw"
+        });
+
+        if (uploaded.url) {
+          application.offerLetter.url = uploaded.url;
+        }
+      } catch (error) {
+        warnings.push(
+          "Offer letter storage could not be completed, but the application was still marked as selected."
+        );
+        console.error("Offer letter generation failed during selection", error);
+      }
     }
 
     if (status === "Completed") {
@@ -594,19 +605,26 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     await application.save();
 
     if (application.status !== prevStatus) {
-      await sendApplicationStatusEmail({
-        user: application.user,
-        internship: application.internship,
-        durationKey: application.durationKey,
-        status: application.status,
-        previousStatus: prevStatus,
-        offerLetterUrl: application.offerLetter?.url,
-        taskPdfUrl: application.internshipMeta?.taskPdfUrl,
-        certificateUrl: generatedCertificate?.pdfUrl || application.certificate?.pdfUrl
-      });
+      try {
+        await sendApplicationStatusEmail({
+          user: application.user,
+          internship: application.internship,
+          durationKey: application.durationKey,
+          status: application.status,
+          previousStatus: prevStatus,
+          offerLetterUrl: application.offerLetter?.url,
+          taskPdfUrl: application.internshipMeta?.taskPdfUrl,
+          certificateUrl: generatedCertificate?.pdfUrl || application.certificate?.pdfUrl
+        });
+      } catch (error) {
+        warnings.push(
+          "The status was updated, but the notification email could not be sent."
+        );
+        console.error("Application status email failed", error);
+      }
     }
 
-    res.json({ application });
+    res.json({ application, warnings });
   } catch (err) {
     next(err);
   }

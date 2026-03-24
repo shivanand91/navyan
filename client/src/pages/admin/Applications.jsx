@@ -112,11 +112,16 @@ export default function AdminApplications() {
   const handleStatusChange = async (id, status) => {
     setUpdatingId(`${id}:status:${status}`);
     try {
-      await api.post(`/applications/admin/${id}/action`, {
+      const { data } = await api.post(`/applications/admin/${id}/action`, {
         status,
         internalNotes: notesById[id]
       });
-      toast.success(`Status updated to ${status}`);
+      if (Array.isArray(data?.warnings) && data.warnings.length > 0) {
+        toast.success(`Status updated to ${status}`);
+        toast.warning(data.warnings[0]);
+      } else {
+        toast.success(`Status updated to ${status}`);
+      }
       load();
     } catch (e) {
       console.error(e);
