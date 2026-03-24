@@ -343,6 +343,19 @@ export default function AdminApplications() {
           <div className="flex flex-wrap items-center gap-2">
             {activeWorkflowKey === "new" ? (
               <>
+                {app.status !== "Completed" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      updatingId === `${app._id}:status:Completed` ||
+                      (requiresPaymentReview && !paymentCleared)
+                    }
+                    onClick={() => handleStatusChange(app._id, "Completed")}
+                  >
+                    Complete
+                  </Button>
+                ) : null}
                 <Button
                   size="sm"
                   variant="subtle"
@@ -367,17 +380,19 @@ export default function AdminApplications() {
 
             {activeWorkflowKey === "review" ? (
               <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={
-                    updatingId === `${app._id}:status:Completed` ||
-                    (requiresPaymentReview && !paymentCleared)
-                  }
-                  onClick={() => handleStatusChange(app._id, "Completed")}
-                >
-                  Complete
-                </Button>
+                {app.status !== "Completed" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      updatingId === `${app._id}:status:Completed` ||
+                      (requiresPaymentReview && !paymentCleared)
+                    }
+                    onClick={() => handleStatusChange(app._id, "Completed")}
+                  >
+                    Complete
+                  </Button>
+                ) : null}
                 <Button
                   size="sm"
                   variant="ghost"
@@ -390,13 +405,42 @@ export default function AdminApplications() {
             ) : null}
 
             {activeWorkflowKey === "inprogress" ? (
+              <>
+                {app.status !== "Completed" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      updatingId === `${app._id}:status:Completed` ||
+                      (requiresPaymentReview && !paymentCleared)
+                    }
+                    onClick={() => handleStatusChange(app._id, "Completed")}
+                  >
+                    Complete
+                  </Button>
+                ) : null}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={updatingId === `${app._id}:status:Rejected`}
+                  onClick={() => handleStatusChange(app._id, "Rejected")}
+                >
+                  Reject
+                </Button>
+              </>
+            ) : null}
+
+            {activeWorkflowKey === "completed" && app.status !== "Completed" ? (
               <Button
                 size="sm"
-                variant="ghost"
-                disabled={updatingId === `${app._id}:status:Rejected`}
-                onClick={() => handleStatusChange(app._id, "Rejected")}
+                variant="outline"
+                disabled={
+                  updatingId === `${app._id}:status:Completed` ||
+                  (requiresPaymentReview && !paymentCleared)
+                }
+                onClick={() => handleStatusChange(app._id, "Completed")}
               >
-                Reject
+                Complete
               </Button>
             ) : null}
           </div>
