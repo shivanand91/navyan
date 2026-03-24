@@ -234,6 +234,17 @@ export default function Applications() {
                   </div>
                 )}
 
+                {app.internalNotes ? (
+                  <div className="mt-3 rounded-3xl border border-slate-200 bg-white/80 p-4 dark:border-white/8 dark:bg-white/5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                      Admin notes
+                    </p>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
+                      {app.internalNotes}
+                    </p>
+                  </div>
+                ) : null}
+
                 {TASK_WORKSPACE_STATUSES.includes(app.status) && (
                   <div className="mt-4 rounded-3xl border border-[#e4d4ad] bg-[#f8efdd]/65 p-4 dark:border-[#4b3f29] dark:bg-[#2b2417]/40">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

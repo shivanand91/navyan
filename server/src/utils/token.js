@@ -8,7 +8,7 @@ export const signAccessToken = (user) => {
       role: user.role
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "15m" }
+    { expiresIn: process.env.JWT_EXPIRES_IN || "30d" }
   );
 };
 
@@ -20,7 +20,7 @@ export const signRefreshToken = (user) => {
       type: "refresh"
     },
     process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" }
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d" }
   );
 };
 

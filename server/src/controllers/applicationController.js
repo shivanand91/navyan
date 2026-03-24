@@ -22,6 +22,7 @@ import {
 import { buildUpiPaymentPayload, getDurationPricing } from "../services/paymentService.js";
 import {
   resolveAssignedTaskPdfUrl,
+  resolveInternshipDomainLabel,
   shouldExposeAssignedTask
 } from "../services/taskAssignmentService.js";
 
@@ -37,8 +38,7 @@ const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").trim();
 const buildApplicationGroups = (applications) =>
   Object.values(
     applications.reduce((groups, application) => {
-      const categoryLabel =
-        application.internship?.role || application.internship?.title || "Uncategorized";
+      const categoryLabel = resolveInternshipDomainLabel(application.internship);
       const categoryKey = categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
       if (!groups[categoryKey]) {
@@ -413,7 +413,10 @@ export const adminListApplications = async (req, res, next) => {
       : applications;
 
     res.json({
-      applications: filteredApplications,
+      applications: filteredApplications.map((application) => ({
+        ...application.toObject(),
+        domainLabel: resolveInternshipDomainLabel(application.internship)
+      })),
       groups: buildApplicationGroups(filteredApplications)
     });
   } catch (err) {

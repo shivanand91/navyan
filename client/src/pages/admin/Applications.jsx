@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "@/lib/axios";
+import { getApiErrorMessage } from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,7 @@ const getWorkflowBucket = (application) => {
   }
 
   if (
-    ["Shortlisted", "Submitted", "Revision Requested"].includes(application.status) ||
+    ["Submitted", "Revision Requested"].includes(application.status) ||
     application.payment?.status === "Pending"
   ) {
     return "review";
@@ -102,7 +103,7 @@ export default function AdminApplications() {
       load();
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data?.message || "Could not review payment.");
+      toast.error(getApiErrorMessage(error, "Could not review payment."));
     } finally {
       setUpdatingId(null);
     }
@@ -119,7 +120,7 @@ export default function AdminApplications() {
       load();
     } catch (e) {
       console.error(e);
-      toast.error("Could not update status.");
+      toast.error(getApiErrorMessage(e, "Could not update status."));
     } finally {
       setUpdatingId(null);
     }
@@ -132,7 +133,10 @@ export default function AdminApplications() {
 
     const grouped = applications.reduce((accumulator, application) => {
       const categoryLabel =
-        application.internship?.role || application.internship?.title || "Uncategorized";
+        application.domainLabel ||
+        application.internship?.role ||
+        application.internship?.title ||
+        "General Internship";
       const categoryKey = categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
       if (!accumulator[categoryKey]) {
@@ -205,6 +209,9 @@ export default function AdminApplications() {
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {app.user?.email} · Duration: {app.durationKey} · Applied on{" "}
               {new Date(app.createdAt).toLocaleDateString()}
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Domain: {app.domainLabel || app.internship?.role || app.internship?.title || "General Internship"}
             </p>
             <div className="flex flex-wrap gap-3 pt-1 text-[11px]">
               {app.user?.profile?.resumeUrl && (
@@ -329,47 +336,64 @@ export default function AdminApplications() {
             }
           />
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={
-                updatingId === `${app._id}:status:Shortlisted` ||
-                (requiresPaymentReview && !paymentCleared)
-              }
-              onClick={() => handleStatusChange(app._id, "Shortlisted")}
-            >
-              Shortlist
-            </Button>
-            <Button
-              size="sm"
-              variant="subtle"
-              disabled={
-                updatingId === `${app._id}:status:Selected` ||
-                (requiresPaymentReview && !paymentCleared)
-              }
-              onClick={() => handleStatusChange(app._id, "Selected")}
-            >
-              Select
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={updatingId === `${app._id}:status:Rejected`}
-              onClick={() => handleStatusChange(app._id, "Rejected")}
-            >
-              Reject
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={
-                updatingId === `${app._id}:status:Completed` ||
-                (requiresPaymentReview && !paymentCleared)
-              }
-              onClick={() => handleStatusChange(app._id, "Completed")}
-            >
-              Complete
-            </Button>
+            {activeWorkflowKey === "new" ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="subtle"
+                  disabled={
+                    updatingId === `${app._id}:status:Selected` ||
+                    (requiresPaymentReview && !paymentCleared)
+                  }
+                  onClick={() => handleStatusChange(app._id, "Selected")}
+                >
+                  Select
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={updatingId === `${app._id}:status:Rejected`}
+                  onClick={() => handleStatusChange(app._id, "Rejected")}
+                >
+                  Reject
+                </Button>
+              </>
+            ) : null}
+
+            {activeWorkflowKey === "review" ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={
+                    updatingId === `${app._id}:status:Completed` ||
+                    (requiresPaymentReview && !paymentCleared)
+                  }
+                  onClick={() => handleStatusChange(app._id, "Completed")}
+                >
+                  Complete
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={updatingId === `${app._id}:status:Rejected`}
+                  onClick={() => handleStatusChange(app._id, "Rejected")}
+                >
+                  Reject
+                </Button>
+              </>
+            ) : null}
+
+            {activeWorkflowKey === "inprogress" ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={updatingId === `${app._id}:status:Rejected`}
+                onClick={() => handleStatusChange(app._id, "Rejected")}
+              >
+                Reject
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

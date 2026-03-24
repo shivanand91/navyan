@@ -11,6 +11,7 @@ export const TASK_ASSIGNED_STATUSES = [
 
 const DOMAIN_PDF_MAPPINGS = [
   {
+    label: "Full Stack Development",
     envKey: "PDF_FULLSTACK",
     matchers: [
       "full stack",
@@ -21,8 +22,29 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   },
   {
+    label: "Mobile App Development",
+    envKey: "PDF_APP_DEV",
+    matchers: [
+      "mobile app development",
+      "mobile development",
+      "mobile developer",
+      "app development",
+      "app dev",
+      "app developer",
+      "mobile app",
+      "android",
+      "ios",
+      "flutter",
+      "react native",
+      "react-native"
+    ]
+  },
+  {
+    label: "Frontend Development",
     envKey: "PDF_FRONTEND",
     matchers: [
+      "frontend development",
+      "front end development",
       "front end",
       "frontend",
       "front-end",
@@ -31,6 +53,7 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   },
   {
+    label: "Backend Development",
     envKey: "PDF_BACKEND",
     matchers: [
       "back end",
@@ -42,18 +65,7 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   },
   {
-    envKey: "PDF_APP_DEV",
-    matchers: [
-      "app development",
-      "app dev",
-      "mobile app",
-      "android",
-      "ios",
-      "flutter",
-      "react native"
-    ]
-  },
-  {
+    label: "Data Analytics",
     envKey: "PDF_DATA_ANALYTICS",
     matchers: [
       "data analytics",
@@ -65,6 +77,7 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   },
   {
+    label: "UI/UX Design",
     envKey: "PDF_UI_UX",
     matchers: [
       "ui ux",
@@ -76,6 +89,7 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   },
   {
+    label: "Web Development",
     envKey: "PDF_WEB_DEV",
     matchers: [
       "web development",
@@ -101,6 +115,29 @@ const normalizeDriveLink = (value) => {
   return `https://drive.google.com/file/d/${match[1]}/view`;
 };
 
+const toTitleCase = (value) =>
+  value
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => {
+      const upper = part.toUpperCase();
+      if (["UI", "UX", "API", "IOS"].includes(upper)) {
+        return upper;
+      }
+
+      return `${part.charAt(0).toUpperCase()}${part.slice(1).toLowerCase()}`;
+    })
+    .join(" ");
+
+const cleanupFallbackDomain = (value) =>
+  String(value || "")
+    .replace(/\bintern(ship)?\b/gi, " ")
+    .replace(/\btrainee\b/gi, " ")
+    .replace(/\brole\b/gi, " ")
+    .replace(/[_/-]+/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
 const buildInternshipSearchText = (internship) =>
   [
     internship?.role,
@@ -115,21 +152,59 @@ const buildInternshipSearchText = (internship) =>
     .toLowerCase();
 
 export const resolveDomainTaskPdfUrl = (internship) => {
-  const haystack = buildInternshipSearchText(internship);
-
-  if (!haystack) {
-    return "";
-  }
-
-  const match = DOMAIN_PDF_MAPPINGS.find(({ matchers }) =>
-    matchers.some((keyword) => haystack.includes(keyword))
-  );
+  const match = resolveDomainMapping(internship);
 
   if (!match) {
     return "";
   }
 
   return normalizeDriveLink(process.env[match.envKey]);
+};
+
+export const resolveInternshipDomainLabel = (internship) => {
+  const match = resolveDomainMapping(internship);
+
+  if (match?.label) {
+    return match.label;
+  }
+
+  const fallback =
+    cleanupFallbackDomain(internship?.role) || cleanupFallbackDomain(internship?.title);
+
+  return fallback ? toTitleCase(fallback) : "General Internship";
+};
+
+const resolveDomainMapping = (internship) => {
+  const haystack = buildInternshipSearchText(internship);
+
+  if (!haystack) {
+    return null;
+  }
+
+  const match = DOMAIN_PDF_MAPPINGS
+    .map((mapping) => {
+      const matchedKeywords = mapping.matchers.filter((keyword) => haystack.includes(keyword));
+
+      if (!matchedKeywords.length) {
+        return null;
+      }
+
+      return {
+        ...mapping,
+        matchCount: matchedKeywords.length,
+        longestKeywordLength: Math.max(...matchedKeywords.map((keyword) => keyword.length))
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => {
+      if (right.longestKeywordLength !== left.longestKeywordLength) {
+        return right.longestKeywordLength - left.longestKeywordLength;
+      }
+
+      return right.matchCount - left.matchCount;
+    })[0];
+
+  return match || null;
 };
 
 export const resolveAssignedTaskPdfUrl = ({
