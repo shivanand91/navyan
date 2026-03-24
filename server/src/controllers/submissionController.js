@@ -198,7 +198,7 @@ export const adminReviewSubmission = async (req, res, next) => {
       submission.reviewStatus = "Completed";
       submission.revisionRequested = false;
       application.status = "Completed";
-      generatedCertificate = await ensureCertificateForApplication(application);
+      generatedCertificate = await ensureCertificateForApplication(application, { req });
     } else if (action === "reject") {
       submission.reviewStatus = "Rejected";
       application.status = "Rejected";

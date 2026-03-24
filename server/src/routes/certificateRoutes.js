@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { Certificate } from "../models/Certificate.js";
 import { createCertificateHtml, renderCertificatePdf } from "../services/pdfService.js";
+import { normalizeServerDocumentUrl } from "../utils/origin.js";
 
 const router = express.Router();
 const durationLabels = {
@@ -16,7 +17,16 @@ const durationLabels = {
 router.get("/me", protect, async (req, res, next) => {
   try {
     const certificates = await Certificate.find({ user: req.user._id }).sort({ createdAt: -1 });
-    res.json({ certificates });
+    res.json({
+      certificates: certificates.map((certificate) => ({
+        ...certificate.toObject(),
+        pdfUrl: normalizeServerDocumentUrl(
+          certificate.pdfUrl,
+          req,
+          `/api/certificates/download/${certificate.certificateId}`
+        )
+      }))
+    });
   } catch (err) {
     next(err);
   }
@@ -28,7 +38,16 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
       .populate("user")
       .populate("internship")
       .sort({ createdAt: -1 });
-    res.json({ certificates });
+    res.json({
+      certificates: certificates.map((certificate) => ({
+        ...certificate.toObject(),
+        pdfUrl: normalizeServerDocumentUrl(
+          certificate.pdfUrl,
+          req,
+          `/api/certificates/download/${certificate.certificateId}`
+        )
+      }))
+    });
   } catch (err) {
     next(err);
   }
@@ -85,7 +104,17 @@ router.get("/verify/:certificateId", async (req, res, next) => {
       "fullName role durationKey completionDate issueDate certificateId verifyUrl pdfUrl verificationStatus"
     );
     if (!certificate) return res.status(404).json({ valid: false });
-    res.json({ valid: certificate.verificationStatus !== "Revoked", certificate });
+    res.json({
+      valid: certificate.verificationStatus !== "Revoked",
+      certificate: {
+        ...certificate.toObject(),
+        pdfUrl: normalizeServerDocumentUrl(
+          certificate.pdfUrl,
+          req,
+          `/api/certificates/download/${certificate.certificateId}`
+        )
+      }
+    });
   } catch (err) {
     next(err);
   }

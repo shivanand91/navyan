@@ -3,12 +3,7 @@ import { format } from "date-fns";
 import { Certificate } from "../models/Certificate.js";
 import { uploadBuffer } from "./cloudinaryUpload.js";
 import { createCertificateHtml, renderCertificatePdf } from "./pdfService.js";
-
-const stripTrailingSlash = (value) =>
-  typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
-
-const getServerOrigin = () =>
-  stripTrailingSlash(process.env.SERVER_ORIGIN) || "http://localhost:5000";
+import { buildServerUrl } from "../utils/origin.js";
 
 const getDurationLabel = (application) => {
   const durationOption = application.internship?.durations?.find(
@@ -18,7 +13,7 @@ const getDurationLabel = (application) => {
   return durationOption?.label || application.durationKey;
 };
 
-export const ensureCertificateForApplication = async (application) => {
+export const ensureCertificateForApplication = async (application, options = {}) => {
   if (application.certificate) {
     const existing = await Certificate.findById(application.certificate);
     if (existing) {
@@ -76,7 +71,9 @@ export const ensureCertificateForApplication = async (application) => {
     completionDate,
     issueDate: completionDate,
     certificateId,
-    pdfUrl: uploaded.url || `${getServerOrigin()}/api/certificates/download/${certificateId}`,
+    pdfUrl:
+      uploaded.url ||
+      buildServerUrl(options.req, `/api/certificates/download/${certificateId}`),
     verifyUrl,
     verificationStatus: "Valid"
   });

@@ -25,6 +25,7 @@ import {
   resolveInternshipDomainLabel,
   shouldExposeAssignedTask
 } from "../services/taskAssignmentService.js";
+import { buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
 const PAYMENT_INTENT_TTL_MINUTES = 30;
@@ -34,12 +35,6 @@ const createPaymentReference = (internshipId, durationKey) =>
   `NAVPAY-${durationKey.toUpperCase()}-${String(internshipId).slice(-4).toUpperCase()}-${Date.now()}`;
 
 const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").trim();
-
-const stripTrailingSlash = (value) =>
-  typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
-
-const getServerOrigin = () =>
-  stripTrailingSlash(process.env.SERVER_ORIGIN) || "http://localhost:5000";
 
 const getDurationLabel = (application) => {
   const durationOption = application.internship?.durations?.find(
@@ -407,6 +402,26 @@ export const listMyApplications = async (req, res, next) => {
 
         return {
           ...application.toObject(),
+          offerLetter: application.offerLetter
+            ? {
+                ...application.offerLetter,
+                url: normalizeServerDocumentUrl(
+                  application.offerLetter?.url,
+                  req,
+                  `/api/applications/${application._id}/offer-letter`
+                )
+              }
+            : application.offerLetter,
+          certificate: application.certificate
+            ? {
+                ...application.certificate.toObject?.(),
+                pdfUrl: normalizeServerDocumentUrl(
+                  application.certificate?.pdfUrl,
+                  req,
+                  `/api/certificates/download/${application.certificate?.certificateId}`
+                )
+              }
+            : application.certificate,
           studentName: req.user?.profile?.fullName || req.user?.fullName || "Student",
           timeline: getTimelineState(application),
           submissions
@@ -484,6 +499,26 @@ export const adminListApplications = async (req, res, next) => {
     res.json({
       applications: filteredApplications.map((application) => ({
         ...application.toObject(),
+        offerLetter: application.offerLetter
+          ? {
+              ...application.offerLetter,
+              url: normalizeServerDocumentUrl(
+                application.offerLetter?.url,
+                req,
+                `/api/applications/${application._id}/offer-letter`
+              )
+            }
+          : application.offerLetter,
+        certificate: application.certificate
+          ? {
+              ...application.certificate.toObject?.(),
+              pdfUrl: normalizeServerDocumentUrl(
+                application.certificate?.pdfUrl,
+                req,
+                `/api/certificates/download/${application.certificate?.certificateId}`
+              )
+            }
+          : application.certificate,
         domainLabel: resolveInternshipDomainLabel(application.internship)
       })),
       groups: buildApplicationGroups(filteredApplications)
@@ -557,7 +592,10 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     if (prevStatus !== "Selected" && status === "Selected") {
       const internship = application.internship;
       const { offerId, startDate, endDate, htmlPayload } = getOfferLetterDocumentPayload(application);
-      const fallbackOfferLetterUrl = `${getServerOrigin()}/api/applications/${application._id}/offer-letter`;
+      const fallbackOfferLetterUrl = buildServerUrl(
+        req,
+        `/api/applications/${application._id}/offer-letter`
+      );
 
       application.internshipMeta = {
         ...(application.internshipMeta || {}),
@@ -599,7 +637,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     if (status === "Completed") {
-      generatedCertificate = await ensureCertificateForApplication(application);
+      generatedCertificate = await ensureCertificateForApplication(application, { req });
     }
 
     await application.save();
