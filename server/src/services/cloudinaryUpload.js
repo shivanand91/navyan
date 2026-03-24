@@ -2,11 +2,7 @@ import "../config/env.js";
 import { configureCloudinary } from "../config/cloudinary.js";
 import fs from "fs/promises";
 import path from "path";
-
-const bufferToDataUri = (buffer, mimetype) => {
-  const base64 = buffer.toString("base64");
-  return `data:${mimetype};base64,${base64}`;
-};
+import { Readable } from "stream";
 
 const isEphemeralFilesystemRuntime = () =>
   Boolean(
@@ -59,13 +55,25 @@ export const uploadBuffer = async ({
     return { url: `${origin}/uploads/${filename}`, publicId: filename, storage: "local" };
   }
 
-  const dataUri = bufferToDataUri(buffer, mimetype);
+  const res = await new Promise((resolve, reject) => {
+    const upload = client.uploader.upload_stream(
+      {
+        folder,
+        public_id: publicId,
+        resource_type: resourceType || "auto",
+        overwrite: true
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
 
-  const res = await client.uploader.upload(dataUri, {
-    folder,
-    public_id: publicId,
-    resource_type: resourceType || "auto",
-    overwrite: true
+        resolve(result);
+      }
+    );
+
+    Readable.from(buffer).pipe(upload);
   });
 
   return { url: res.secure_url, publicId: res.public_id, storage: "cloudinary" };

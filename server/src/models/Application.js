@@ -61,6 +61,8 @@ const applicationSchema = new mongoose.Schema(
     offerLetter: {
       id: String,
       accessToken: String,
+      mimeType: String,
+      fileData: String,
       url: String,
       issuedAt: Date
     },

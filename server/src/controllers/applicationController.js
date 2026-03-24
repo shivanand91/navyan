@@ -71,6 +71,24 @@ const ensureOfferLetterAccessToken = (application) => {
 const getOfferLetterPublicPath = (application) =>
   `/api/applications/offer-letter/${ensureOfferLetterAccessToken(application)}`;
 
+const serializeOfferLetterForResponse = (application, req) => {
+  if (!application.offerLetter) {
+    return application.offerLetter;
+  }
+
+  return {
+    id: application.offerLetter.id,
+    accessToken: application.offerLetter.accessToken,
+    mimeType: application.offerLetter.mimeType,
+    issuedAt: application.offerLetter.issuedAt,
+    url: normalizeServerDocumentUrl(
+      application.offerLetter?.url,
+      req,
+      getOfferLetterPublicPath(application)
+    )
+  };
+};
+
 const getOfferLetterDocumentPayload = (application) => {
   const internship = application.internship;
   const user = application.user;
@@ -427,16 +445,7 @@ export const listMyApplications = async (req, res, next) => {
 
         return {
           ...application.toObject(),
-          offerLetter: application.offerLetter
-            ? {
-                ...application.offerLetter,
-                url: normalizeServerDocumentUrl(
-                  application.offerLetter?.url,
-                  req,
-                  getOfferLetterPublicPath(application)
-                )
-              }
-            : application.offerLetter,
+          offerLetter: serializeOfferLetterForResponse(application, req),
           certificate: application.certificate
             ? {
                 ...application.certificate.toObject?.(),
@@ -529,16 +538,7 @@ export const adminListApplications = async (req, res, next) => {
     res.json({
       applications: filteredApplications.map((application) => ({
         ...application.toObject(),
-        offerLetter: application.offerLetter
-          ? {
-              ...application.offerLetter,
-              url: normalizeServerDocumentUrl(
-                application.offerLetter?.url,
-                req,
-                getOfferLetterPublicPath(application)
-              )
-            }
-          : application.offerLetter,
+        offerLetter: serializeOfferLetterForResponse(application, req),
         certificate: application.certificate
           ? {
               ...application.certificate.toObject?.(),
@@ -641,6 +641,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
       application.offerLetter = {
         id: offerId,
         accessToken: ensureOfferLetterAccessToken(application),
+        mimeType: "application/pdf",
         url: fallbackOfferLetterUrl,
         issuedAt: new Date()
       };
@@ -648,6 +649,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
       try {
         const html = await createOfferLetterHtml(htmlPayload);
         const pdfBuffer = await renderOfferLetterPdf(html);
+        application.offerLetter.fileData = pdfBuffer.toString("base64");
         const uploaded = await uploadBuffer({
           buffer: pdfBuffer,
           mimetype: "application/pdf",
@@ -718,6 +720,17 @@ export const getOfferLetterPdf = async (req, res, next) => {
       return res.status(404).json({ message: "Offer letter not available yet" });
     }
 
+    if (application.offerLetter?.fileData) {
+      const pdfBuffer = Buffer.from(application.offerLetter.fileData, "base64");
+      res.setHeader("Content-Type", application.offerLetter.mimeType || "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename=\"${application.offerLetter.id || "offer-letter"}.pdf\"`
+      );
+      res.send(pdfBuffer);
+      return;
+    }
+
     const { offerId, htmlPayload } = getOfferLetterDocumentPayload(application);
     const html = await createOfferLetterHtml(htmlPayload);
     const pdfBuffer = await renderOfferLetterPdf(html);
@@ -746,9 +759,30 @@ export const getPublicOfferLetterPdf = async (req, res, next) => {
       return res.status(404).json({ message: "Offer letter not available yet" });
     }
 
+    if (application.offerLetter?.fileData) {
+      const pdfBuffer = Buffer.from(application.offerLetter.fileData, "base64");
+      res.setHeader("Content-Type", application.offerLetter.mimeType || "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename=\"${application.offerLetter.id || "offer-letter"}.pdf\"`
+      );
+      res.send(pdfBuffer);
+      return;
+    }
+
     const { offerId, htmlPayload } = getOfferLetterDocumentPayload(application);
     const html = await createOfferLetterHtml(htmlPayload);
     const pdfBuffer = await renderOfferLetterPdf(html);
+
+    application.offerLetter = {
+      ...(application.offerLetter || {}),
+      id: application.offerLetter?.id || offerId,
+      accessToken: ensureOfferLetterAccessToken(application),
+      mimeType: "application/pdf",
+      fileData: pdfBuffer.toString("base64"),
+      issuedAt: application.offerLetter?.issuedAt || new Date()
+    };
+    await application.save();
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `inline; filename=\"${offerId}.pdf\"`);
