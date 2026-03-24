@@ -86,7 +86,7 @@ const stripTrailingSlash = (value) =>
   typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
 
 const getDashboardBaseUrl = () =>
-  stripTrailingSlash(process.env.CLIENT_URL) || "http://localhost:5173";
+  stripTrailingSlash(process.env.CLIENT_URL) || "https://navyan.online";
 
 const getDurationLabel = (internship, durationKey) => {
   const duration = internship?.durations?.find((item) => item.key === durationKey);
