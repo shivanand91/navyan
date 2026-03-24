@@ -45,14 +45,18 @@ Required environment variables:
 - `TRUST_PROXY=1`
 - `CERTIFICATE_VERIFY_BASE_URL=https://your-frontend-domain/verify-certificate`
 - `INTERNSHIP_PAYMENT_UPI_ID=your_upi_id`
-- `SMTP_SERVICE=gmail`
-- `SMTP_USER=your_email@example.com`
-- `SMTP_PASS=your_16_char_gmail_app_password`
+- `EMAIL_FROM=Navyan <notifications@mail.yourdomain.com>`
+- `RESEND_API_KEY=re_your_resend_api_key`
 
 Optional backend environment variables:
 
 - `COOKIE_DOMAIN=.yourdomain.com`
-- `EMAIL_FROM=Navyan <your_email@example.com>`
+- `RESEND_FROM=Navyan <notifications@mail.yourdomain.com>`
+- `SMTP_HOST=smtp.resend.com`
+- `SMTP_PORT=465`
+- `SMTP_SECURE=true`
+- `SMTP_USER=resend`
+- `SMTP_PASS=re_your_resend_api_key`
 - `SEED_ADMIN_NAME=Navyan Admin`
 - `SEED_ADMIN_EMAIL=admin@yourdomain.com`
 - `SEED_ADMIN_PASSWORD=change_this_password`
@@ -67,7 +71,7 @@ Important:
 - If frontend and backend are on different domains, keep `COOKIE_SECURE=true` and `COOKIE_SAME_SITE=none`.
 - If you deploy the backend from only the `server/` folder, set `DOCUMENT_LOGO_URL` so PDF documents can still embed the company logo.
 - Local file uploads are not ideal for production. Use Cloudinary.
-- For Gmail SMTP, first enable Google 2-Step Verification, then generate an App Password, and use that 16-character password in `SMTP_PASS`.
+- For Resend, verify your sending domain first, then create a Resend API key and put it in `RESEND_API_KEY`. The app can also use the same key through Resend SMTP with `SMTP_USER=resend`.
 
 ## 3. Frontend deployment
 

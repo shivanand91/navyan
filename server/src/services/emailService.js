@@ -102,13 +102,13 @@ const getInternshipTitle = (internship) => internship?.title || internship?.role
 const getRoleLabel = (internship) => internship?.role || internship?.title || "Internship";
 
 const getFromAddress = () =>
-  process.env.EMAIL_FROM?.trim() || process.env.SMTP_USER?.trim() || "";
+  process.env.EMAIL_FROM?.trim() || process.env.RESEND_FROM?.trim() || "";
 
 const getReadableEmailError = (error) => {
-  const smtpUser = process.env.SMTP_USER?.trim()?.toLowerCase() || "";
+  const smtpUser = process.env.SMTP_USER?.trim()?.toLowerCase() || "resend";
 
-  if (error?.code === "EAUTH" && smtpUser.endsWith("@gmail.com")) {
-    return "Gmail SMTP rejected the login. Turn on Google 2-Step Verification, create a Gmail App Password, put that 16-character password in SMTP_PASS, and restart the server.";
+  if (error?.code === "EAUTH" && smtpUser === "resend") {
+    return "Resend SMTP rejected the credentials. Set a valid RESEND_API_KEY or SMTP_PASS from the Resend dashboard and restart the server.";
   }
 
   if (error?.code === "EAI_AGAIN") {
@@ -149,34 +149,26 @@ const withEmailRetry = async (operation) => {
   throw lastError;
 };
 
-const looksLikeGmailAppPassword = (value) => /^[a-z0-9]{16}$/i.test(value.replace(/\s+/g, ""));
-
 const getEmailConfig = () => {
-  const service = process.env.SMTP_SERVICE?.trim();
+  const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
+  const configuredService = process.env.SMTP_SERVICE?.trim();
   const configuredHost = process.env.SMTP_HOST?.trim();
   const user =
+    (resendApiKey ? "resend" : "") ||
     process.env.SMTP_USER?.trim() ||
     process.env.EMAIL_USER?.trim() ||
-    process.env.GMAIL_USER?.trim() ||
     "";
   const rawPass =
+    resendApiKey ||
     process.env.SMTP_PASS?.trim() ||
     process.env.EMAIL_PASSWORD?.trim() ||
-    process.env.GMAIL_PASS?.trim() ||
     "";
-  const pass =
-    user.toLowerCase().endsWith("@gmail.com") ? rawPass.replace(/\s+/g, "") : rawPass;
-  let host = configuredHost;
-  let secure = parseBoolean(process.env.SMTP_SECURE, service ? true : false);
-  let port = Number(process.env.SMTP_PORT || (secure ? "465" : "587"));
-
-  if (!user || !pass || (!service && !host)) {
-    if (!service && !host && user.toLowerCase().endsWith("@gmail.com")) {
-      host = "smtp.gmail.com";
-      secure = true;
-      port = 465;
-    }
-  }
+  const pass = rawPass;
+  const isResendConfig = Boolean(resendApiKey || user === "resend");
+  const service = isResendConfig ? "" : configuredService;
+  const host = configuredHost || (isResendConfig ? "smtp.resend.com" : "");
+  const secure = parseBoolean(process.env.SMTP_SECURE, true);
+  const port = Number(process.env.SMTP_PORT || "465");
 
   return {
     service,
@@ -223,18 +215,27 @@ export const verifyEmailTransport = async () => {
   const transporter = getTransporter();
   const smtpUser = process.env.SMTP_USER?.trim()?.toLowerCase() || "";
   const smtpPass = process.env.SMTP_PASS?.trim() || "";
+  const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
+  const fromAddress = getFromAddress();
 
   if (!transporter) {
     return {
       ok: false,
-      reason: "SMTP configuration is incomplete."
+      reason: "Resend email configuration is incomplete."
     };
   }
 
-  if (smtpUser.endsWith("@gmail.com") && smtpPass && !looksLikeGmailAppPassword(smtpPass)) {
+  if (!fromAddress) {
     return {
       ok: false,
-      reason: "Current SMTP_PASS does not look like a Gmail App Password. Replace it with the 16-character App Password from your Google account."
+      reason: "Set EMAIL_FROM or RESEND_FROM to a verified sender address, for example Navyan <notifications@mail.yourdomain.com>."
+    };
+  }
+
+  if (!resendApiKey && (!smtpUser || !smtpPass)) {
+    return {
+      ok: false,
+      reason: "Set RESEND_API_KEY or provide explicit SMTP_USER/SMTP_PASS credentials for Resend SMTP."
     };
   }
 
