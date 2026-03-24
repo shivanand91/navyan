@@ -1,19 +1,62 @@
+import { spawnSync } from "child_process";
 import { existsSync } from "fs";
 import htmlPdfNode from "html-pdf-node";
+
+const normalizeBrowserValue = (value) =>
+  typeof value === "string" ? value.trim().replace(/^['"]|['"]$/g, "") : "";
+
+const resolveBrowserCommandPath = (command) => {
+  if (!command) return null;
+
+  const result = spawnSync("which", [command], {
+    encoding: "utf8"
+  });
+
+  if (result.status !== 0) {
+    return null;
+  }
+
+  const resolvedPath = result.stdout.trim();
+  return resolvedPath && existsSync(resolvedPath) ? resolvedPath : null;
+};
+
+const resolveBrowserCandidate = (candidate) => {
+  const normalized = normalizeBrowserValue(candidate);
+  if (!normalized) return null;
+
+  if (existsSync(normalized)) {
+    return normalized;
+  }
+
+  if (!normalized.includes("/")) {
+    return resolveBrowserCommandPath(normalized);
+  }
+
+  return null;
+};
 
 const PDF_BROWSER_CANDIDATES = [
   process.env.PDF_BROWSER_PATH,
   process.env.PUPPETEER_EXECUTABLE_PATH,
+  process.env.CHROME_BIN,
+  process.env.GOOGLE_CHROME_BIN,
+  process.env.GOOGLE_CHROME_SHIM,
   "/usr/bin/google-chrome",
   "/usr/bin/google-chrome-stable",
   "/usr/bin/chromium",
-  "/usr/bin/chromium-browser"
-].filter(Boolean);
+  "/usr/bin/chromium-browser",
+  "google-chrome",
+  "google-chrome-stable",
+  "chromium",
+  "chromium-browser"
+];
 
 const resolvePdfBrowserPath = () => {
   for (const candidate of PDF_BROWSER_CANDIDATES) {
-    if (existsSync(candidate)) {
-      return candidate;
+    const resolvedPath = resolveBrowserCandidate(candidate);
+
+    if (resolvedPath) {
+      return resolvedPath;
     }
   }
 
