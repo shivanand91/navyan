@@ -35,7 +35,7 @@ const resolveBrowserCandidate = (candidate) => {
   return null;
 };
 
-const PDF_BROWSER_CANDIDATES = [
+const getPdfBrowserCandidates = () => [
   process.env.PDF_BROWSER_PATH,
   process.env.PUPPETEER_EXECUTABLE_PATH,
   process.env.CHROME_BIN,
@@ -45,6 +45,8 @@ const PDF_BROWSER_CANDIDATES = [
   "/usr/bin/google-chrome-stable",
   "/usr/bin/chromium",
   "/usr/bin/chromium-browser",
+  "/opt/google/chrome/chrome",
+  "/snap/bin/chromium",
   "google-chrome",
   "google-chrome-stable",
   "chromium",
@@ -59,8 +61,32 @@ const PDF_BROWSER_ARGS = [
   "--no-zygote"
 ];
 
+const resolveBrowserPathFromEnvPath = () => {
+  const systemPath = normalizeBrowserValue(process.env.PATH);
+  if (!systemPath) return null;
+
+  const candidateNames = [
+    "google-chrome",
+    "google-chrome-stable",
+    "chromium",
+    "chromium-browser",
+    "chrome"
+  ];
+
+  for (const segment of systemPath.split(":").map((item) => item.trim()).filter(Boolean)) {
+    for (const name of candidateNames) {
+      const candidate = `${segment}/${name}`;
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+};
+
 const resolvePdfBrowserPath = () => {
-  for (const candidate of PDF_BROWSER_CANDIDATES) {
+  for (const candidate of getPdfBrowserCandidates()) {
     const resolvedPath = resolveBrowserCandidate(candidate);
 
     if (resolvedPath) {
@@ -68,7 +94,7 @@ const resolvePdfBrowserPath = () => {
     }
   }
 
-  return null;
+  return resolveBrowserPathFromEnvPath();
 };
 
 const resolveBundledPuppeteerPath = () => {
