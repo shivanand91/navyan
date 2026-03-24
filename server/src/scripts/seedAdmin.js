@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../config/env.js";
 
 import { connectDB } from "../config/db.js";
 import { upsertAdminAccount } from "../services/adminSeedService.js";

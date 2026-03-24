@@ -1,3 +1,4 @@
+import "../config/env.js";
 import { spawnSync } from "child_process";
 import { existsSync } from "fs";
 import puppeteer from "puppeteer";
