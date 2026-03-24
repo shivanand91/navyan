@@ -73,7 +73,8 @@ Important:
 
 - If frontend and backend are on different domains, keep `COOKIE_SECURE=true` and `COOKIE_SAME_SITE=none`.
 - If you deploy the backend from only the `server/` folder, set `DOCUMENT_LOGO_URL` so PDF documents can still embed the company logo.
-- Local file uploads are not ideal for production. Use Cloudinary.
+- Local file uploads are not ideal for production. Use Cloudinary if you want permanent external file URLs.
+- Without Cloudinary, offer letters and certificates now fall back to dynamic PDF routes instead of writing to the local filesystem. This is compatible with Vercel/serverless runtimes.
 - For Resend, verify your sending domain first, then create a Resend API key and put it in `RESEND_API_KEY`. The app can also use the same key through Resend SMTP with `SMTP_USER=resend`.
 
 ## 3. Frontend deployment

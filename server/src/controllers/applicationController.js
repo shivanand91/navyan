@@ -35,6 +35,75 @@ const createPaymentReference = (internshipId, durationKey) =>
 
 const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").trim();
 
+const stripTrailingSlash = (value) =>
+  typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
+
+const getServerOrigin = () =>
+  stripTrailingSlash(process.env.SERVER_ORIGIN) || "http://localhost:5000";
+
+const getDurationLabel = (application) => {
+  const durationOption = application.internship?.durations?.find(
+    (item) => item.key === application.durationKey
+  );
+
+  return (
+    durationOption?.label ||
+    (application.durationKey === "4-weeks"
+      ? "4 weeks"
+      : application.durationKey === "3-months"
+        ? "3 months"
+        : "6 months")
+  );
+};
+
+const getOfferLetterDocumentPayload = (application) => {
+  const internship = application.internship;
+  const user = application.user;
+  const startDate = application.internshipMeta?.startDate
+    ? new Date(application.internshipMeta.startDate)
+    : new Date();
+  const endDate = application.internshipMeta?.endDate
+    ? new Date(application.internshipMeta.endDate)
+    : application.durationKey === "4-weeks"
+      ? addWeeks(startDate, 4)
+      : application.durationKey === "3-months"
+        ? addMonths(startDate, 3)
+        : addMonths(startDate, 6);
+  const durationOption = internship?.durations?.find((d) => d.key === application.durationKey);
+  const offerId =
+    application.offerLetter?.id ||
+    `NAV-OFFER-${new Date().getFullYear()}-${String(application._id).slice(-6).toUpperCase()}`;
+
+  return {
+    offerId,
+    startDate,
+    endDate,
+    durationLabel: getDurationLabel(application),
+    htmlPayload: {
+      offerId,
+      studentName: user?.profile?.fullName || user?.fullName || "Student",
+      internshipTitle: internship?.title || "Internship",
+      role: internship?.role,
+      durationLabel: getDurationLabel(application),
+      mode: internship?.mode || "remote",
+      startDateStr: format(startDate, "dd MMM yyyy"),
+      endDateStr: format(endDate, "dd MMM yyyy"),
+      issueDateStr: format(new Date(), "dd MMM yyyy"),
+      internshipType: durationOption?.isPaid ? "Paid internship" : "Merit-based internship",
+      organizationName: "Navyan"
+    }
+  };
+};
+
+const OFFER_LETTER_VISIBLE_STATUSES = new Set([
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested",
+  "Completed"
+]);
+
 const buildApplicationGroups = (applications) =>
   Object.values(
     applications.reduce((groups, application) => {
@@ -486,24 +555,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     // Phase 2: On Selected -> generate offer letter, assign task PDF, set dates
     if (prevStatus !== "Selected" && status === "Selected") {
       const internship = application.internship;
-      const user = application.user;
-
-      const durationOption = internship?.durations?.find((d) => d.key === application.durationKey);
-      const durationLabel =
-        durationOption?.label ||
-        (application.durationKey === "4-weeks"
-          ? "4 weeks"
-          : application.durationKey === "3-months"
-            ? "3 months"
-            : "6 months");
-
-      const startDate = new Date();
-      const endDate =
-        application.durationKey === "4-weeks"
-          ? addWeeks(startDate, 4)
-          : application.durationKey === "3-months"
-            ? addMonths(startDate, 3)
-            : addMonths(startDate, 6);
+      const { offerId, startDate, endDate, htmlPayload } = getOfferLetterDocumentPayload(application);
 
       application.internshipMeta = {
         ...(application.internshipMeta || {}),
@@ -516,25 +568,10 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         })
       };
 
-      const offerId = `NAV-OFFER-${new Date().getFullYear()}-${String(application._id).slice(-6).toUpperCase()}`;
-
-      const html = await createOfferLetterHtml({
-        offerId,
-        studentName: user?.profile?.fullName || user?.fullName || "Student",
-        internshipTitle: internship?.title || "Internship",
-        role: internship?.role,
-        durationLabel,
-        mode: internship?.mode || "remote",
-        startDateStr: format(startDate, "dd MMM yyyy"),
-        endDateStr: format(endDate, "dd MMM yyyy"),
-        issueDateStr: format(new Date(), "dd MMM yyyy"),
-        internshipType: durationOption?.isPaid ? "Paid internship" : "Merit-based internship",
-        organizationName: "Navyan"
-      });
+      const html = await createOfferLetterHtml(htmlPayload);
 
       const pdfBuffer = await renderOfferLetterPdf(html);
 
-      // Upload to Cloudinary as raw/pdf
       const uploaded = await uploadBuffer({
         buffer: pdfBuffer,
         mimetype: "application/pdf",
@@ -545,7 +582,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
 
       application.offerLetter = {
         id: offerId,
-        url: uploaded.url,
+        url: uploaded.url || `${getServerOrigin()}/api/applications/${application._id}/offer-letter`,
         issuedAt: new Date()
       };
     }
@@ -570,6 +607,37 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     res.json({ application });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getOfferLetterPdf = async (req, res, next) => {
+  try {
+    const application = await Application.findById(req.params.id)
+      .populate("user")
+      .populate("internship");
+
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    const isOwner = String(application.user?._id) === String(req.user?._id);
+    if (!req.user || (!isOwner && req.user.role !== "admin")) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    if (!application.offerLetter?.id && !OFFER_LETTER_VISIBLE_STATUSES.has(application.status)) {
+      return res.status(404).json({ message: "Offer letter not available yet" });
+    }
+
+    const { offerId, htmlPayload } = getOfferLetterDocumentPayload(application);
+    const html = await createOfferLetterHtml(htmlPayload);
+    const pdfBuffer = await renderOfferLetterPdf(html);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename=\"${offerId}.pdf\"`);
+    res.send(pdfBuffer);
   } catch (err) {
     next(err);
   }

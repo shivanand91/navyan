@@ -4,7 +4,8 @@ import {
   applyToInternship,
   listMyApplications,
   adminListApplications,
-  adminUpdateApplicationStatus
+  adminUpdateApplicationStatus,
+  getOfferLetterPdf
 } from "../controllers/applicationController.js";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post("/payment-intent", protect, createPaymentIntent);
 router.post("/", protect, applyToInternship);
 router.get("/me", protect, listMyApplications);
+router.get("/:id/offer-letter", protect, getOfferLetterPdf);
 
 // Admin
 router.get("/admin", protect, requireAdmin, adminListApplications);

@@ -1,13 +1,21 @@
+import "../config/env.js";
 import { configureCloudinary } from "../config/cloudinary.js";
 import fs from "fs/promises";
 import path from "path";
-
-const { enabled, client } = configureCloudinary();
 
 const bufferToDataUri = (buffer, mimetype) => {
   const base64 = buffer.toString("base64");
   return `data:${mimetype};base64,${base64}`;
 };
+
+const isEphemeralFilesystemRuntime = () =>
+  Boolean(
+    process.env.VERCEL ||
+      process.env.AWS_EXECUTION_ENV ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.AWS_LAMBDA_FUNCTION_VERSION ||
+      process.env.LAMBDA_TASK_ROOT
+  );
 
 const ensureUploadsDir = async () => {
   const dir = path.join(process.cwd(), "uploads");
@@ -30,7 +38,13 @@ export const uploadBuffer = async ({
   publicId,
   resourceType
 }) => {
+  const { enabled, client } = configureCloudinary();
+
   if (!enabled) {
+    if (isEphemeralFilesystemRuntime()) {
+      return { url: "", publicId: "", storage: "dynamic" };
+    }
+
     const uploadsDir = await ensureUploadsDir();
     const safeFolder = (folder || "misc").replaceAll("/", "_");
     const safeId = (publicId || `file_${Date.now()}`).replaceAll("/", "_");
@@ -42,7 +56,7 @@ export const uploadBuffer = async ({
       (typeof process.env.SERVER_ORIGIN === "string"
         ? process.env.SERVER_ORIGIN.trim().replace(/\/$/, "")
         : "") || "http://localhost:5000";
-    return { url: `${origin}/uploads/${filename}`, publicId: filename };
+    return { url: `${origin}/uploads/${filename}`, publicId: filename, storage: "local" };
   }
 
   const dataUri = bufferToDataUri(buffer, mimetype);
@@ -54,5 +68,5 @@ export const uploadBuffer = async ({
     overwrite: true
   });
 
-  return { url: res.secure_url, publicId: res.public_id };
+  return { url: res.secure_url, publicId: res.public_id, storage: "cloudinary" };
 };

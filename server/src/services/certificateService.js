@@ -7,6 +7,9 @@ import { createCertificateHtml, renderCertificatePdf } from "./pdfService.js";
 const stripTrailingSlash = (value) =>
   typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
 
+const getServerOrigin = () =>
+  stripTrailingSlash(process.env.SERVER_ORIGIN) || "http://localhost:5000";
+
 const getDurationLabel = (application) => {
   const durationOption = application.internship?.durations?.find(
     (item) => item.key === application.durationKey
@@ -73,7 +76,7 @@ export const ensureCertificateForApplication = async (application) => {
     completionDate,
     issueDate: completionDate,
     certificateId,
-    pdfUrl: uploaded.url,
+    pdfUrl: uploaded.url || `${getServerOrigin()}/api/certificates/download/${certificateId}`,
     verifyUrl,
     verificationStatus: "Valid"
   });
