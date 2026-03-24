@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { Certificate } from "../models/Certificate.js";
 import { createCertificateHtml, renderCertificatePdf } from "../services/pdfService.js";
-import { normalizeServerDocumentUrl } from "../utils/origin.js";
+import { buildServerUrl } from "../utils/origin.js";
 
 const router = express.Router();
 const durationLabels = {
@@ -20,11 +20,7 @@ router.get("/me", protect, async (req, res, next) => {
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
-        pdfUrl: normalizeServerDocumentUrl(
-          certificate.pdfUrl,
-          req,
-          `/api/certificates/download/${certificate.certificateId}`
-        )
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
       }))
     });
   } catch (err) {
@@ -41,11 +37,7 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
-        pdfUrl: normalizeServerDocumentUrl(
-          certificate.pdfUrl,
-          req,
-          `/api/certificates/download/${certificate.certificateId}`
-        )
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
       }))
     });
   } catch (err) {
@@ -108,11 +100,7 @@ router.get("/verify/:certificateId", async (req, res, next) => {
       valid: certificate.verificationStatus !== "Revoked",
       certificate: {
         ...certificate.toObject(),
-        pdfUrl: normalizeServerDocumentUrl(
-          certificate.pdfUrl,
-          req,
-          `/api/certificates/download/${certificate.certificateId}`
-        )
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
       }
     });
   } catch (err) {

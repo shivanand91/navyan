@@ -1,8 +1,4 @@
-import QRCode from "qrcode";
-import { format } from "date-fns";
 import { Certificate } from "../models/Certificate.js";
-import { uploadBuffer } from "./cloudinaryUpload.js";
-import { createCertificateHtml, renderCertificatePdf } from "./pdfService.js";
 import { buildServerUrl } from "../utils/origin.js";
 
 const getDurationLabel = (application) => {
@@ -35,31 +31,7 @@ export const ensureCertificateForApplication = async (application, options = {})
     stripTrailingSlash(process.env.CERTIFICATE_VERIFY_BASE_URL) ||
     `${stripTrailingSlash(process.env.CLIENT_URL) || "http://localhost:5173"}/verify-certificate`;
   const verifyUrl = `${verifyBaseUrl}?cid=${certificateId}`;
-  const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
   const completionDate = new Date();
-
-  const html = await createCertificateHtml({
-    certificateId,
-    studentName:
-      application.user?.profile?.fullName || application.user?.fullName || "Navyan Student",
-    internshipTitle: application.internship?.title || "Internship",
-    role: application.internship?.role || application.internship?.title || "Intern",
-    durationLabel: getDurationLabel(application),
-    completionDateStr: format(completionDate, "dd MMM yyyy"),
-    issueDateStr: format(completionDate, "dd MMM yyyy"),
-    organizationName: "Navyan",
-    verifyUrl,
-    qrCodeDataUrl
-  });
-
-  const pdfBuffer = await renderCertificatePdf(html);
-  const uploaded = await uploadBuffer({
-    buffer: pdfBuffer,
-    mimetype: "application/pdf",
-    folder: "navyan/certificates",
-    publicId: certificateId,
-    resourceType: "raw"
-  });
 
   const certificate = await Certificate.create({
     application: application._id,
@@ -71,9 +43,7 @@ export const ensureCertificateForApplication = async (application, options = {})
     completionDate,
     issueDate: completionDate,
     certificateId,
-    pdfUrl:
-      uploaded.url ||
-      buildServerUrl(options.req, `/api/certificates/download/${certificateId}`),
+    pdfUrl: buildServerUrl(options.req, `/api/certificates/download/${certificateId}`),
     verifyUrl,
     verificationStatus: "Valid"
   });
