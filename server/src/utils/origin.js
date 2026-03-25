@@ -1,4 +1,4 @@
-const stripTrailingSlash = (value) =>
+export const stripTrailingSlash = (value) =>
   typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
 
 const LOCAL_ORIGIN_PATTERN = /^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?/i;

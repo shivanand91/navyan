@@ -1,5 +1,5 @@
 import { Certificate } from "../models/Certificate.js";
-import { buildServerUrl } from "../utils/origin.js";
+import { buildServerUrl, stripTrailingSlash } from "../utils/origin.js";
 
 const getDurationLabel = (application) => {
   const durationOption = application.internship?.durations?.find(
