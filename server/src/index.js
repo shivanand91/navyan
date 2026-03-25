@@ -18,12 +18,12 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import serviceInquiryRoutes from "./routes/serviceInquiryRoutes.js";
+import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
 const app = express();
 const isProduction = process.env.NODE_ENV === "production";
 
-const normalizeOrigin = (value) =>
-  typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
+const normalizeOrigin = (value) => normalizeAbsoluteUrl(value);
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -42,7 +42,10 @@ const createOriginMatcher = (value) => {
 
 const allowedOrigins = [
   ...(process.env.ALLOWED_ORIGINS || "").split(","),
-  process.env.CLIENT_URL || "https://www.navyan.online"
+  process.env.CLIENT_URL || "https://www.navyan.online",
+  "https://www.navyan.online",
+  "https://navyan.online",
+  "https://navyan.vercel.app"
 ]
   .map(normalizeOrigin)
   .filter(Boolean);
