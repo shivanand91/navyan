@@ -188,6 +188,15 @@ export const createPaymentIntent = async (req, res, next) => {
       });
     }
 
+    await PaymentAttempt.updateMany(
+      {
+        user: userId,
+        application: null,
+        status: "Initiated"
+      },
+      { $set: { status: "Expired" } }
+    );
+
     const blockingWorkflow = await findBlockingWorkflow(userId);
     if (blockingWorkflow) {
       return res.status(400).json(buildBlockingWorkflowResponse(blockingWorkflow));

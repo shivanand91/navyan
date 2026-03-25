@@ -12,7 +12,7 @@ export const APPLICATION_BLOCKING_STATUSES = [
   "Revision Requested"
 ];
 
-export const PAYMENT_BLOCKING_STATUSES = ["Initiated", "Submitted", "PendingVerification"];
+export const PAYMENT_BLOCKING_STATUSES = ["Submitted", "PendingVerification"];
 
 const getDurationLabel = (internship, durationKey) => {
   const duration = internship?.durations?.find((item) => item.key === durationKey);
