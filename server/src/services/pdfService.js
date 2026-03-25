@@ -460,6 +460,7 @@ export const createCertificateHtml = async ({
     <head>
       <meta charset="UTF-8" />
       <style>
+        @page { size: A4 landscape; margin: 0; }
         * { box-sizing: border-box; }
         body {
           margin: 0;
@@ -469,191 +470,190 @@ export const createCertificateHtml = async ({
         }
         .page {
           position: relative;
-          padding: 28px;
-          min-height: 100vh;
+          padding: 22px 24px 18px;
           background:
             radial-gradient(circle at top left, rgba(212,168,95,0.16), transparent 26%),
             radial-gradient(circle at bottom right, rgba(109,40,217,0.08), transparent 24%),
             linear-gradient(180deg, #fffcf8 0%, #f8f3ea 100%);
           border: 1px solid rgba(200,169,107,0.28);
-          border-radius: 28px;
+          border-radius: 24px;
           overflow: hidden;
         }
         .page::before {
           content: "";
           position: absolute;
-          inset: 14px;
+          inset: 12px;
           border: 1px solid rgba(15,23,42,0.08);
-          border-radius: 22px;
+          border-radius: 18px;
           pointer-events: none;
         }
         .topbar {
           position: relative;
           display: flex;
           justify-content: space-between;
-          gap: 24px;
+          gap: 18px;
           align-items: flex-start;
         }
         .brand {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
         }
         .logo {
-          width: 92px;
+          width: 82px;
           height: auto;
         }
         .brand-name {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 800;
           letter-spacing: 0.18em;
           text-transform: uppercase;
           color: #2b2113;
         }
         .brand-subtitle {
-          margin-top: 6px;
-          font-size: 12px;
+          margin-top: 4px;
+          font-size: 11px;
           letter-spacing: 0.14em;
           text-transform: uppercase;
           color: #7c6b54;
         }
         .id-chip {
-          padding: 10px 16px;
+          padding: 8px 14px;
           border-radius: 999px;
           background: rgba(212,168,95,0.12);
           border: 1px solid rgba(200,169,107,0.28);
           color: #6d4e14;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 800;
           letter-spacing: 0.14em;
           text-transform: uppercase;
         }
         .title-wrap {
-          margin-top: 18px;
+          margin-top: 14px;
           text-align: center;
         }
         .eyebrow {
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 800;
           color: #7c6b54;
           letter-spacing: 0.18em;
           text-transform: uppercase;
         }
         .title {
-          margin: 16px 0 0;
-          font-size: 38px;
+          margin: 12px 0 0;
+          font-size: 34px;
           line-height: 1.05;
           font-weight: 800;
           color: #15161c;
         }
         .subtitle {
-          margin: 10px auto 0;
-          max-width: 720px;
-          font-size: 13px;
-          line-height: 1.8;
+          margin: 8px auto 0;
+          max-width: 680px;
+          font-size: 12px;
+          line-height: 1.7;
           color: #4b5563;
         }
         .recipient {
-          margin-top: 26px;
+          margin-top: 18px;
           text-align: center;
-          padding: 22px 28px;
-          border-radius: 26px;
+          padding: 18px 22px;
+          border-radius: 22px;
           background: rgba(255,255,255,0.72);
           border: 1px solid rgba(15,23,42,0.08);
           box-shadow: 0 18px 40px rgba(15,23,42,0.06);
         }
         .recipient-name {
-          font-size: 34px;
+          font-size: 30px;
           font-weight: 800;
           color: #1f1728;
         }
         .recipient-copy {
-          margin-top: 14px;
-          font-size: 14px;
-          line-height: 1.9;
+          margin-top: 10px;
+          font-size: 12.5px;
+          line-height: 1.72;
           color: #374151;
         }
         .grid {
-          margin-top: 22px;
+          margin-top: 16px;
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
+          gap: 10px;
         }
         .card {
-          border-radius: 22px;
+          border-radius: 18px;
           border: 1px solid rgba(15,23,42,0.08);
           background: rgba(255,255,255,0.82);
-          padding: 16px 18px;
+          padding: 13px 15px;
         }
         .card-label {
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 800;
           letter-spacing: 0.16em;
           text-transform: uppercase;
           color: #7c6b54;
         }
         .card-value {
-          margin-top: 8px;
-          font-size: 15px;
+          margin-top: 6px;
+          font-size: 13px;
           font-weight: 700;
           color: #111827;
         }
         .footer {
-          margin-top: 24px;
+          margin-top: 18px;
           display: grid;
-          grid-template-columns: minmax(0, 1fr) 210px;
-          gap: 20px;
+          grid-template-columns: minmax(0, 1fr) 190px;
+          gap: 16px;
           align-items: end;
         }
         .signature-zone {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 24px;
+          gap: 18px;
         }
         .signature-card {
-          padding-top: 8px;
+          padding-top: 4px;
         }
         .signature {
-          width: 180px;
+          width: 168px;
           height: auto;
         }
         .sig-line {
-          margin-top: 8px;
-          padding-top: 8px;
+          margin-top: 6px;
+          padding-top: 6px;
           border-top: 1px solid rgba(15,23,42,0.18);
-          font-size: 12px;
+          font-size: 11px;
           color: #4b5563;
         }
         .sig-line strong {
           display: block;
-          margin-bottom: 4px;
-          font-size: 13px;
+          margin-bottom: 3px;
+          font-size: 12px;
           color: #111827;
         }
         .verify-box {
-          padding: 16px;
-          border-radius: 24px;
+          padding: 13px;
+          border-radius: 20px;
           border: 1px solid rgba(15,23,42,0.08);
           background: rgba(255,255,255,0.82);
           text-align: center;
         }
         .verify-box img {
-          width: 104px;
-          height: 104px;
+          width: 90px;
+          height: 90px;
         }
         .verify-title {
-          margin-top: 10px;
-          font-size: 11px;
+          margin-top: 8px;
+          font-size: 10px;
           font-weight: 800;
           letter-spacing: 0.16em;
           text-transform: uppercase;
           color: #7c6b54;
         }
         .verify-url {
-          margin-top: 8px;
-          font-size: 10px;
+          margin-top: 6px;
+          font-size: 8.8px;
           color: #6b7280;
-          line-height: 1.6;
+          line-height: 1.45;
           word-break: break-all;
         }
       </style>
@@ -744,10 +744,10 @@ export const renderCertificatePdf = async (html) => {
   return await generatePdfBufferFromHtml(html, {
     landscape: true,
     margin: {
-      top: "10mm",
-      right: "10mm",
-      bottom: "10mm",
-      left: "10mm"
+      top: "6mm",
+      right: "6mm",
+      bottom: "6mm",
+      left: "6mm"
     }
   });
 };

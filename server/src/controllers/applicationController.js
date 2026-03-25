@@ -6,7 +6,10 @@ import crypto from "crypto";
 import { addMonths, addWeeks, format } from "date-fns";
 import { createOfferLetterHtml, renderOfferLetterPdf } from "../services/pdfService.js";
 import { getProfileCompletion } from "../utils/profileCompletion.js";
-import { ensureCertificateForApplication } from "../services/certificateService.js";
+import {
+  buildCertificateVerifyUrl,
+  ensureCertificateForApplication
+} from "../services/certificateService.js";
 import {
   buildBlockingWorkflowResponse,
   findBlockingWorkflow
@@ -447,6 +450,11 @@ export const listMyApplications = async (req, res, next) => {
           certificate: application.certificate
             ? {
                 ...application.certificate.toObject?.(),
+                verifyUrl: buildCertificateVerifyUrl(
+                  req,
+                  application.certificate?.certificateId,
+                  application.certificate?.verifyUrl
+                ),
                 pdfUrl: normalizeServerDocumentUrl(
                   application.certificate?.pdfUrl,
                   req,
@@ -540,6 +548,11 @@ export const adminListApplications = async (req, res, next) => {
         certificate: application.certificate
           ? {
               ...application.certificate.toObject?.(),
+              verifyUrl: buildCertificateVerifyUrl(
+                req,
+                application.certificate?.certificateId,
+                application.certificate?.verifyUrl
+              ),
               pdfUrl: normalizeServerDocumentUrl(
                 application.certificate?.pdfUrl,
                 req,

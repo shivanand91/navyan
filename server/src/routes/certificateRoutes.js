@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { format } from "date-fns";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { Certificate } from "../models/Certificate.js";
+import { buildCertificateVerifyUrl } from "../services/certificateService.js";
 import { createCertificateHtml, renderCertificatePdf } from "../services/pdfService.js";
 import { buildServerUrl } from "../utils/origin.js";
 
@@ -20,7 +21,8 @@ router.get("/me", protect, async (req, res, next) => {
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
-        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+        verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }))
     });
   } catch (err) {
@@ -37,7 +39,8 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
-        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+        verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }))
     });
   } catch (err) {
@@ -55,13 +58,7 @@ router.get("/download/:certificateId", async (req, res, next) => {
       return res.status(404).json({ message: "Certificate not found" });
     }
 
-    const verifyUrl =
-      certificate.verifyUrl ||
-      `${
-        (typeof process.env.CERTIFICATE_VERIFY_BASE_URL === "string"
-          ? process.env.CERTIFICATE_VERIFY_BASE_URL.trim().replace(/\/$/, "")
-          : "") || "http://localhost:5173/verify-certificate"
-      }?cid=${certificate.certificateId}`;
+    const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
     const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
     const html = await createCertificateHtml({
       certificateId: certificate.certificateId,
@@ -100,7 +97,8 @@ router.get("/verify/:certificateId", async (req, res, next) => {
       valid: certificate.verificationStatus !== "Revoked",
       certificate: {
         ...certificate.toObject(),
-        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`)
+        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+        verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }
     });
   } catch (err) {

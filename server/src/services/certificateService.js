@@ -1,12 +1,22 @@
 import { Certificate } from "../models/Certificate.js";
-import { buildServerUrl, stripTrailingSlash } from "../utils/origin.js";
+import {
+  buildClientUrl,
+  buildServerUrl,
+  normalizeAbsoluteUrl,
+  normalizeClientDocumentUrl
+} from "../utils/origin.js";
 
-const getDurationLabel = (application) => {
-  const durationOption = application.internship?.durations?.find(
-    (item) => item.key === application.durationKey
-  );
+export const buildCertificateVerifyUrl = (req, certificateId, existingVerifyUrl = "") => {
+  const encodedCertificateId = encodeURIComponent(certificateId);
+  const fallbackPath = `/verify-certificate?cid=${encodedCertificateId}`;
+  const configuredBaseUrl = normalizeAbsoluteUrl(process.env.CERTIFICATE_VERIFY_BASE_URL);
 
-  return durationOption?.label || application.durationKey;
+  if (configuredBaseUrl) {
+    const configuredUrl = `${configuredBaseUrl}?cid=${encodedCertificateId}`;
+    return normalizeClientDocumentUrl(existingVerifyUrl || configuredUrl, req, fallbackPath);
+  }
+
+  return normalizeClientDocumentUrl(existingVerifyUrl, req, fallbackPath) || buildClientUrl(req, fallbackPath);
 };
 
 export const ensureCertificateForApplication = async (application, options = {}) => {
@@ -27,10 +37,7 @@ export const ensureCertificateForApplication = async (application, options = {})
   const certificateId = `NAV-CERT-${new Date().getFullYear()}-${String(application._id)
     .slice(-6)
     .toUpperCase()}`;
-  const verifyBaseUrl =
-    stripTrailingSlash(process.env.CERTIFICATE_VERIFY_BASE_URL) ||
-    `${stripTrailingSlash(process.env.CLIENT_URL) || "http://localhost:5173"}/verify-certificate`;
-  const verifyUrl = `${verifyBaseUrl}?cid=${certificateId}`;
+  const verifyUrl = buildCertificateVerifyUrl(options.req, certificateId);
   const completionDate = new Date();
 
   const certificate = await Certificate.create({
