@@ -422,7 +422,7 @@ export const createOfferLetterHtml = async ({
         </div>
 
         <div class="footer">
-          <span>Generated digitally by the Navyan internship workflow system.</span>
+          <span>This document has been officially issued by the Navyan.</span>
           <span>${escapeHtml(issueDateStr)}</span>
         </div>
       </div>
