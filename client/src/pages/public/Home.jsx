@@ -12,6 +12,7 @@ import {
   Clock3,
   Code2,
   FileText,
+  Globe2,
   Layers3,
   Rocket,
   ShieldCheck,
@@ -29,7 +30,9 @@ import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 import { TestimonialCarousel } from "@/components/premium/TestimonialCarousel";
 
-const trustMetrics = [
+const VISITOR_STORAGE_KEY = "navyan_visitor_id";
+
+const baseTrustMetrics = [
   { label: "Structured workflows", value: "8+", hint: "Lifecycle", icon: Layers3, tone: "gold" },
   { label: "Public verification", value: "100%", hint: "Trust", icon: ShieldCheck, tone: "cyan" },
   { label: "Internship formats", value: "3", hint: "Programs", icon: BriefcaseBusiness, tone: "violet" },
@@ -165,6 +168,7 @@ const testimonials = [
 export default function Home() {
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visitorStats, setVisitorStats] = useState(null);
 
   const faqItems = useMemo(
     () =>
@@ -175,6 +179,23 @@ export default function Home() {
       })),
     []
   );
+
+  const trustMetrics = useMemo(() => {
+    const formattedVisitors = new Intl.NumberFormat("en-IN").format(
+      visitorStats?.uniqueVisitors || 0
+    );
+
+    return [
+      {
+        label: "Tracked visitors",
+        value: visitorStats ? formattedVisitors : "…",
+        hint: "Live",
+        icon: Globe2,
+        tone: "gold"
+      },
+      ...baseTrustMetrics
+    ];
+  }, [visitorStats]);
 
   useEffect(() => {
     const load = async () => {
@@ -189,6 +210,61 @@ export default function Home() {
     };
 
     load();
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const getOrCreateVisitorId = () => {
+      if (typeof window === "undefined") return "";
+
+      const existingId = window.localStorage.getItem(VISITOR_STORAGE_KEY);
+      if (existingId) {
+        return existingId;
+      }
+
+      const createdId =
+        typeof window.crypto?.randomUUID === "function"
+          ? window.crypto.randomUUID()
+          : `navyan-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      window.localStorage.setItem(VISITOR_STORAGE_KEY, createdId);
+      return createdId;
+    };
+
+    const trackVisitor = async () => {
+      try {
+        const visitorId = getOrCreateVisitorId();
+        if (!visitorId) return;
+
+        const { data } = await api.post("/analytics/visit", {
+          visitorId,
+          path: window.location.pathname,
+          referrer: document.referrer
+        });
+
+        if (!ignore) {
+          setVisitorStats(data.stats || null);
+        }
+      } catch (error) {
+        try {
+          const { data } = await api.get("/analytics/public");
+          if (!ignore) {
+            setVisitorStats(data.stats || null);
+          }
+        } catch {
+          if (!ignore) {
+            setVisitorStats(null);
+          }
+        }
+      }
+    };
+
+    trackVisitor();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   return (
@@ -346,7 +422,7 @@ export default function Home() {
             title="A product stack built for trust, progression, and premium execution."
             description="Navyan is not a brochure site. It is a modern internship lifecycle platform and a premium service workflow in one connected interface."
           />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             {trustMetrics.map((item, index) => (
               <RevealInView key={item.label} delay={index * 0.05}>
                 <MetricCard {...item} />
