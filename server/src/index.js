@@ -19,6 +19,7 @@ import submissionRoutes from "./routes/submissionRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import serviceInquiryRoutes from "./routes/serviceInquiryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
 const app = express();
@@ -126,6 +127,7 @@ app.use("/api/submissions", submissionRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/service-inquiries", serviceInquiryRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/jobs", jobRoutes);
 
 // 404 + errors
 app.use(notFound);

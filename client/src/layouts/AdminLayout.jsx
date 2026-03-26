@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   BadgeCheck,
   BarChart3,
+  Briefcase,
   BriefcaseBusiness,
   FileSearch,
   Layers3,
@@ -20,6 +21,7 @@ import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 const links = [
   { to: "/admin", label: "Overview", icon: BarChart3, caption: "Analytics" },
   { to: "/admin/internships", label: "Internships", icon: BriefcaseBusiness, caption: "Programs" },
+  { to: "/admin/jobs", label: "Jobs", icon: Briefcase, caption: "Hiring" },
   { to: "/admin/applications", label: "Applications", icon: Users2, caption: "Candidates" },
   { to: "/admin/submissions", label: "Submissions", icon: FileSearch, caption: "Reviews" },
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },

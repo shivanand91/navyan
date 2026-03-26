@@ -9,6 +9,7 @@ const Home = lazy(() => import("@/pages/public/Home"));
 const Internships = lazy(() => import("@/pages/public/Internships"));
 const InternshipDetail = lazy(() => import("@/pages/public/InternshipDetail"));
 const Services = lazy(() => import("@/pages/public/Services"));
+const Jobs = lazy(() => import("@/pages/public/Jobs"));
 const About = lazy(() => import("@/pages/public/About"));
 const Contact = lazy(() => import("@/pages/public/Contact"));
 const VerifyCertificate = lazy(() => import("@/pages/public/VerifyCertificate"));
@@ -18,10 +19,12 @@ const StudentDashboard = lazy(() => import("@/pages/student/Dashboard"));
 const ProfileOverview = lazy(() => import("@/pages/student/ProfileOverview"));
 const Profile = lazy(() => import("@/pages/student/Profile"));
 const StudentInternships = lazy(() => import("@/pages/student/Internships"));
+const StudentJobs = lazy(() => import("@/pages/student/Jobs"));
 const Applications = lazy(() => import("@/pages/student/Applications"));
 const Certificates = lazy(() => import("@/pages/student/Certificates"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminInternships = lazy(() => import("@/pages/admin/Internships"));
+const AdminJobs = lazy(() => import("@/pages/admin/Jobs"));
 const AdminApplications = lazy(() => import("@/pages/admin/Applications"));
 const AdminSubmissions = lazy(() => import("@/pages/admin/Submissions"));
 const AdminCertificates = lazy(() => import("@/pages/admin/Certificates"));
@@ -61,6 +64,7 @@ export default function App() {
         <Route path="/" element={<LazyPage><Home /></LazyPage>} />
         <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
         <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
+        <Route path="/jobs" element={<LazyPage><Jobs /></LazyPage>} />
         <Route path="/services" element={<LazyPage><Services /></LazyPage>} />
         <Route path="/about" element={<LazyPage><About /></LazyPage>} />
         <Route path="/contact" element={<LazyPage><Contact /></LazyPage>} />
@@ -82,6 +86,7 @@ export default function App() {
         <Route path="profile" element={<LazyPage><ProfileOverview /></LazyPage>} />
         <Route path="profile/edit" element={<LazyPage><Profile /></LazyPage>} />
         <Route path="internships" element={<LazyPage><StudentInternships /></LazyPage>} />
+        <Route path="jobs" element={<LazyPage><StudentJobs /></LazyPage>} />
         <Route path="applications" element={<LazyPage><Applications /></LazyPage>} />
         <Route path="certificates" element={<LazyPage><Certificates /></LazyPage>} />
       </Route>
@@ -96,6 +101,7 @@ export default function App() {
       >
         <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
         <Route path="internships" element={<LazyPage><AdminInternships /></LazyPage>} />
+        <Route path="jobs" element={<LazyPage><AdminJobs /></LazyPage>} />
         <Route path="applications" element={<LazyPage><AdminApplications /></LazyPage>} />
         <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />
         <Route path="certificates" element={<LazyPage><AdminCertificates /></LazyPage>} />

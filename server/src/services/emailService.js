@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { normalizeAbsoluteUrl } from "../utils/origin.js";
 
 const durationLabels = {
   "4-weeks": "4 weeks",
@@ -86,7 +87,7 @@ const stripTrailingSlash = (value) =>
   typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
 
 const getDashboardBaseUrl = () =>
-  stripTrailingSlash(process.env.CLIENT_URL) || "https://navyan.online";
+  normalizeAbsoluteUrl(process.env.CLIENT_URL) || "https://navyan.online";
 
 const getDurationLabel = (internship, durationKey) => {
   const duration = internship?.durations?.find((item) => item.key === durationKey);
@@ -100,6 +101,8 @@ const getRecipientEmail = (user) => user?.profile?.email || user?.email || "";
 const getInternshipTitle = (internship) => internship?.title || internship?.role || "Internship";
 
 const getRoleLabel = (internship) => internship?.role || internship?.title || "Internship";
+
+const getJobBaseUrl = () => `${getDashboardBaseUrl()}/jobs`;
 
 const getFromAddress = () =>
   process.env.EMAIL_FROM?.trim() || process.env.RESEND_FROM?.trim() || "";
@@ -456,6 +459,45 @@ export const sendApplicationStatusEmail = async ({
       nextStep: meta.nextStep,
       primaryAction: action,
       secondaryAction
+    })
+  });
+};
+
+export const sendNewJobPostedEmail = async ({ user, job }) => {
+  const recipient = getRecipientEmail(user);
+  if (!recipient || !job?.title) {
+    return false;
+  }
+
+  const studentName = getStudentName(user);
+  const roleLabel = job.role || job.title;
+  const actionHref =
+    job.sourceType === "external" && job.applyUrl
+      ? job.applyUrl
+      : getJobBaseUrl();
+
+  return sendEmail({
+    to: recipient,
+    subject: `Navyan: New job opening - ${job.title}`,
+    text: `Hello ${studentName}, a new ${job.title} opening has been added on Navyan for ${job.companyName}. Check it here: ${actionHref}`,
+    html: buildEmailLayout({
+      eyebrow: "New job opening",
+      title: `${job.title} is now live on Navyan`,
+      intro: `Hello ${studentName}, a new opportunity has been added for ${job.companyName}. Explore the role details and apply if it matches your profile.`,
+      summaryRows: [
+        { label: "Job title", value: job.title },
+        { label: "Company", value: job.companyName || "Navyan" },
+        { label: "Role", value: roleLabel },
+        { label: "Location", value: job.location || "Flexible" }
+      ],
+      nextStep:
+        job.sourceType === "external"
+          ? "This role uses an external apply link. Review the posting and continue on the company application page."
+          : "This role uses the Navyan portal. Log in to your student dashboard to apply with your profile.",
+      primaryAction: {
+        href: actionHref,
+        label: job.sourceType === "external" ? "Open company apply link" : "Explore jobs on Navyan"
+      }
     })
   });
 };

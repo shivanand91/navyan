@@ -1,5 +1,14 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { Compass, FileBadge2, FolderKanban, LayoutDashboard, Search, Settings2, UserRound } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Compass,
+  FileBadge2,
+  FolderKanban,
+  LayoutDashboard,
+  Search,
+  Settings2,
+  UserRound
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,6 +20,7 @@ import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 const links = [
   { to: "/student", label: "Overview", icon: LayoutDashboard, caption: "Home" },
   { to: "/student/internships", label: "Internships", icon: Compass, caption: "Apply" },
+  { to: "/student/jobs", label: "Jobs", icon: BriefcaseBusiness, caption: "Career" },
   { to: "/student/applications", label: "My Applications", icon: FolderKanban, caption: "Track" },
   { to: "/student/certificates", label: "Certificates", icon: FileBadge2, caption: "Proof" },
   { to: "/student/profile", label: "Profile", icon: UserRound, caption: "Identity" },

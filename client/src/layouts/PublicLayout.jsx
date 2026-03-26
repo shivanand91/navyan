@@ -9,6 +9,7 @@ import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 const navLinks = [
   { to: "/", label: "Home", caption: "Start" },
   { to: "/internships", label: "Internships", caption: "Talent" },
+  { to: "/jobs", label: "Jobs", caption: "Careers" },
   { to: "/services", label: "Services", caption: "Studio" },
   { to: "/verify-certificate", label: "Verify", caption: "Trust" },
   { to: "/about", label: "About", caption: "Brand" },
