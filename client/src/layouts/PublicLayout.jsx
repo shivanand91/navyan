@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ArrowRight, Github, Instagram, Linkedin, Youtube } from "lucide-react";
+import { ArrowRight, Github, Instagram, Linkedin, X, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -17,24 +17,24 @@ const navLinks = [
 
 const socialLinks = [
   {
-    href: "https://example.com/navyan-instagram",
+    href: "#",
     label: "Instagram",
     icon: Instagram
   },
   {
-    href: "https://example.com/navyan-linkedin",
+    href: "https://www.linkedin.com/company/navyan",
     label: "LinkedIn",
     icon: Linkedin
   },
   {
-    href: "https://example.com/navyan-youtube",
+    href: "https://youtu.be/3XBvTJydmFE?si=VxWg2f7zP_OuHyI6",
     label: "YouTube",
     icon: Youtube
   },
   {
     href: "https://example.com/navyan-github",
-    label: "GitHub",
-    icon: Github
+    label: "X.com",
+    icon: X
   }
 ];
 
