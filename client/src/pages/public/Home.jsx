@@ -66,6 +66,62 @@ const studentSignals = [
   "Certificate verification is public, permanent, and brand-safe."
 ];
 
+const durationTracks = [
+  {
+    duration: "4 Weeks",
+    label: "Fast practical start",
+    title: "Project-based learning with a verified internship experience.",
+    description:
+      "A compact track for students who want hands-on execution without waiting months to see progress.",
+    accentLineClass: "from-primary via-primary/40 to-transparent",
+    badgeClass: "border-primary/20 bg-primary/10 text-primary",
+    featureTone: "text-primary",
+    outcomeTone: "border-primary/15 bg-primary/10 dark:bg-primary/10",
+    features: [
+      "Project-based learning with structured task execution.",
+      "A verified Navyan internship workflow from start to finish.",
+      "Completion certificate after successful internship completion."
+    ],
+    outcome: "Ideal for students who want skill momentum, clarity, and a strong first internship credential."
+  },
+  {
+    duration: "3 Months",
+    label: "Most balanced track",
+    title: "Real-world problem solving with deeper review, rewards, and credibility.",
+    description:
+      "A stronger internship format for students who want more than guided tasks and want to work closer to execution reality.",
+    accentLineClass: "from-secondary via-secondary/45 to-transparent",
+    badgeClass: "border-secondary/20 bg-secondary/10 text-secondary",
+    featureTone: "text-secondary",
+    outcomeTone: "border-secondary/15 bg-secondary/10 dark:bg-secondary/10",
+    features: [
+      "Work on real-world problem statements with execution pressure.",
+      "Completion certificate after successful delivery and evaluation.",
+      "Top performers may receive swags and exciting gifts.",
+      "Future letter of recommendation support for strong performers."
+    ],
+    outcome: "Best for students who want stronger portfolio proof, visible performance feedback, and brand-backed recognition."
+  },
+  {
+    duration: "6 Months",
+    label: "Deepest growth path",
+    title: "Longer ownership, stronger outcomes, and the most serious performance rewards.",
+    description:
+      "The long-duration track is for students who want more depth, more responsibility, and a higher-trust internship arc.",
+    accentLineClass: "from-success via-success/45 to-transparent",
+    badgeClass: "border-success/20 bg-success/10 text-success",
+    featureTone: "text-success",
+    outcomeTone: "border-success/15 bg-success/10 dark:bg-success/10",
+    features: [
+      "Includes everything available in the 3-month track.",
+      "Deeper exposure to longer execution cycles and delivery consistency.",
+      "Swags and gifts for strong performers.",
+      "Letter of recommendation support for standout candidates."
+    ],
+    outcome: "Designed for students who want long-term growth, stronger discipline, and a premium internship story."
+  }
+];
+
 const faqs = [
   {
     q: "Is Navyan only an internship portal?",
@@ -471,6 +527,112 @@ export default function Home() {
               </div>
             </div>
           </RevealInView>
+        </div>
+      </section>
+
+      <section className="navyan-section px-4 md:px-6">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <SectionHeading
+            eyebrow="Duration tracks"
+            title="Choose the internship depth that matches your ambition."
+            description="Every Navyan duration is verified and outcome-driven. The difference is how deeply you work, how much exposure you get, and what performance rewards become possible."
+          />
+
+          <div className="grid gap-4 xl:grid-cols-[0.34fr_0.66fr]">
+            <RevealInView className="navyan-panel p-6">
+              <p className="navyan-pill">What every track includes</p>
+              <h3 className="mt-5 font-display text-3xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                Verified internships with clear outcomes and visible progress.
+              </h3>
+              <div className="mt-6 space-y-4">
+                {[
+                  {
+                    title: "Verified internship record",
+                    description: "Every selected student moves through a structured workflow with status visibility and document support.",
+                    icon: ShieldCheck,
+                    tone: "text-primary"
+                  },
+                  {
+                    title: "Task-based learning",
+                    description: "Students work against defined project or problem statements instead of vague internship promises.",
+                    icon: Code2,
+                    tone: "text-secondary"
+                  },
+                  {
+                    title: "Completion-backed credibility",
+                    description: "Certificates and performance outcomes stay tied to actual execution, not just enrollment.",
+                    icon: FileText,
+                    tone: "text-success"
+                  }
+                ].map((item) => (
+                  <div key={item.title} className="rounded-[22px] border border-white/8 bg-white/5 p-4">
+                    <item.icon className={`h-4 w-4 ${item.tone}`} />
+                    <p className="mt-4 text-sm font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                      {item.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </RevealInView>
+
+              <div className="grid gap-4 lg:grid-cols-3">
+              {durationTracks.map((track, index) => (
+                <RevealInView key={track.duration} delay={index * 0.05} className="h-full">
+                  <div className="navyan-card h-full p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] dark:hover:shadow-[0_28px_80px_rgba(0,0,0,0.34)]">
+                    <div className={`mb-6 h-px w-full bg-gradient-to-r ${track.accentLineClass}`} />
+
+                    <div className="flex h-full flex-col">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-[#8c96a3]">
+                            {track.label}
+                          </p>
+                          <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.05em] text-slate-950 dark:text-[#f5f7fa]">
+                            {track.duration}
+                          </h3>
+                        </div>
+                        <div className={`rounded-full border px-3 py-1 text-[11px] font-semibold ${track.badgeClass}`}>
+                          Verified
+                        </div>
+                      </div>
+
+                      <div className="mt-5 space-y-3">
+                        <p className="text-lg font-semibold leading-8 text-slate-950 dark:text-[#f5f7fa]">
+                          {track.title}
+                        </p>
+                        <p className="text-sm leading-7 text-slate-700 dark:text-[#c7cfdb]">
+                          {track.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-6 flex-1 space-y-3">
+                        {track.features.map((feature) => (
+                          <div key={feature} className="flex items-start gap-3">
+                            <BadgeCheck className={`mt-1 h-4 w-4 shrink-0 ${track.featureTone}`} />
+                            <p className="text-sm leading-7 text-slate-800 dark:text-[#dbe2ec]">
+                              {feature}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className={`mt-6 rounded-[22px] border p-4 ${track.outcomeTone}`}>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-[#8c96a3]">
+                          Why choose this
+                        </p>
+                        <p className="mt-3 text-sm leading-7 text-slate-800 dark:text-[#dbe2ec]">
+                          {track.outcome}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </RevealInView>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
