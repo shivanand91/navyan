@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Drawer } from "vaul";
 import { Menu } from "lucide-react";
@@ -11,8 +12,14 @@ export function MobileDrawerNav({
   pathname,
   actions
 }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
-    <Drawer.Root shouldScaleBackground>
+    <Drawer.Root open={open} onOpenChange={setOpen} shouldScaleBackground>
       <Drawer.Trigger asChild>
         <Button variant="outline" size="icon">
           <Menu className="h-4 w-4" />

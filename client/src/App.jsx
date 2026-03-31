@@ -1,5 +1,5 @@
-import { Suspense, lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { StudentLayout } from "@/layouts/StudentLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
@@ -58,57 +58,71 @@ function LazyPage({ children }) {
   return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname, location.search]);
+
+  return null;
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<LazyPage><Home /></LazyPage>} />
-        <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
-        <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
-        <Route path="/jobs" element={<LazyPage><Jobs /></LazyPage>} />
-        <Route path="/services" element={<LazyPage><Services /></LazyPage>} />
-        <Route path="/about" element={<LazyPage><About /></LazyPage>} />
-        <Route path="/contact" element={<LazyPage><Contact /></LazyPage>} />
-        <Route path="/verify-certificate" element={<LazyPage><VerifyCertificate /></LazyPage>} />
-        <Route path="/verify-certificate/:certificateId" element={<LazyPage><VerifyCertificate /></LazyPage>} />
-        <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
-        <Route path="/signup" element={<LazyPage><Signup /></LazyPage>} />
-      </Route>
+    <>
+      <ScrollToTop />
 
-      <Route
-        path="/student"
-        element={
-          <PrivateRoute role="student">
-            <StudentLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<LazyPage><StudentDashboard /></LazyPage>} />
-        <Route path="profile" element={<LazyPage><ProfileOverview /></LazyPage>} />
-        <Route path="profile/edit" element={<LazyPage><Profile /></LazyPage>} />
-        <Route path="internships" element={<LazyPage><StudentInternships /></LazyPage>} />
-        <Route path="jobs" element={<LazyPage><StudentJobs /></LazyPage>} />
-        <Route path="applications" element={<LazyPage><Applications /></LazyPage>} />
-        <Route path="certificates" element={<LazyPage><Certificates /></LazyPage>} />
-      </Route>
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LazyPage><Home /></LazyPage>} />
+          <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
+          <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
+          <Route path="/jobs" element={<LazyPage><Jobs /></LazyPage>} />
+          <Route path="/services" element={<LazyPage><Services /></LazyPage>} />
+          <Route path="/about" element={<LazyPage><About /></LazyPage>} />
+          <Route path="/contact" element={<LazyPage><Contact /></LazyPage>} />
+          <Route path="/verify-certificate" element={<LazyPage><VerifyCertificate /></LazyPage>} />
+          <Route path="/verify-certificate/:certificateId" element={<LazyPage><VerifyCertificate /></LazyPage>} />
+          <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
+          <Route path="/signup" element={<LazyPage><Signup /></LazyPage>} />
+        </Route>
 
-      <Route
-        path="/admin"
-        element={
-          <PrivateRoute role="admin">
-            <AdminLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
-        <Route path="internships" element={<LazyPage><AdminInternships /></LazyPage>} />
-        <Route path="jobs" element={<LazyPage><AdminJobs /></LazyPage>} />
-        <Route path="referrals" element={<LazyPage><AdminReferrals /></LazyPage>} />
-        <Route path="applications" element={<LazyPage><AdminApplications /></LazyPage>} />
-        <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />
-        <Route path="certificates" element={<LazyPage><AdminCertificates /></LazyPage>} />
-        <Route path="service-inquiries" element={<LazyPage><ServiceInquiries /></LazyPage>} />
-      </Route>
-    </Routes>
+        <Route
+          path="/student"
+          element={
+            <PrivateRoute role="student">
+              <StudentLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<LazyPage><StudentDashboard /></LazyPage>} />
+          <Route path="profile" element={<LazyPage><ProfileOverview /></LazyPage>} />
+          <Route path="profile/edit" element={<LazyPage><Profile /></LazyPage>} />
+          <Route path="internships" element={<LazyPage><StudentInternships /></LazyPage>} />
+          <Route path="jobs" element={<LazyPage><StudentJobs /></LazyPage>} />
+          <Route path="applications" element={<LazyPage><Applications /></LazyPage>} />
+          <Route path="certificates" element={<LazyPage><Certificates /></LazyPage>} />
+        </Route>
+
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute role="admin">
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="internships" element={<LazyPage><AdminInternships /></LazyPage>} />
+          <Route path="jobs" element={<LazyPage><AdminJobs /></LazyPage>} />
+          <Route path="referrals" element={<LazyPage><AdminReferrals /></LazyPage>} />
+          <Route path="applications" element={<LazyPage><AdminApplications /></LazyPage>} />
+          <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />
+          <Route path="certificates" element={<LazyPage><AdminCertificates /></LazyPage>} />
+          <Route path="service-inquiries" element={<LazyPage><ServiceInquiries /></LazyPage>} />
+        </Route>
+      </Routes>
+    </>
   );
 }
