@@ -408,7 +408,7 @@ export default function StudentInternships() {
 
                   <div className="flex flex-col gap-3 lg:items-end">
                     <Button onClick={() => openInternshipModal(internship)}>
-                      Open workflow
+                      Apply Now
                       <ArrowUpRight className="ml-2 h-4 w-4" />
                     </Button>
                     <p className="max-w-[220px] text-xs text-slate-500 dark:text-[#7e8794] lg:text-right">

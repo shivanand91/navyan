@@ -140,7 +140,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
       <div className="space-y-4">
         <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
-            Cohort details
+            Internship details
           </p>
           <div className="mt-4 space-y-3">
             <div className="flex items-start gap-3 rounded-[22px] border border-white/8 bg-[#0f1318] p-4">
