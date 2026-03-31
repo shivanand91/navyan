@@ -7,6 +7,7 @@ import {
   FileSearch,
   Layers3,
   Search,
+  Share2,
   ShieldCheck,
   Users2
 } from "lucide-react";
@@ -22,6 +23,7 @@ const links = [
   { to: "/admin", label: "Overview", icon: BarChart3, caption: "Analytics" },
   { to: "/admin/internships", label: "Internships", icon: BriefcaseBusiness, caption: "Programs" },
   { to: "/admin/jobs", label: "Jobs", icon: Briefcase, caption: "Hiring" },
+  { to: "/admin/referrals", label: "Referrals", icon: Share2, caption: "Codes" },
   { to: "/admin/applications", label: "Applications", icon: Users2, caption: "Candidates" },
   { to: "/admin/submissions", label: "Submissions", icon: FileSearch, caption: "Reviews" },
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },

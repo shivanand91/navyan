@@ -25,6 +25,7 @@ const Certificates = lazy(() => import("@/pages/student/Certificates"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminInternships = lazy(() => import("@/pages/admin/Internships"));
 const AdminJobs = lazy(() => import("@/pages/admin/Jobs"));
+const AdminReferrals = lazy(() => import("@/pages/admin/Referrals"));
 const AdminApplications = lazy(() => import("@/pages/admin/Applications"));
 const AdminSubmissions = lazy(() => import("@/pages/admin/Submissions"));
 const AdminCertificates = lazy(() => import("@/pages/admin/Certificates"));
@@ -102,6 +103,7 @@ export default function App() {
         <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
         <Route path="internships" element={<LazyPage><AdminInternships /></LazyPage>} />
         <Route path="jobs" element={<LazyPage><AdminJobs /></LazyPage>} />
+        <Route path="referrals" element={<LazyPage><AdminReferrals /></LazyPage>} />
         <Route path="applications" element={<LazyPage><AdminApplications /></LazyPage>} />
         <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />
         <Route path="certificates" element={<LazyPage><AdminCertificates /></LazyPage>} />

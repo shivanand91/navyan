@@ -58,6 +58,14 @@ const applicationSchema = new mongoose.Schema(
         default: "Not Required"
       }
     },
+    referral: {
+      referralCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ReferralCode"
+      },
+      code: String,
+      ownerName: String
+    },
     offerLetter: {
       id: String,
       accessToken: String,

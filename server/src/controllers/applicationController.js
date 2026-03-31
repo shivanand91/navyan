@@ -15,6 +15,10 @@ import {
   findBlockingWorkflow
 } from "../services/applicationAccessService.js";
 import {
+  findActiveReferralCodeByValue,
+  incrementReferralUsage
+} from "./referralController.js";
+import {
   sendApplicationReceivedEmail,
   sendApplicationStatusEmail
 } from "../services/emailService.js";
@@ -265,7 +269,14 @@ export const createPaymentIntent = async (req, res, next) => {
 export const applyToInternship = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const { internshipId, durationKey, motivation, paymentAttemptId, utrNumber } = req.body;
+    const {
+      internshipId,
+      durationKey,
+      motivation,
+      paymentAttemptId,
+      utrNumber,
+      referralCode
+    } = req.body;
 
     if (!internshipId || !durationKey) {
       return res.status(400).json({ message: "Missing fields" });
@@ -308,6 +319,22 @@ export const applyToInternship = async (req, res, next) => {
     let payment = {
       status: "Not Required"
     };
+    let referral = null;
+
+    if (referralCode) {
+      const activeReferral = await findActiveReferralCodeByValue(referralCode);
+      if (!activeReferral) {
+        return res.status(400).json({
+          message: "This referral code is invalid or no longer active."
+        });
+      }
+
+      referral = {
+        referralCode: activeReferral._id,
+        code: activeReferral.code,
+        ownerName: activeReferral.ownerName
+      };
+    }
 
     if (isPaid) {
       if (!paymentAttemptId || !utrNumber) {
@@ -381,13 +408,18 @@ export const applyToInternship = async (req, res, next) => {
       durationKey,
       motivation,
       status: "Under Review",
-      payment
+      payment,
+      referral
     });
 
     if (payment.paymentAttempt) {
       await PaymentAttempt.findByIdAndUpdate(payment.paymentAttempt, {
         application: application._id
       });
+    }
+
+    if (referral?.referralCode) {
+      await incrementReferralUsage(referral.referralCode);
     }
 
     await sendApplicationReceivedEmail({
@@ -539,6 +571,8 @@ export const adminListApplications = async (req, res, next) => {
             application.user?.email,
             application.internship?.title,
             application.internship?.role,
+            application.referral?.code,
+            application.referral?.ownerName,
             application.durationKey,
             application.status
           ]

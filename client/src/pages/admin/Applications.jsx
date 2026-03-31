@@ -218,6 +218,12 @@ export default function AdminApplications() {
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Domain: {app.domainLabel || app.internship?.role || app.internship?.title || "General Internship"}
             </p>
+            {app.referral?.code ? (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Referral: {app.referral.code}
+                {app.referral.ownerName ? ` · ${app.referral.ownerName}` : ""}
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-3 pt-1 text-[11px]">
               {app.user?.profile?.resumeUrl && (
                 <a
