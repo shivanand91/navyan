@@ -59,8 +59,8 @@ export function AdminLayout() {
   return (
     <div className="navyan-shell min-h-screen">
       <div className="mx-auto flex max-w-[1560px] gap-5 px-3 py-3 md:px-5 md:py-5">
-        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col overflow-hidden bg-[#0f1318]/96 text-[#f5f7fa] lg:flex">
-          <div className="border-b border-white/8 px-5 py-5">
+        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col bg-[#0f1318]/96 text-[#f5f7fa] lg:flex">
+          <div className="shrink-0 border-b border-white/8 px-5 py-5">
             <Link to={dashboardHomePath}>
               <BrandLogo imageClassName="h-12 md:h-14" />
             </Link>
@@ -77,7 +77,7 @@ export function AdminLayout() {
             </div>
           </div>
 
-          <nav className="flex-1 space-y-2 px-4 py-5">
+          <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 py-5">
             {links.map((link) => (
               <NavLink
                 key={link.to}
@@ -100,18 +100,23 @@ export function AdminLayout() {
             ))}
           </nav>
 
-          <div className="mt-auto border-t border-white/8 p-4">
+          <div className="mt-auto shrink-0 border-t border-white/8 p-4">
             <div className="rounded-[22px] border border-white/8 bg-white/5 p-4">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-display text-base font-semibold text-[#f5f7fa]">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-base font-semibold text-[#f5f7fa]">
                     {user?.fullName}
                   </p>
-                  <p className="text-xs text-[#7e8794]">{user?.email}</p>
+                  <p className="truncate text-xs text-[#7e8794]">{user?.email}</p>
                 </div>
                 <ThemeToggle variant="ghost" />
               </div>
-              <Button variant="ghost" size="sm" className="mt-4 w-full justify-start" onClick={logout}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-4 w-full justify-start"
+                onClick={logout}
+              >
                 Logout
               </Button>
             </div>
