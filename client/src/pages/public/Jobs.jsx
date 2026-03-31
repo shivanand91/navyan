@@ -26,6 +26,12 @@ const createEmptyFilters = () => ({
   employmentType: ""
 });
 
+const normalizeExternalUrl = (value) => {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed.replace(/^\/+/, "")}`;
+};
+
 export default function Jobs() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
@@ -251,7 +257,7 @@ export default function Jobs() {
                               </Link>
                             )
                           ) : (
-                            <a href={job.applyUrl} target="_blank" rel="noreferrer">
+                            <a href={normalizeExternalUrl(job.applyUrl)} target="_blank" rel="noreferrer">
                               <Button className="w-full">
                                 Open company apply link
                                 <ArrowUpRight className="ml-2 h-4 w-4" />

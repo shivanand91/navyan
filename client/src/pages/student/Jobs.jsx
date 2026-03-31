@@ -16,6 +16,12 @@ const createEmptyFilters = () => ({
   employmentType: ""
 });
 
+const normalizeExternalUrl = (value) => {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed.replace(/^\/+/, "")}`;
+};
+
 export default function StudentJobs() {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -53,7 +59,7 @@ export default function StudentJobs() {
 
   const applyToJob = async (job) => {
     if (!job?.isInternal) {
-      window.open(job.applyUrl, "_blank", "noopener,noreferrer");
+      window.open(normalizeExternalUrl(job.applyUrl), "_blank", "noopener,noreferrer");
       return;
     }
 

@@ -2,6 +2,7 @@ import { Job } from "../models/Job.js";
 import { JobApplication } from "../models/JobApplication.js";
 import { User } from "../models/User.js";
 import { sendNewJobPostedEmail } from "../services/emailService.js";
+import { normalizeAbsoluteUrl } from "../utils/origin.js";
 
 const slugify = (value) =>
   String(value || "")
@@ -22,8 +23,14 @@ const normalizeTags = (tags) => {
     .filter(Boolean);
 };
 
+const normalizeJobApplyUrl = (sourceType, applyUrl) =>
+  sourceType === "external" ? normalizeAbsoluteUrl(applyUrl) : "";
+
+const isValidExternalApplyUrl = (value) => /^https?:\/\//i.test(String(value || ""));
+
 const toJobResponse = (job) => ({
-  ...job.toObject(),
+  ...(job.toObject ? job.toObject() : job),
+  applyUrl: normalizeJobApplyUrl(job.sourceType, job.applyUrl),
   isInternal: job.sourceType === "internal",
   isExternal: job.sourceType === "external"
 });
@@ -64,7 +71,10 @@ export const adminListJobs = async (req, res, next) => {
 
     res.json({
       jobs: jobs.map(toJobResponse),
-      applications: applications.map((application) => application.toObject())
+      applications: applications.map((application) => ({
+        ...application.toObject(),
+        job: application.job ? toJobResponse(application.job) : application.job
+      }))
     });
   } catch (err) {
     next(err);
@@ -96,6 +106,13 @@ export const createJob = async (req, res, next) => {
       return res.status(400).json({ message: "External jobs require an apply link." });
     }
 
+    const normalizedApplyUrl = normalizeJobApplyUrl(sourceType, applyUrl);
+    if (sourceType === "external" && !isValidExternalApplyUrl(normalizedApplyUrl)) {
+      return res.status(400).json({
+        message: "Enter a valid external apply link, for example https://www.tcs.com"
+      });
+    }
+
     const normalizedSlug = slugify(slug || `${title}-${companyName}`);
     if (!normalizedSlug) {
       return res.status(400).json({ message: "A valid slug could not be generated for this job." });
@@ -111,7 +128,7 @@ export const createJob = async (req, res, next) => {
       location,
       employmentType,
       sourceType: sourceType === "external" ? "external" : "internal",
-      applyUrl: sourceType === "external" ? String(applyUrl || "").trim() : "",
+      applyUrl: normalizedApplyUrl,
       tags: normalizeTags(tags),
       isPublished: isPublished !== false,
       createdBy: req.user?._id
@@ -174,6 +191,13 @@ export const updateJob = async (req, res, next) => {
       return res.status(400).json({ message: "External jobs require an apply link." });
     }
 
+    const normalizedApplyUrl = normalizeJobApplyUrl(nextSourceType, applyUrl);
+    if (nextSourceType === "external" && !isValidExternalApplyUrl(normalizedApplyUrl)) {
+      return res.status(400).json({
+        message: "Enter a valid external apply link, for example https://www.tcs.com"
+      });
+    }
+
     job.title = title ?? job.title;
     job.slug = slugify(slug || job.slug || `${title || job.title}-${companyName || job.companyName}`);
     job.companyName = companyName ?? job.companyName;
@@ -183,7 +207,7 @@ export const updateJob = async (req, res, next) => {
     job.location = location ?? job.location;
     job.employmentType = employmentType ?? job.employmentType;
     job.sourceType = nextSourceType;
-    job.applyUrl = nextSourceType === "external" ? String(applyUrl || "").trim() : "";
+    job.applyUrl = normalizedApplyUrl;
     job.tags = tags !== undefined ? normalizeTags(tags) : job.tags;
     job.isPublished = typeof isPublished === "boolean" ? isPublished : job.isPublished;
 
@@ -258,7 +282,12 @@ export const listMyJobApplications = async (req, res, next) => {
       .populate("job")
       .sort({ createdAt: -1 });
 
-    res.json({ applications: applications.map((application) => application.toObject()) });
+    res.json({
+      applications: applications.map((application) => ({
+        ...application.toObject(),
+        job: application.job ? toJobResponse(application.job) : application.job
+      }))
+    });
   } catch (err) {
     next(err);
   }
