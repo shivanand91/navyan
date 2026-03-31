@@ -24,6 +24,7 @@ const profileSchema = new mongoose.Schema(
     githubUrl: String,
     linkedinUrl: String,
     avatarUrl: String,
+    allowJobEmails: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false }
   },
   { _id: false }

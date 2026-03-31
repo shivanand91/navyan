@@ -137,12 +137,17 @@ export const createJob = async (req, res, next) => {
     let emailStats = null;
     if (job.isPublished) {
       try {
-        const students = await User.find({ role: "student" }).select("fullName email profile");
+        const students = await User.find({
+          role: "student",
+          email: { $exists: true, $ne: "" },
+          "profile.allowJobEmails": true
+        }).select("fullName email profile");
         const deliveries = await Promise.allSettled(
           students.map((student) => sendNewJobPostedEmail({ user: student, job }))
         );
 
         emailStats = {
+          eligible: students.length,
           total: deliveries.length,
           sent: deliveries.filter((item) => item.status === "fulfilled" && item.value).length
         };

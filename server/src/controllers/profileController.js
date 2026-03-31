@@ -60,6 +60,10 @@ export const updateMyProfile = async (req, res, next) => {
       updates.hasLaptop = parseBoolean(updates.hasLaptop);
     }
 
+    if (updates.allowJobEmails !== undefined) {
+      updates.allowJobEmails = parseBoolean(updates.allowJobEmails);
+    }
+
     if (typeof updates.fullName === "string" && updates.fullName.trim()) {
       user.fullName = updates.fullName.trim();
     }

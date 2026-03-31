@@ -153,6 +153,31 @@ export default function Profile() {
           </Field>
         </div>
 
+        <div className="md:col-span-2">
+          <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--bg-secondary)]/75 p-4 shadow-soft">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-1">
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-[color:var(--text)]">
+                  Job email preferences
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-[color:var(--text-secondary)]">
+                  Turn this on if you want Navyan to email you whenever new job opportunities are
+                  published.
+                </p>
+              </div>
+
+              <label className="inline-flex items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm dark:bg-[color:var(--bg-elevated)] dark:text-[color:var(--text)]">
+                <input
+                  type="checkbox"
+                  {...register("allowJobEmails")}
+                  className="h-4 w-4 rounded border border-[color:var(--border)] text-primary accent-[color:var(--primary)]"
+                />
+                Allow job alert emails
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div className="md:col-span-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : "Save profile"}
