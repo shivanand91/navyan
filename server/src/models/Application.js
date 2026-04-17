@@ -92,6 +92,8 @@ const applicationSchema = new mongoose.Schema(
 );
 
 applicationSchema.index({ user: 1, internship: 1, durationKey: 1 }, { unique: true });
+applicationSchema.index({ createdAt: -1 });
+applicationSchema.index({ status: 1, createdAt: -1 });
 applicationSchema.index(
   { "offerLetter.accessToken": 1 },
   { unique: true, sparse: true }

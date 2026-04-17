@@ -61,6 +61,73 @@ const summarizeStatuses = (applications) =>
     return counts;
   }, {});
 
+const metaTextClass = "text-[11px] text-slate-500 dark:text-slate-400";
+const detailCardClass =
+  "rounded-2xl border border-slate-200 bg-white/80 px-3 py-3 dark:border-white/8 dark:bg-white/5";
+
+const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : "Not added");
+
+const formatList = (value) => {
+  if (Array.isArray(value)) {
+    const filtered = value.filter(Boolean);
+    return filtered.length > 0 ? filtered.join(", ") : "Not added";
+  }
+
+  return value || "Not added";
+};
+
+const formatBoolean = (value) => {
+  if (typeof value !== "boolean") {
+    return "Not added";
+  }
+
+  return value ? "Yes" : "No";
+};
+
+const getDurationLabel = (application) =>
+  application.internship?.durations?.find((item) => item.key === application.durationKey)?.label ||
+  application.durationKey;
+
+const normalizePhoneLink = (value) => {
+  const digits = String(value || "").replace(/[^\d+]/g, "");
+  return digits || "";
+};
+
+const normalizeWhatsappLink = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits ? `https://wa.me/${digits}` : "";
+};
+
+function DetailTile({ label, value }) {
+  return (
+    <div className={detailCardClass}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
+        {label}
+      </p>
+      <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{value || "Not added"}</p>
+    </div>
+  );
+}
+
+function ActionLink({ href, children }) {
+  if (!href) {
+    return null;
+  }
+
+  const opensInNewTab = /^https?:\/\//i.test(href);
+
+  return (
+    <a
+      href={href}
+      target={opensInNewTab ? "_blank" : undefined}
+      rel={opensInNewTab ? "noreferrer" : undefined}
+      className="text-primary"
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function AdminApplications() {
   const [applications, setApplications] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -194,6 +261,29 @@ export default function AdminApplications() {
   );
 
   const renderApplicationCard = (app) => {
+    const profile = app.user?.profile || {};
+    const fullName = profile.fullName || app.user?.fullName || "Candidate";
+    const email = app.user?.email || "";
+    const phone = profile.phone || "";
+    const whatsapp = profile.whatsapp || "";
+    const startDate = app.internshipMeta?.startDate;
+    const endDate = app.internshipMeta?.endDate;
+    const contactActions = [
+      { href: email ? `mailto:${email}` : "", label: "Email" },
+      { href: phone ? `tel:${normalizePhoneLink(phone)}` : "", label: "Call" },
+      { href: normalizeWhatsappLink(whatsapp), label: "WhatsApp" },
+      { href: profile.resumeUrl, label: "Resume" },
+      { href: profile.githubUrl, label: "GitHub" },
+      { href: profile.linkedinUrl, label: "LinkedIn" },
+      { href: profile.portfolioUrl, label: "Portfolio" },
+      {
+        href:
+          TASK_BRIEF_VISIBLE_STATUSES.has(app.status) && app.internshipMeta?.taskPdfUrl
+            ? app.internshipMeta.taskPdfUrl
+            : "",
+        label: "Task brief"
+      }
+    ].filter((item) => item.href);
     const paymentStatus = app.payment?.status;
     const requiresPaymentReview = paymentStatus && paymentStatus !== "Not Required";
     const paymentCleared = ["Verified", "Linked"].includes(paymentStatus);
@@ -206,75 +296,35 @@ export default function AdminApplications() {
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div className="space-y-1">
             <p className="font-medium text-slate-800 dark:text-slate-100">
-              {app.user?.fullName ?? "Candidate"} ·{" "}
+              {fullName} ·{" "}
               <span className="text-slate-500 dark:text-slate-400">
                 {app.internship?.title ?? "Internship"}
               </span>
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {app.user?.email} · Duration: {app.durationKey} · Applied on{" "}
+            <p className={metaTextClass}>
+              {email || "Email not added"} · Duration: {getDurationLabel(app)} · Applied on{" "}
               {new Date(app.createdAt).toLocaleDateString()}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className={metaTextClass}>
               Domain: {app.domainLabel || app.internship?.role || app.internship?.title || "General Internship"}
             </p>
+            {activeWorkflowKey === "inprogress" && (startDate || endDate) ? (
+              <p className={metaTextClass}>
+                Start: {formatDate(startDate)} · End: {formatDate(endDate)}
+              </p>
+            ) : null}
             {app.referral?.code ? (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className={metaTextClass}>
                 Referral: {app.referral.code}
                 {app.referral.ownerName ? ` · ${app.referral.ownerName}` : ""}
               </p>
             ) : null}
             <div className="flex flex-wrap gap-3 pt-1 text-[11px]">
-              {app.user?.profile?.resumeUrl && (
-                <a
-                  href={app.user.profile.resumeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  Resume
-                </a>
-              )}
-              {app.user?.profile?.githubUrl && (
-                <a
-                  href={app.user.profile.githubUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  GitHub
-                </a>
-              )}
-              {app.user?.profile?.linkedinUrl && (
-                <a
-                  href={app.user.profile.linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  LinkedIn
-                </a>
-              )}
-              {app.user?.profile?.portfolioUrl && (
-                <a
-                  href={app.user.profile.portfolioUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  Portfolio
-                </a>
-              )}
-              {TASK_BRIEF_VISIBLE_STATUSES.has(app.status) && app.internshipMeta?.taskPdfUrl && (
-                <a
-                  href={app.internshipMeta.taskPdfUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  Task brief
-                </a>
-              )}
+              {contactActions.map((item) => (
+                <ActionLink key={`${app._id}-${item.label}`} href={item.href}>
+                  {item.label}
+                </ActionLink>
+              ))}
             </div>
           </div>
           <StatusBadge status={app.status} />
@@ -285,6 +335,45 @@ export default function AdminApplications() {
             {app.motivation}
           </p>
         )}
+
+        <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          <DetailTile label="Phone / WhatsApp" value={[phone, whatsapp].filter(Boolean).join(" / ")} />
+          <DetailTile
+            label="Location"
+            value={[profile.city, profile.state].filter(Boolean).join(", ")}
+          />
+          <DetailTile
+            label="Education"
+            value={[profile.college, profile.degree, profile.branch].filter(Boolean).join(" · ")}
+          />
+          <DetailTile
+            label="Academic year"
+            value={[profile.currentYear, profile.graduationYear && `Grad ${profile.graduationYear}`]
+              .filter(Boolean)
+              .join(" · ")}
+          />
+          <DetailTile label="Skills" value={formatList(profile.skills)} />
+          <DetailTile label="Preferred roles" value={formatList(profile.preferredRoles)} />
+          <DetailTile
+            label="Work setup"
+            value={[
+              profile.dailyHours ? `${profile.dailyHours} hrs/day` : "",
+              `Laptop: ${formatBoolean(profile.hasLaptop)}`,
+              profile.englishLevel || ""
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          />
+          <DetailTile label="Experience" value={profile.prevInternshipExperience} />
+          {activeWorkflowKey === "inprogress" ? (
+            <DetailTile
+              label="Internship dates"
+              value={[startDate && `Start ${formatDate(startDate)}`, endDate && `End ${formatDate(endDate)}`]
+                .filter(Boolean)
+                .join(" · ")}
+            />
+          ) : null}
+        </div>
 
         {requiresPaymentReview ? (
           <div
@@ -468,7 +557,7 @@ export default function AdminApplications() {
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Search (name, notes...)"
+            placeholder="Search name, email, phone, notes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 w-52 text-xs"

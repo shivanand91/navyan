@@ -19,7 +19,7 @@ export default function ProfileOverview() {
       try {
         const [profileRes, applicationsRes, certificatesRes] = await Promise.all([
           api.get("/profile/me"),
-          api.get("/applications/me"),
+          api.get("/applications/me", { params: { view: "summary" } }),
           api.get("/certificates/me")
         ]);
         setProfile(profileRes.data.profile || null);

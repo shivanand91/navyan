@@ -29,7 +29,7 @@ export default function AdminDashboard() {
     const load = async () => {
       try {
         const [apps, ints, leads, submitted, issued] = await Promise.all([
-          api.get("/applications/admin"),
+          api.get("/applications/admin", { params: { view: "summary" } }),
           api.get("/internships/admin"),
           api.get("/service-inquiries/admin"),
           api.get("/submissions/admin"),

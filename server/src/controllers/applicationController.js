@@ -167,6 +167,189 @@ const buildApplicationGroups = (applications) =>
     }, {})
   ).sort((left, right) => left.categoryLabel.localeCompare(right.categoryLabel));
 
+const APPLICATION_BASE_SELECT = [
+  "user",
+  "internship",
+  "durationKey",
+  "motivation",
+  "status",
+  "internalNotes",
+  "payment",
+  "referral",
+  "offerLetter",
+  "internshipMeta",
+  "submission",
+  "certificate",
+  "createdAt"
+].join(" ");
+
+const ADMIN_USER_SELECT = [
+  "fullName",
+  "email",
+  "profile.fullName",
+  "profile.phone",
+  "profile.whatsapp",
+  "profile.city",
+  "profile.state",
+  "profile.college",
+  "profile.degree",
+  "profile.branch",
+  "profile.currentYear",
+  "profile.graduationYear",
+  "profile.skills",
+  "profile.preferredRoles",
+  "profile.prevInternshipExperience",
+  "profile.dailyHours",
+  "profile.hasLaptop",
+  "profile.englishLevel",
+  "profile.resumeUrl",
+  "profile.portfolioUrl",
+  "profile.githubUrl",
+  "profile.linkedinUrl"
+].join(" ");
+
+const STUDENT_USER_SELECT = "fullName email";
+
+const INTERNSHIP_SELECT = [
+  "title",
+  "role",
+  "mode",
+  "durations.key",
+  "durations.label",
+  "durations.isPaid",
+  "durations.taskPdfUrl"
+].join(" ");
+
+const CERTIFICATE_SELECT = "certificateId completionDate role pdfUrl verifyUrl";
+
+const SUBMISSION_HISTORY_SELECT = [
+  "application",
+  "attemptNumber",
+  "studentName",
+  "taskName",
+  "taskNumber",
+  "projectTitle",
+  "codeLink",
+  "liveDemoLink",
+  "projects",
+  "submittedAt",
+  "reviewStatus"
+].join(" ");
+
+const normalizeView = (value) => (value === "summary" ? "summary" : "detail");
+
+const syncApplicationsForListing = async (applications) => {
+  const updates = [];
+
+  for (const application of applications) {
+    let changed = syncApplicationLifecycle(application);
+    const shouldAssignTask = shouldExposeAssignedTask(application);
+    const taskPdfUrl = shouldAssignTask
+      ? resolveAssignedTaskPdfUrl({
+          internship: application.internship,
+          durationKey: application.durationKey,
+          existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
+        })
+      : "";
+
+    if (shouldAssignTask && taskPdfUrl && application.internshipMeta?.taskPdfUrl !== taskPdfUrl) {
+      application.internshipMeta = {
+        ...(application.internshipMeta || {}),
+        taskPdfUrl
+      };
+      changed = true;
+    }
+
+    if (application.offerLetter?.id && !application.offerLetter?.accessToken) {
+      ensureOfferLetterAccessToken(application);
+      changed = true;
+    }
+
+    if (!changed) {
+      continue;
+    }
+
+    const nextUpdate = { status: application.status };
+    if (application.internshipMeta) {
+      nextUpdate.internshipMeta = application.internshipMeta;
+    }
+    if (application.offerLetter) {
+      nextUpdate.offerLetter = application.offerLetter;
+    }
+
+    updates.push({
+      updateOne: {
+        filter: { _id: application._id },
+        update: { $set: nextUpdate }
+      }
+    });
+  }
+
+  if (updates.length > 0) {
+    await Application.bulkWrite(updates);
+  }
+};
+
+const loadSubmissionHistory = async (applicationIds) => {
+  if (applicationIds.length === 0) {
+    return {};
+  }
+
+  const submissions = await Submission.find({
+    application: { $in: applicationIds }
+  })
+    .select(SUBMISSION_HISTORY_SELECT)
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return submissions.reduce((grouped, submission) => {
+    const key = String(submission.application);
+
+    if (!grouped[key]) {
+      grouped[key] = [];
+    }
+
+    grouped[key].push(submission);
+    return grouped;
+  }, {});
+};
+
+const serializeCertificateForResponse = (certificate, req) => {
+  if (!certificate) {
+    return certificate;
+  }
+
+  return {
+    ...certificate.toObject?.(),
+    ...(!certificate.toObject ? certificate : {}),
+    verifyUrl: buildCertificateVerifyUrl(req, certificate?.certificateId, certificate?.verifyUrl),
+    pdfUrl: normalizeServerDocumentUrl(
+      certificate?.pdfUrl,
+      req,
+      `/api/certificates/download/${certificate?.certificateId}`
+    )
+  };
+};
+
+const serializeApplicationForResponse = (application, req, options = {}) => {
+  const { includeTimeline = false, includeSubmissions = false, submissionsByApplication = {} } = options;
+  const applicationObject = application.toObject();
+
+  return {
+    ...applicationObject,
+    offerLetter: serializeOfferLetterForResponse(application, req),
+    certificate: serializeCertificateForResponse(application.certificate, req),
+    domainLabel: resolveInternshipDomainLabel(application.internship),
+    ...(includeTimeline ? { timeline: getTimelineState(application) } : {}),
+    ...(includeSubmissions
+      ? {
+          studentName: req.user?.profile?.fullName || req.user?.fullName || "Student",
+          submissions: submissionsByApplication[String(application._id)] || []
+        }
+      : {})
+  };
+};
+
 export const createPaymentIntent = async (req, res, next) => {
   try {
     const userId = req.user._id;
@@ -443,72 +626,29 @@ export const applyToInternship = async (req, res, next) => {
 export const listMyApplications = async (req, res, next) => {
   try {
     const userId = req.user._id;
+    const view = normalizeView(req.query.view);
     const applications = await Application.find({ user: userId })
-      .populate("internship")
-      .populate("payment.paymentAttempt")
-      .populate("submission")
-      .populate("certificate")
+      .select(APPLICATION_BASE_SELECT)
+      .populate({ path: "user", select: STUDENT_USER_SELECT })
+      .populate({ path: "internship", select: INTERNSHIP_SELECT })
+      .populate({ path: "certificate", select: CERTIFICATE_SELECT })
       .sort({ createdAt: -1 });
 
-    for (const application of applications) {
-      let changed = syncApplicationLifecycle(application);
-      const shouldAssignTask = shouldExposeAssignedTask(application);
-      const taskPdfUrl = shouldAssignTask
-        ? resolveAssignedTaskPdfUrl({
-            internship: application.internship,
-            durationKey: application.durationKey,
-            existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
-          })
-        : "";
+    await syncApplicationsForListing(applications);
 
-      if (shouldAssignTask && taskPdfUrl && application.internshipMeta?.taskPdfUrl !== taskPdfUrl) {
-        application.internshipMeta = {
-          ...(application.internshipMeta || {}),
-          taskPdfUrl
-        };
-        changed = true;
-      }
+    const submissionsByApplication =
+      view === "detail"
+        ? await loadSubmissionHistory(applications.map((application) => application._id))
+        : {};
 
-      if (application.offerLetter?.id && !application.offerLetter?.accessToken) {
-        ensureOfferLetterAccessToken(application);
-        changed = true;
-      }
-
-      if (changed) {
-        await application.save();
-      }
-    }
-
-    const enrichedApplications = await Promise.all(
-      applications.map(async (application) => {
-        const submissions = await Submission.find({ application: application._id }).sort({
-          createdAt: -1
-        });
-
-        return {
-          ...application.toObject(),
-          offerLetter: serializeOfferLetterForResponse(application, req),
-          certificate: application.certificate
-            ? {
-                ...application.certificate.toObject?.(),
-                verifyUrl: buildCertificateVerifyUrl(
-                  req,
-                  application.certificate?.certificateId,
-                  application.certificate?.verifyUrl
-                ),
-                pdfUrl: normalizeServerDocumentUrl(
-                  application.certificate?.pdfUrl,
-                  req,
-                  `/api/certificates/download/${application.certificate?.certificateId}`
-                )
-              }
-            : application.certificate,
-          studentName: req.user?.profile?.fullName || req.user?.fullName || "Student",
-          timeline: getTimelineState(application),
-          submissions
-        };
+    const enrichedApplications = applications.map((application) =>
+      serializeApplicationForResponse(application, req, {
+        includeTimeline: true,
+        includeSubmissions: view === "detail",
+        submissionsByApplication
       })
     );
+
     res.json({ applications: enrichedApplications });
   } catch (err) {
     next(err);
@@ -518,6 +658,7 @@ export const listMyApplications = async (req, res, next) => {
 export const adminListApplications = async (req, res, next) => {
   try {
     const { status, search } = req.query;
+    const view = normalizeView(req.query.view);
     const query = {};
 
     if (status) {
@@ -525,41 +666,13 @@ export const adminListApplications = async (req, res, next) => {
     }
 
     const applications = await Application.find(query)
-      .populate("user")
-      .populate("internship")
-      .populate("payment.paymentAttempt")
-      .populate("submission")
-      .populate("certificate")
+      .select(APPLICATION_BASE_SELECT)
+      .populate({ path: "user", select: ADMIN_USER_SELECT })
+      .populate({ path: "internship", select: INTERNSHIP_SELECT })
+      .populate({ path: "certificate", select: CERTIFICATE_SELECT })
       .sort({ createdAt: -1 });
 
-    for (const application of applications) {
-      let changed = syncApplicationLifecycle(application);
-      const shouldAssignTask = shouldExposeAssignedTask(application);
-      const taskPdfUrl = shouldAssignTask
-        ? resolveAssignedTaskPdfUrl({
-            internship: application.internship,
-            durationKey: application.durationKey,
-            existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
-          })
-        : "";
-
-      if (shouldAssignTask && taskPdfUrl && application.internshipMeta?.taskPdfUrl !== taskPdfUrl) {
-        application.internshipMeta = {
-          ...(application.internshipMeta || {}),
-          taskPdfUrl
-        };
-        changed = true;
-      }
-
-      if (application.offerLetter?.id && !application.offerLetter?.accessToken) {
-        ensureOfferLetterAccessToken(application);
-        changed = true;
-      }
-
-      if (changed) {
-        await application.save();
-      }
-    }
+    await syncApplicationsForListing(applications);
 
     const normalizedSearch = typeof search === "string" ? search.trim().toLowerCase() : "";
 
@@ -569,6 +682,14 @@ export const adminListApplications = async (req, res, next) => {
             application.internalNotes,
             application.user?.fullName,
             application.user?.email,
+            application.user?.profile?.phone,
+            application.user?.profile?.whatsapp,
+            application.user?.profile?.city,
+            application.user?.profile?.state,
+            application.user?.profile?.college,
+            application.user?.profile?.degree,
+            ...(application.user?.profile?.skills || []),
+            ...(application.user?.profile?.preferredRoles || []),
             application.internship?.title,
             application.internship?.role,
             application.referral?.code,
@@ -585,27 +706,10 @@ export const adminListApplications = async (req, res, next) => {
       : applications;
 
     res.json({
-      applications: filteredApplications.map((application) => ({
-        ...application.toObject(),
-        offerLetter: serializeOfferLetterForResponse(application, req),
-        certificate: application.certificate
-          ? {
-              ...application.certificate.toObject?.(),
-              verifyUrl: buildCertificateVerifyUrl(
-                req,
-                application.certificate?.certificateId,
-                application.certificate?.verifyUrl
-              ),
-              pdfUrl: normalizeServerDocumentUrl(
-                application.certificate?.pdfUrl,
-                req,
-                `/api/certificates/download/${application.certificate?.certificateId}`
-              )
-            }
-          : application.certificate,
-        domainLabel: resolveInternshipDomainLabel(application.internship)
-      })),
-      groups: buildApplicationGroups(filteredApplications)
+      applications: filteredApplications.map((application) =>
+        serializeApplicationForResponse(application, req)
+      ),
+      ...(view === "detail" ? { groups: buildApplicationGroups(filteredApplications) } : {})
     });
   } catch (err) {
     next(err);
