@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { BookOpen, PlayCircle, Sparkles } from "lucide-react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,71 +27,6 @@ export default function Courses() {
 
   return (
     <div>
-      <section className="navyan-section px-4 pt-12 md:px-6">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div className="space-y-6">
-            <div className="navyan-pill">NAVYAN Courses</div>
-            <div className="space-y-4">
-              <h1 className="max-w-3xl font-display text-4xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa] md:text-5xl">
-                Learn through structured video courses before or alongside internships.
-              </h1>
-              <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-[#b7c0cc]">
-                NAVYAN courses are curated from the admin panel and published as clean, watchable
-                learning tracks. Explore the right topic, watch the content, then move into live
-                internships with more confidence.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/internships">
-                <Button>
-                  Explore internships
-                </Button>
-              </Link>
-              <Link to="/contact">
-                <Button variant="outline">Need guidance?</Button>
-              </Link>
-            </div>
-          </div>
-
-          <div className="navyan-panel grid gap-4 p-6 md:grid-cols-2">
-            {[
-              {
-                title: "Practical learning",
-                description: "Clear videos students can use as preparation before applying.",
-                icon: BookOpen
-              },
-              {
-                title: "Admin-managed publishing",
-                description: "Courses go live directly from the backend using YouTube URLs.",
-                icon: PlayCircle
-              },
-              {
-                title: "Skill-first progression",
-                description: "Courses and internships now sit in one ecosystem instead of disconnected pages.",
-                icon: Sparkles
-              },
-              {
-                title: "Fast access",
-                description: "Simple embedded learning experience with no confusing friction on the public site.",
-                icon: BookOpen
-              }
-            ].map((item) => (
-              <div key={item.title} className="navyan-card px-5 py-5">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
-                  <item.icon className="h-4 w-4" />
-                </div>
-                <p className="mt-4 font-display text-lg font-semibold text-slate-950 dark:text-[#f5f7fa]">
-                  {item.title}
-                </p>
-                <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
