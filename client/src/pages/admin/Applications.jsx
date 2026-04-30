@@ -398,276 +398,43 @@ export default function AdminApplications() {
   );
 
   const renderApplicationCard = (app) => {
-    const profile = getApplicantProfile(app);
     const fullName = getApplicantName(app);
-    const email = app.user?.email || "";
-    const startDate = app.internshipMeta?.startDate;
-    const endDate = app.internshipMeta?.endDate;
-    const contactActions = buildContactActions(app);
     const paymentStatus = app.payment?.status;
     const requiresPaymentReview = paymentStatus && paymentStatus !== "Not Required";
     const paymentCleared = ["Verified", "Linked"].includes(paymentStatus);
-    const isInProgressView = activeWorkflowKey === "inprogress";
-    const endDateMeta = getEndDateMeta(endDate);
 
     return (
       <div
         key={app._id}
-        className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70"
+        className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 transition-all hover:border-primary/30"
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-1">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1 flex-1">
             <p className="font-medium text-slate-800 dark:text-slate-100">
-              {fullName} ·{" "}
-              <span className="text-slate-500 dark:text-slate-400">
-                {app.internship?.title ?? "Internship"}
-              </span>
+              {fullName}
             </p>
             <p className={metaTextClass}>
-              {email || "Email not added"} · Duration: {getDurationLabel(app)} · Applied on{" "}
+              {app.internship?.title ?? "Internship"} • Applied on{" "}
               {new Date(app.createdAt).toLocaleDateString()}
             </p>
-            <p className={metaTextClass}>
-              Domain: {app.domainLabel || app.internship?.role || app.internship?.title || "General Internship"}
-            </p>
-            {!isInProgressView && app.referral?.code ? (
-              <p className={metaTextClass}>
-                Referral: {app.referral.code}
-                {app.referral.ownerName ? ` · ${app.referral.ownerName}` : ""}
-              </p>
-            ) : null}
-            {!isInProgressView && contactActions.length > 0 ? (
-              <div className="flex flex-wrap gap-3 pt-1 text-[11px]">
-                {contactActions.map((item) => (
-                  <ActionLink key={`${app._id}-${item.label}`} href={item.href}>
-                    {item.label}
-                  </ActionLink>
-                ))}
-              </div>
-            ) : null}
           </div>
-          <StatusBadge status={app.status} />
-        </div>
-
-        {isInProgressView ? (
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <TimelineTile label="Start date" value={formatDate(startDate)} />
-            <TimelineTile
-              label="End date"
-              value={formatDate(endDate)}
-              hint={endDateMeta.hint}
-              isUrgent={endDateMeta.isUrgent}
-            />
-          </div>
-        ) : null}
-
-        {!isInProgressView && app.motivation ? (
-          <p className="mt-3 rounded-2xl bg-white px-3 py-2 text-sm text-slate-600 dark:bg-[#15151e] dark:text-slate-300">
-            {app.motivation}
-          </p>
-        ) : null}
-
-        {!isInProgressView ? (
-          <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            <DetailTile
-              label="Phone / WhatsApp"
-              value={[profile.phone, profile.whatsapp].filter(Boolean).join(" / ")}
-            />
-            <DetailTile
-              label="Location"
-              value={[profile.city, profile.state].filter(Boolean).join(", ")}
-            />
-            <DetailTile
-              label="Education"
-              value={[profile.college, profile.degree, profile.branch].filter(Boolean).join(" · ")}
-            />
-            <DetailTile
-              label="Academic year"
-              value={[profile.currentYear, profile.graduationYear && `Grad ${profile.graduationYear}`]
-                .filter(Boolean)
-                .join(" · ")}
-            />
-            <DetailTile label="Skills" value={formatList(profile.skills)} />
-            <DetailTile label="Preferred roles" value={formatList(profile.preferredRoles)} />
-            <DetailTile
-              label="Work setup"
-              value={[
-                profile.dailyHours ? `${profile.dailyHours} hrs/day` : "",
-                `Laptop: ${formatBoolean(profile.hasLaptop)}`,
-                profile.englishLevel || ""
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            />
-            <DetailTile label="Experience" value={profile.prevInternshipExperience} />
-          </div>
-        ) : null}
-
-        {requiresPaymentReview ? (
-          <div
-            className={`mt-3 rounded-2xl border px-3 py-3 text-xs ${
-              paymentStatus === "Verified" || paymentStatus === "Linked"
-                ? "border-emerald-200 bg-emerald-50/80 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200"
-                : paymentStatus === "Rejected"
-                  ? "border-rose-200 bg-rose-50/80 text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200"
-                  : "border-amber-200 bg-amber-50/80 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
-            }`}
-          >
-            <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-              <div>
-                <p className="font-medium">
-                  Payment{" "}
-                  {paymentStatus === "Pending"
-                    ? "awaiting verification"
-                    : paymentStatus.toLowerCase()}{" "}
-                  · Rs {app.payment.amount}
-                </p>
-                <p className="mt-1">
-                  UTR: {app.payment.utrNumber} · Ref: {app.payment.paymentReference}
-                </p>
-              </div>
-              {paymentStatus === "Pending" ? (
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="success"
-                    disabled={updatingId === `${app._id}:payment:Verified`}
-                    onClick={() => handlePaymentDecision(app._id, "Verified")}
-                  >
-                    Verify payment
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    disabled={updatingId === `${app._id}:payment:Rejected`}
-                    onClick={() => handlePaymentDecision(app._id, "Rejected")}
-                  >
-                    Reject payment
-                  </Button>
-                </div>
-              ) : null}
-            </div>
-            {!paymentCleared && paymentStatus !== "Rejected" ? (
-              <p className="mt-2 text-[11px] opacity-80">
-                Workflow actions remain locked until this payment is verified.
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        <div className="mt-4 space-y-3">
-          <Input
-            placeholder="Internal notes"
-            value={notesById[app._id] || ""}
-            onChange={(event) =>
-              setNotesById((prev) => ({ ...prev, [app._id]: event.target.value }))
-            }
-          />
-          <div className="flex flex-wrap items-center gap-2">
-            {activeWorkflowKey === "new" ? (
-              <>
-                {app.status !== "Completed" ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={
-                      updatingId === `${app._id}:status:Completed` ||
-                      (requiresPaymentReview && !paymentCleared)
-                    }
-                    onClick={() => handleStatusChange(app._id, "Completed")}
-                  >
-                    Complete
-                  </Button>
-                ) : null}
-                <Button
-                  size="sm"
-                  variant="subtle"
-                  disabled={
-                    updatingId === `${app._id}:status:Selected` ||
-                    (requiresPaymentReview && !paymentCleared)
-                  }
-                  onClick={() => handleStatusChange(app._id, "Selected")}
-                >
-                  Select
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={updatingId === `${app._id}:status:Rejected`}
-                  onClick={() => handleStatusChange(app._id, "Rejected")}
-                >
-                  Reject
-                </Button>
-              </>
-            ) : null}
-
-            {activeWorkflowKey === "review" ? (
-              <>
-                {app.status !== "Completed" ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={
-                      updatingId === `${app._id}:status:Completed` ||
-                      (requiresPaymentReview && !paymentCleared)
-                    }
-                    onClick={() => handleStatusChange(app._id, "Completed")}
-                  >
-                    Complete
-                  </Button>
-                ) : null}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={updatingId === `${app._id}:status:Rejected`}
-                  onClick={() => handleStatusChange(app._id, "Rejected")}
-                >
-                  Reject
-                </Button>
-              </>
-            ) : null}
-
-            {activeWorkflowKey === "inprogress" ? (
-              <>
-                {app.status !== "Completed" ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={
-                      updatingId === `${app._id}:status:Completed` ||
-                      (requiresPaymentReview && !paymentCleared)
-                    }
-                    onClick={() => handleStatusChange(app._id, "Completed")}
-                  >
-                    Complete
-                  </Button>
-                ) : null}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={updatingId === `${app._id}:status:Rejected`}
-                  onClick={() => handleStatusChange(app._id, "Rejected")}
-                >
-                  Reject
-                </Button>
-              </>
-            ) : null}
-
-            {activeWorkflowKey === "completed" && app.status !== "Completed" ? (
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={
-                  updatingId === `${app._id}:status:Completed` ||
-                  (requiresPaymentReview && !paymentCleared)
-                }
-                onClick={() => handleStatusChange(app._id, "Completed")}
-              >
-                Complete
-              </Button>
-            ) : null}
+          <div className="flex items-center gap-3">
+            <StatusBadge status={app.status} />
+            <Button
+              size="sm"
+              variant="subtle"
+              onClick={() => setSelectedApplicationId(app._id)}
+            >
+              View Details
+            </Button>
           </div>
         </div>
+
+        {requiresPaymentReview && paymentStatus === "Pending" ? (
+          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+            <p className="font-medium">Payment awaiting verification · Rs {app.payment.amount}</p>
+          </div>
+        ) : null}
       </div>
     );
   };
@@ -792,123 +559,95 @@ export default function AdminApplications() {
               {selectedApplication ? (
                 <Card>
                   <CardHeader className="space-y-3">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex flex-col gap-4">
                       <div>
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                          Applicant details
+                          Student Details
                         </p>
-                        <CardTitle className="mt-1 text-base">
+                        <CardTitle className="mt-2 text-2xl">
                           {getApplicantName(selectedApplication)}
                         </CardTitle>
-                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                          {selectedApplication.internship?.title || "Internship"} ·{" "}
-                          {getDurationLabel(selectedApplication)} · {selectedApplication.status}
-                        </p>
                       </div>
-                      <div className="flex flex-wrap gap-3 text-[11px]">
-                        {buildContactActions(selectedApplication).map((item) => (
-                          <ActionLink
-                            key={`detail-${selectedApplication._id}-${item.label}`}
-                            href={item.href}
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
+                          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                            Field Applied
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                            {selectedApplication.internship?.title || "Internship"}
+                          </p>
+                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            {selectedApplication.durationKey} • {selectedApplication.status}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
+                          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                            End Date
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                            {formatDate(selectedApplication.internshipMeta?.endDate)}
+                          </p>
+                          <p
+                            className={`mt-1 text-sm ${
+                              getEndDateMeta(selectedApplication.internshipMeta?.endDate).isUrgent
+                                ? "text-rose-600 dark:text-rose-400"
+                                : "text-slate-600 dark:text-slate-300"
+                            }`}
                           >
-                            {item.label}
-                          </ActionLink>
-                        ))}
+                            {getEndDateMeta(selectedApplication.internshipMeta?.endDate).hint}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
+                        <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">
+                          Quick Links
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedApplication.offerLetter?.url ? (
+                            <a href={selectedApplication.offerLetter.url} target="_blank" rel="noreferrer">
+                              <Button size="sm" variant="outline">
+                                📄 Offer Letter
+                              </Button>
+                            </a>
+                          ) : null}
+                          {getApplicantProfile(selectedApplication).phone ? (
+                            <a href={`tel:${normalizePhoneLink(getApplicantProfile(selectedApplication).phone)}`}>
+                              <Button size="sm" variant="outline">
+                                📞 Call
+                              </Button>
+                            </a>
+                          ) : null}
+                          {getApplicantProfile(selectedApplication).linkedinUrl ? (
+                            <a href={getApplicantProfile(selectedApplication).linkedinUrl} target="_blank" rel="noreferrer">
+                              <Button size="sm" variant="outline">
+                                💼 LinkedIn
+                              </Button>
+                            </a>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
+                        <Button
+                          className="w-full"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await api.post(`/applications/admin/${selectedApplication._id}/send-reminder`);
+                              toast.success("Reminder email sent to student!");
+                            } catch (error) {
+                              toast.error(getApiErrorMessage(error, "Failed to send reminder email"));
+                            }
+                          }}
+                        >
+                          ⏰ Send Task Submission Reminder
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-                      <DetailTile label="Email" value={selectedApplication.user?.email} />
-                      <DetailTile
-                        label="Phone / WhatsApp"
-                        value={[
-                          getApplicantProfile(selectedApplication).phone,
-                          getApplicantProfile(selectedApplication).whatsapp
-                        ]
-                          .filter(Boolean)
-                          .join(" / ")}
-                      />
-                      <DetailTile
-                        label="Location"
-                        value={[
-                          getApplicantProfile(selectedApplication).city,
-                          getApplicantProfile(selectedApplication).state
-                        ]
-                          .filter(Boolean)
-                          .join(", ")}
-                      />
-                      <DetailTile
-                        label="Applied on"
-                        value={formatDate(selectedApplication.createdAt)}
-                      />
-                      <TimelineTile
-                        label="Start date"
-                        value={formatDate(selectedApplication.internshipMeta?.startDate)}
-                      />
-                      <TimelineTile
-                        label="End date"
-                        value={formatDate(selectedApplication.internshipMeta?.endDate)}
-                        hint={getEndDateMeta(selectedApplication.internshipMeta?.endDate).hint}
-                        isUrgent={getEndDateMeta(selectedApplication.internshipMeta?.endDate).isUrgent}
-                      />
-                      <DetailTile
-                        label="Education"
-                        value={[
-                          getApplicantProfile(selectedApplication).college,
-                          getApplicantProfile(selectedApplication).degree,
-                          getApplicantProfile(selectedApplication).branch
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      />
-                      <DetailTile
-                        label="Academic year"
-                        value={[
-                          getApplicantProfile(selectedApplication).currentYear,
-                          getApplicantProfile(selectedApplication).graduationYear &&
-                            `Grad ${getApplicantProfile(selectedApplication).graduationYear}`
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      />
-                      <DetailTile
-                        label="Skills"
-                        value={formatList(getApplicantProfile(selectedApplication).skills)}
-                      />
-                      <DetailTile
-                        label="Preferred roles"
-                        value={formatList(getApplicantProfile(selectedApplication).preferredRoles)}
-                      />
-                      <DetailTile
-                        label="Work setup"
-                        value={[
-                          getApplicantProfile(selectedApplication).dailyHours
-                            ? `${getApplicantProfile(selectedApplication).dailyHours} hrs/day`
-                            : "",
-                          `Laptop: ${formatBoolean(getApplicantProfile(selectedApplication).hasLaptop)}`,
-                          getApplicantProfile(selectedApplication).englishLevel || ""
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      />
-                      <DetailTile
-                        label="Experience"
-                        value={getApplicantProfile(selectedApplication).prevInternshipExperience}
-                      />
-                    </div>
-
-                    {selectedApplication.motivation ? (
-                      <div className="rounded-2xl bg-slate-50/80 px-4 py-4 dark:bg-[#15151e]">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-                          Motivation
-                        </p>
-                        <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                          {selectedApplication.motivation}
-                        </p>
-                      </div>
-                    ) : null}
-                  </CardContent>
                 </Card>
               ) : null}
 

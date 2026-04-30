@@ -501,3 +501,39 @@ export const sendNewJobPostedEmail = async ({ user, job }) => {
     })
   });
 };
+
+export const sendTaskSubmissionReminderEmail = async ({ user, application, internship }) => {
+  const recipient = getRecipientEmail(user);
+  if (!recipient || !application || !internship) {
+    return false;
+  }
+
+  const studentName = getStudentName(user);
+  const internshipTitle = getInternshipTitle(internship);
+  const dashboardUrl = `${getDashboardBaseUrl()}/student/applications`;
+  const endDate = application.internshipMeta?.endDate
+    ? new Date(application.internshipMeta.endDate).toLocaleDateString()
+    : "your internship end date";
+
+  return sendEmail({
+    to: recipient,
+    subject: `Navyan: Task submission reminder - ${internshipTitle}`,
+    text: `Hello ${studentName}, this is a reminder to submit your project deliverables for ${internshipTitle} before ${endDate}. Log in to your dashboard to submit: ${dashboardUrl}`,
+    html: buildEmailLayout({
+      eyebrow: "Task submission reminder",
+      title: `Don't miss your submission deadline`,
+      intro: `Hello ${studentName}, this is a friendly reminder to submit your project deliverables for ${internshipTitle} before the deadline.`,
+      summaryRows: [
+        { label: "Internship", value: internshipTitle },
+        { label: "Submission deadline", value: endDate },
+        { label: "Status", value: application.status || "In Progress" }
+      ],
+      nextStep:
+        "Open your Navyan dashboard, review the project brief, and submit your completed work before the deadline. If you need an extension or have any doubts, reach out to the admin team.",
+      primaryAction: {
+        href: dashboardUrl,
+        label: "Open dashboard to submit"
+      }
+    })
+  });
+};

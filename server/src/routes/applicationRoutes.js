@@ -6,7 +6,8 @@ import {
   adminListApplications,
   adminUpdateApplicationStatus,
   getOfferLetterPdf,
-  getPublicOfferLetterPdf
+  getPublicOfferLetterPdf,
+  sendTaskSubmissionReminder
 } from "../controllers/applicationController.js";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 
@@ -24,5 +25,6 @@ router.get("/admin", protect, requireAdmin, adminListApplications);
 router.post("/admin/:id/action", protect, requireAdmin, adminUpdateApplicationStatus);
 router.post("/admin/:id", protect, requireAdmin, adminUpdateApplicationStatus);
 router.patch("/admin/:id", protect, requireAdmin, adminUpdateApplicationStatus);
+router.post("/admin/:id/send-reminder", protect, requireAdmin, sendTaskSubmissionReminder);
 
 export default router;

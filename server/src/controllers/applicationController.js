@@ -20,7 +20,8 @@ import {
 } from "./referralController.js";
 import {
   sendApplicationReceivedEmail,
-  sendApplicationStatusEmail
+  sendApplicationStatusEmail,
+  sendTaskSubmissionReminderEmail
 } from "../services/emailService.js";
 import {
   getTimelineState,
@@ -890,6 +891,36 @@ export const getPublicOfferLetterPdf = async (req, res, next) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `inline; filename=\"${offerId}.pdf\"`);
     res.send(pdfBuffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const sendTaskSubmissionReminder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const application = await Application.findById(id)
+      .populate("user")
+      .populate("internship");
+
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    const emailSent = await sendTaskSubmissionReminderEmail({
+      user: application.user,
+      application,
+      internship: application.internship
+    });
+
+    if (!emailSent) {
+      return res.status(500).json({ message: "Failed to send reminder email" });
+    }
+
+    res.json({
+      success: true,
+      message: "Task submission reminder email sent successfully"
+    });
   } catch (err) {
     next(err);
   }
