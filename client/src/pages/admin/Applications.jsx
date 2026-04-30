@@ -620,10 +620,31 @@ export default function AdminApplications() {
                               </Button>
                             </a>
                           ) : null}
+                          {getApplicantProfile(selectedApplication).whatsapp ? (
+                            <a href={normalizeWhatsappLink(getApplicantProfile(selectedApplication).whatsapp)} target="_blank" rel="noreferrer">
+                              <Button size="sm" variant="outline">
+                                💬 WhatsApp
+                              </Button>
+                            </a>
+                          ) : null}
+                          {getApplicantProfile(selectedApplication).githubUrl ? (
+                            <a href={getApplicantProfile(selectedApplication).githubUrl} target="_blank" rel="noreferrer">
+                              <Button size="sm" variant="outline">
+                                🔗 GitHub
+                              </Button>
+                            </a>
+                          ) : null}
                           {getApplicantProfile(selectedApplication).linkedinUrl ? (
                             <a href={getApplicantProfile(selectedApplication).linkedinUrl} target="_blank" rel="noreferrer">
                               <Button size="sm" variant="outline">
                                 💼 LinkedIn
+                              </Button>
+                            </a>
+                          ) : null}
+                          {getApplicantProfile(selectedApplication).portfolioUrl ? (
+                            <a href={getApplicantProfile(selectedApplication).portfolioUrl} target="_blank" rel="noreferrer">
+                              <Button size="sm" variant="outline">
+                                🌐 Portfolio
                               </Button>
                             </a>
                           ) : null}
