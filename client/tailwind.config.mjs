@@ -5,28 +5,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#0B0D10",
-        backgroundSecondary: "#111418",
-        tertiary: "#171B21",
-        surface: "#14181D",
-        elevated: "#1A2027",
-        sidebar: "#0F1318",
+        background: "#F8FBFF",
+        backgroundSecondary: "#F3F8FF",
+        tertiary: "#EAF2FF",
+        surface: "#FFFFFF",
+        elevated: "#FFFFFF",
+        sidebar: "#FFFFFF",
         border: "rgba(255,255,255,0.08)",
         softBorder: "rgba(255,255,255,0.05)",
-        textPrimary: "#F5F7FA",
-        textSecondary: "#B7C0CC",
-        textMuted: "#7E8794",
+        textPrimary: "#0F172A",
+        textSecondary: "#475569",
+        textMuted: "#64748B",
         primary: {
-          DEFAULT: "#D4A85F"
+          DEFAULT: "#2563EB"
         },
         secondary: {
-          DEFAULT: "#E3B76F"
+          DEFAULT: "#F97316"
         },
         accent: {
-          DEFAULT: "#8B5CF6"
+          DEFAULT: "#0EA5E9"
         },
         plum: {
-          DEFAULT: "#6D28D9"
+          DEFAULT: "#EA580C"
         },
         cyan: {
           DEFAULT: "#67E8F9"
@@ -43,7 +43,7 @@ export default {
       },
       fontFamily: {
         sans: ["Manrope", "sans-serif"],
-        display: ["Space Grotesk", "sans-serif"]
+        display: ["Outfit", "sans-serif"]
       },
       borderRadius: {
         xl: "1rem",

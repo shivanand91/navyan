@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ArrowRight, Github, Instagram, Linkedin, X, Youtube } from "lucide-react";
+import { ArrowRight, Instagram, Linkedin, X, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -8,12 +8,21 @@ import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 
 const navLinks = [
   { to: "/", label: "Home", caption: "Start" },
-  { to: "/internships", label: "Internships", caption: "Talent" },
+  { to: "/courses", label: "Courses", caption: "Learn" },
+  { to: "/internships", label: "Internships", caption: "Apply" },
   { to: "/jobs", label: "Jobs", caption: "Careers" },
-  { to: "/services", label: "Services", caption: "Studio" },
+  { to: "/services", label: "Services", caption: "Build" },
   { to: "/verify-certificate", label: "Verify", caption: "Trust" },
-  { to: "/about", label: "About", caption: "Brand" },
-  { to: "/contact", label: "Contact", caption: "Talk" }
+  { to: "/contact", label: "Contact", caption: "Talk" },
+];
+
+const footerLinks = [
+  { to: "/", label: "Home" },
+  { to: "/courses", label: "Courses" },
+  { to: "/internships", label: "Internships" },
+  { to: "/jobs", label: "Jobs" },
+  { to: "/services", label: "Services" },
+  { to: "/contact", label: "Contact" },
 ];
 
 const socialLinks = [
@@ -75,7 +84,7 @@ export function PublicLayout() {
             </Link>
             <Link to="/signup">
               <Button size="sm">
-                Get started
+                Create account
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -96,7 +105,7 @@ export function PublicLayout() {
                     </Button>
                   </Link>
                   <Link to="/signup" className="flex-1">
-                    <Button className="w-full">Get started</Button>
+                    <Button className="w-full">Create account</Button>
                   </Link>
                 </>
               }
@@ -109,22 +118,21 @@ export function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-[color:var(--border)] bg-[color:var(--bg-secondary)]">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.9fr] md:px-6">
-          <div className="space-y-4">
+      <footer className="border-t border-[color:var(--border)] bg-[color:var(--bg-secondary)]/96 backdrop-blur-xl">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_0.9fr_1fr] md:px-6">
+          <div className="space-y-4 md:pr-10">
             <BrandLogo imageClassName="h-14 md:h-16" surface="adaptive" />
             <p className="max-w-md text-sm leading-7 text-[color:var(--text-secondary)]">
-              Navyan is an AI-era internship and product services platform built for ambitious
-              students, freshers, and founders who value clarity, execution, and premium
-              experience.
+              NAVYAN helps students apply, get selected, track performance, and earn verified
+              internship outcomes through a clear and modern workflow.
             </p>
           </div>
           <div>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-              Explore
+              Links
             </p>
             <div className="mt-4 space-y-3">
-              {navLinks.slice(0, 4).map((link) => (
+              {footerLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
@@ -137,20 +145,9 @@ export function PublicLayout() {
           </div>
           <div>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-              Trust layer
-            </p>
-            <div className="mt-4 space-y-3 text-sm text-[color:var(--text-secondary)]">
-              <p>Structured internships</p>
-              <p>Public certificate verification</p>
-              <p>Product studio for startups</p>
-              <p>Built in India, designed globally</p>
-            </div>
-          </div>
-          <div>
-            <p className="font-display text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
               Follow us
             </p>
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-2">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -169,8 +166,7 @@ export function PublicLayout() {
           </div>
         </div>
         <div className="border-t border-[color:var(--border)] px-4 py-4 text-center text-xs text-[color:var(--text-muted)]">
-          © {new Date().getFullYear()} Navyan. Premium internship workflows and digital product
-          execution.
+          © {new Date().getFullYear()} NAVYAN. Internship & skill development platform.
         </div>
       </footer>
     </div>

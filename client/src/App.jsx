@@ -6,6 +6,7 @@ import { AdminLayout } from "@/layouts/AdminLayout";
 import { useAuth } from "@/context/AuthContext";
 
 const Home = lazy(() => import("@/pages/public/Home"));
+const Courses = lazy(() => import("@/pages/public/Courses"));
 const Internships = lazy(() => import("@/pages/public/Internships"));
 const InternshipDetail = lazy(() => import("@/pages/public/InternshipDetail"));
 const Services = lazy(() => import("@/pages/public/Services"));
@@ -25,6 +26,7 @@ const Certificates = lazy(() => import("@/pages/student/Certificates"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminInternships = lazy(() => import("@/pages/admin/Internships"));
 const AdminJobs = lazy(() => import("@/pages/admin/Jobs"));
+const AdminCourses = lazy(() => import("@/pages/admin/Courses"));
 const AdminReferrals = lazy(() => import("@/pages/admin/Referrals"));
 const AdminApplications = lazy(() => import("@/pages/admin/Applications"));
 const AdminSubmissions = lazy(() => import("@/pages/admin/Submissions"));
@@ -76,6 +78,7 @@ export default function App() {
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LazyPage><Home /></LazyPage>} />
+          <Route path="/courses" element={<LazyPage><Courses /></LazyPage>} />
           <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
           <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
           <Route path="/jobs" element={<LazyPage><Jobs /></LazyPage>} />
@@ -116,6 +119,7 @@ export default function App() {
           <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
           <Route path="internships" element={<LazyPage><AdminInternships /></LazyPage>} />
           <Route path="jobs" element={<LazyPage><AdminJobs /></LazyPage>} />
+          <Route path="courses" element={<LazyPage><AdminCourses /></LazyPage>} />
           <Route path="referrals" element={<LazyPage><AdminReferrals /></LazyPage>} />
           <Route path="applications" element={<LazyPage><AdminApplications /></LazyPage>} />
           <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />

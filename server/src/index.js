@@ -21,6 +21,7 @@ import serviceInquiryRoutes from "./routes/serviceInquiryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import referralRoutes from "./routes/referralRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
 const app = express();
@@ -130,6 +131,7 @@ app.use("/api/service-inquiries", serviceInquiryRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/referrals", referralRoutes);
+app.use("/api/courses", courseRoutes);
 
 // 404 + errors
 app.use(notFound);
