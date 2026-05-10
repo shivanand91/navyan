@@ -80,7 +80,7 @@ export default function OfferLetterPreview() {
         <div className="mx-16 mt-1 border-b border-[#d4a017]"></div>
 
         {/* TITLE */}
-        <div className="text-center mt-6">
+        <div className="text-center mt-1">
           <h2 className="text-3xl font-bold text-[#0b2347] tracking-widest">OFFER LETTER</h2>
           <div className="flex justify-center items-center gap-2 mt-1">
              <div className="h-[1px] w-8 bg-[#d4a017]"></div>
@@ -90,17 +90,17 @@ export default function OfferLetterPreview() {
         </div>
 
         {/* CONTENT BODY */}
-        <div className="px-16 mt-6 text-[13.5px] leading-relaxed text-slate-900">
-          <p className="font-bold">Dear {document.studentName},</p>
-          <p className="mt-3 font-bold text-[#0b2347]">Congratulations!</p>
-          <p className="mt-2">
+        <div className="px-16 mt-1 text-[13.5px] leading-relaxed text-slate-900">
+          <p className="font-bold">Dear {document.studentName}, <span className="font-bold text-[#0b2347]">Congratulations!</span> </p>
+          
+          <p className="mt-1">
             We are pleased to offer you the position of <span className="font-bold text-[#0b2347]">{document.role}</span> at <span className="font-bold text-[#0b2347]">Navyan (Internships and IT Services)</span>. 
             We were impressed with your skills, passion, and enthusiasm, and we believe you will be a great addition to our team.
           </p>
 
           {/* INTERNSHIP DETAILS SECTION */}
-          <div className="mt-5">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="mt-2">
+            <div className="flex items-center gap-2 mb-1">
               <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">💼</span>
               <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Internship Details</h3>
             </div>
@@ -116,8 +116,8 @@ export default function OfferLetterPreview() {
           </div>
 
           {/* ROLE & RESPONSIBILITIES */}
-          <div className="mt-5">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="mt-2">
+            <div className="flex items-center gap-2 mb-1">
               <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">👤</span>
               <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Role & Responsibilities</h3>
             </div>
@@ -131,7 +131,7 @@ export default function OfferLetterPreview() {
 
           {/* TERMS & CONDITIONS */}
           <div className="mt-5">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-1">
               <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">📄</span>
               <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Terms & Conditions</h3>
             </div>
@@ -143,7 +143,7 @@ export default function OfferLetterPreview() {
             </ol>
           </div>
 
-          <p className="mt-6">We are excited to have you on board and look forward to a productive and rewarding journey together.</p>
+          <p className="mt-2">We are excited to have you on board and look forward to a productive and rewarding journey together.</p>
           <p className="mt-2 font-bold">Welcome to the <span className="text-[#0b2347]">Navyan</span> family!</p>
         </div>
 
@@ -179,7 +179,7 @@ export default function OfferLetterPreview() {
         </div>
 
         {/* FOOTER BAR */}
-        <div className="absolute bottom-0 w-full bg-[#0b2347] text-white py-3 flex justify-around items-center text-[10px] px-16">
+        <div className="absolute bottom-0 w-full bg-[#0b2347] text-white py-1 flex justify-around items-center text-[10px] px-16">
           <span className="flex items-center gap-1">🌐 www.navyan.online</span>
           <span className="flex items-center gap-1">✉️ contact@navyan.online</span>
           <span className="flex items-center gap-1">📍 India</span>
