@@ -56,7 +56,7 @@ export function PublicLayout() {
       <header className="sticky top-0 z-50 px-3 pt-3 md:px-5 md:pt-5">
         <div className="mx-auto flex max-w-7xl items-center justify-between rounded-[28px] border border-[color:var(--border)] bg-[color:var(--sidebar)] px-4 py-3 text-[color:var(--text)] shadow-[0_20px_60px_rgba(3,5,8,0.18)] backdrop-blur-2xl">
           <Link to="/" className="shrink-0">
-            <BrandLogo imageClassName="h-12 md:h-14 lg:h-16" surface="adaptive" />
+            <BrandLogo imageClassName="h-16 md:h-20 lg:h-24" surface="adaptive" />
           </Link>
 
           <nav className="hidden items-center gap-2 lg:flex">
@@ -121,7 +121,7 @@ export function PublicLayout() {
       <footer className="border-t border-[color:var(--border)] bg-[color:var(--bg-secondary)]/96 backdrop-blur-xl">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_0.9fr_1fr] md:px-6">
           <div className="space-y-4 md:pr-10">
-            <BrandLogo imageClassName="h-14 md:h-16" surface="adaptive" />
+            <BrandLogo imageClassName="h-16 md:h-20" surface="adaptive" />
             <p className="max-w-md text-sm leading-7 text-[color:var(--text-secondary)]">
               NAVYAN helps students apply, get selected, track performance, and earn verified
               internship outcomes through a clear and modern workflow.

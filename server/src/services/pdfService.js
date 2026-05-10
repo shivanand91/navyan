@@ -1,19 +1,33 @@
+import { extname } from "path";
 import { readFile } from "fs/promises";
 import { generatePdfBufferFromHtml } from "../utils/pdf.js";
 
-let cachedLogoDataUri = null;
-const fallbackLogoDataUri = `data:image/svg+xml;base64,${Buffer.from(`
-  <svg xmlns="http://www.w3.org/2000/svg" width="420" height="110" viewBox="0 0 420 110">
-    <rect width="420" height="110" rx="28" fill="#111418" />
-    <rect x="10" y="10" width="400" height="90" rx="22" fill="none" stroke="rgba(212,168,95,0.35)" />
-    <circle cx="58" cy="55" r="22" fill="#d4a85f" />
-    <path d="M48 66V44l19 22V44" fill="none" stroke="#111418" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-    <text x="98" y="66" fill="#f5f7fa" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="6">NAVYAN</text>
-  </svg>
-`).toString("base64")}`;
+let cachedFullLogoDataUri = null;
+let cachedHalfLogoDataUri = null;
 
 const createSvgDataUri = (markup) =>
   `data:image/svg+xml;base64,${Buffer.from(markup).toString("base64")}`;
+
+const fallbackFullLogoDataUri = createSvgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="620" height="190" viewBox="0 0 620 190">
+    <rect width="620" height="190" fill="white"/>
+    <path d="M50 134V58l70 76V58" fill="none" stroke="#1368e8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="144" cy="58" r="14" fill="#f5a400"/>
+    <text x="190" y="118" fill="#061432" font-family="Arial, sans-serif" font-size="78" font-weight="800">Navyan</text>
+    <path d="M192 146h82M438 146h82" stroke="#c98210" stroke-width="3"/>
+    <text x="286" y="153" fill="#061432" font-family="Arial, sans-serif" font-size="20">Internships and IT Services</text>
+  </svg>
+`);
+
+const fallbackHalfLogoDataUri = createSvgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+    <circle cx="110" cy="110" r="102" fill="#fff" stroke="#061432" stroke-width="8"/>
+    <circle cx="110" cy="110" r="84" fill="none" stroke="#c98210" stroke-width="4"/>
+    <path d="M72 145V75l62 70V75" fill="none" stroke="#1368e8" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="150" cy="74" r="12" fill="#f5a400"/>
+    <text x="110" y="36" text-anchor="middle" fill="#061432" font-family="Arial, sans-serif" font-size="20" font-weight="800">NAVYAN</text>
+  </svg>
+`);
 
 const escapeHtml = (value) =>
   String(value ?? "")
@@ -23,61 +37,161 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
-const getLogoDataUri = async () => {
-  if (cachedLogoDataUri) return cachedLogoDataUri;
+const normalizeCandidate = (candidate) => {
+  if (!candidate) return null;
+  if (candidate instanceof URL) return candidate;
+  return String(candidate).trim() || null;
+};
 
-  const remoteLogoUrl = typeof process.env.DOCUMENT_LOGO_URL === "string"
-    ? process.env.DOCUMENT_LOGO_URL.trim()
-    : "";
+const getMimeType = (candidate) => {
+  const extension = extname(candidate instanceof URL ? candidate.pathname : String(candidate)).toLowerCase();
 
+  if (extension === ".png") return "image/png";
+  if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
+  if (extension === ".webp") return "image/webp";
+  if (extension === ".svg") return "image/svg+xml";
+  return "application/octet-stream";
+};
+
+const readAssetAsDataUri = async (candidate) => {
+  const normalized = normalizeCandidate(candidate);
+  if (!normalized) return "";
+
+  const buffer = await readFile(normalized);
+  return `data:${getMimeType(normalized)};base64,${buffer.toString("base64")}`;
+};
+
+const getFullLogoDataUri = async () => {
+  if (cachedFullLogoDataUri) return cachedFullLogoDataUri;
+
+  const remoteLogoUrl = process.env.DOCUMENT_LOGO_URL?.trim();
   if (remoteLogoUrl) {
-    cachedLogoDataUri = remoteLogoUrl;
-    return cachedLogoDataUri;
+    cachedFullLogoDataUri = remoteLogoUrl;
+    return cachedFullLogoDataUri;
   }
 
-  const logoPathCandidates = [
+  const candidates = [
+    process.env.DOCUMENT_FULL_LOGO_PATH,
     process.env.DOCUMENT_LOGO_PATH,
+    new URL("../../../client/src/assests/full_logo.png", import.meta.url),
     new URL("../../../client/src/assests/Navyan.svg", import.meta.url)
-  ].filter(Boolean);
+  ];
 
-  for (const candidate of logoPathCandidates) {
+  for (const candidate of candidates) {
     try {
-      const logoSvg = await readFile(candidate, "utf8");
-      cachedLogoDataUri = createSvgDataUri(logoSvg);
-      return cachedLogoDataUri;
+      cachedFullLogoDataUri = await readAssetAsDataUri(candidate);
+      return cachedFullLogoDataUri;
     } catch {
-      // Try the next configured logo path.
+      // Keep trying known local asset locations.
     }
   }
 
-  cachedLogoDataUri = fallbackLogoDataUri;
-  return cachedLogoDataUri;
+  cachedFullLogoDataUri = fallbackFullLogoDataUri;
+  return cachedFullLogoDataUri;
 };
 
-const getSignatureDataUri = (name, tone = "#1f1728") =>
+const getHalfLogoDataUri = async () => {
+  if (cachedHalfLogoDataUri) return cachedHalfLogoDataUri;
+
+  const remoteLogoUrl = process.env.DOCUMENT_HALF_LOGO_URL?.trim();
+  if (remoteLogoUrl) {
+    cachedHalfLogoDataUri = remoteLogoUrl;
+    return cachedHalfLogoDataUri;
+  }
+
+  const candidates = [
+    process.env.DOCUMENT_HALF_LOGO_PATH,
+    new URL("../../../client/src/assests/half_logo.png", import.meta.url),
+    new URL("../../../client/src/assests/full_logo.png", import.meta.url)
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      cachedHalfLogoDataUri = await readAssetAsDataUri(candidate);
+      return cachedHalfLogoDataUri;
+    } catch {
+      // Keep trying known local asset locations.
+    }
+  }
+
+  cachedHalfLogoDataUri = fallbackHalfLogoDataUri;
+  return cachedHalfLogoDataUri;
+};
+
+const getSignatureDataUri = (name, text, tone = "#061432") =>
   createSvgDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120">
-      <defs>
-        <linearGradient id="ink" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="${tone}" />
-          <stop offset="100%" stop-color="#6d28d9" />
-        </linearGradient>
-      </defs>
-      <path d="M24 92 C88 50, 170 42, 252 64 S416 104, 534 70" fill="none" stroke="rgba(212,168,95,0.22)" stroke-width="5" stroke-linecap="round"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="430" height="120" viewBox="0 0 430 120">
+      <path d="M28 92 C95 80, 164 78, 244 79 C302 79, 356 76, 402 67" fill="none" stroke="#061432" stroke-width="3" stroke-linecap="round"/>
       <text
-        x="14"
-        y="78"
-        fill="url(#ink)"
+        x="34"
+        y="76"
+        fill="${tone}"
         font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
         font-size="46"
-        font-weight="600"
-        letter-spacing="1"
-      >${escapeHtml(name)}</text>
+        font-weight="500"
+        letter-spacing="0"
+      >${escapeHtml(text || name)}</text>
     </svg>
   `);
 
-const founderSignatureDataUri = getSignatureDataUri("Shivanand Kumar", "#2d1d0a");
-const coFounderSignatureDataUri = getSignatureDataUri("Anamika Pandey", "#31154f");
+const founderSignatureDataUri = getSignatureDataUri("Shivanand Kumar", "Shivanand", "#071533");
+const coFounderSignatureDataUri = getSignatureDataUri("Anamika Pandey", "Anamika", "#071533");
+
+const formatMode = (mode) => {
+  const normalized = String(mode || "Remote").trim();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+
+const createCornerStyles = () => `
+  .corner-top {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 360px;
+    height: 290px;
+    background: linear-gradient(135deg, #041328 0%, #08264a 60%, transparent 61%);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .corner-top::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 78px;
+    width: 460px;
+    height: 58px;
+    background: linear-gradient(90deg, #b97712, #f1c45a, #b97712);
+    transform: rotate(-32deg);
+    transform-origin: left top;
+  }
+  .corner-bottom {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 340px;
+    height: 260px;
+    background: linear-gradient(315deg, #041328 0%, #08264a 62%, transparent 63%);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+  .corner-bottom::before {
+    content: "";
+    position: absolute;
+    right: -60px;
+    bottom: 86px;
+    width: 470px;
+    height: 52px;
+    background: linear-gradient(90deg, #b97712, #f1c45a, #b97712);
+    transform: rotate(-31deg);
+    transform-origin: right bottom;
+  }
+  .subtle-lines {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    background-image:
+      repeating-radial-gradient(ellipse at center, rgba(6,20,50,0.15) 0 1px, transparent 1px 9px);
+    mask-image: linear-gradient(90deg, transparent, black 15%, black 85%, transparent);
+  }
+`;
 
 export const createOfferLetterHtml = async ({
   offerId,
@@ -92,7 +206,9 @@ export const createOfferLetterHtml = async ({
   internshipType,
   organizationName
 }) => {
-  const logoDataUri = await getLogoDataUri();
+  const fullLogoDataUri = await getFullLogoDataUri();
+  const halfLogoDataUri = await getHalfLogoDataUri();
+  const resolvedRole = role || internshipTitle;
 
   return `<!doctype html>
   <html>
@@ -104,326 +220,355 @@ export const createOfferLetterHtml = async ({
         body {
           margin: 0;
           font-family: "Inter", "Segoe UI", Arial, sans-serif;
-          color: #111827;
-          background: #f6f1e7;
+          color: #080d1c;
+          background: #ffffff;
         }
         .page {
           position: relative;
-          width: 100%;
-          padding: 24px 24px 18px;
-          background:
-            radial-gradient(circle at top right, rgba(212,168,95,0.14), transparent 28%),
-            linear-gradient(180deg, #fffdf8 0%, #f8f3eb 100%);
-          border: 1px solid rgba(200,169,107,0.28);
-          border-radius: 24px;
+          width: 210mm;
+          height: 297mm;
+          overflow: hidden;
+          background: #fff;
+          padding: 30px 46px 48px;
         }
         .page::before {
           content: "";
           position: absolute;
-          inset: 12px;
-          border: 1px solid rgba(15,23,42,0.08);
-          border-radius: 18px;
+          inset: 0;
+          border: 1px solid #d4a040;
           pointer-events: none;
         }
-        .watermark {
+        .top-corner {
           position: absolute;
-          right: 20px;
-          top: 24px;
-          width: 132px;
-          opacity: 0.05;
+          right: 0;
+          top: 0;
+          width: 134px;
+          height: 118px;
+          background: linear-gradient(225deg, #061432 0 50%, transparent 51%);
+        }
+        .top-corner::after {
+          content: "";
+          position: absolute;
+          right: 12px;
+          top: 2px;
+          width: 32px;
+          height: 158px;
+          background: linear-gradient(#f2c052, #b97812);
+          transform: rotate(-35deg);
+        }
+        .bottom-band {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 48px;
+          background: #061432;
+          color: #fff;
+        }
+        .bottom-band::before,
+        .bottom-band::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          width: 120px;
+          height: 48px;
+          background: linear-gradient(135deg, #f2c052, #b97812);
+        }
+        .bottom-band::before { left: 0; clip-path: polygon(0 0, 100% 100%, 0 100%); }
+        .bottom-band::after { right: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+        .footer-contact {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 34px;
+          height: 100%;
+          font-size: 11px;
+          letter-spacing: 0;
+        }
+        .footer-contact span {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #fff;
         }
         .header {
           position: relative;
-          display: flex;
-          justify-content: space-between;
-          gap: 18px;
-          align-items: flex-start;
-        }
-        .brand {
-          display: flex;
-          align-items: center;
-          gap: 12px;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: 1fr 250px;
+          gap: 34px;
+          align-items: start;
         }
         .logo {
-          width: 70px;
+          width: 286px;
           height: auto;
-          object-fit: contain;
+          display: block;
         }
-        .brand-name {
-          font-size: 13px;
-          font-weight: 800;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: #2b2113;
+        .contact-card {
+          border-left: 2px solid #c47a10;
+          padding-left: 18px;
+          margin-top: 8px;
         }
-        .brand-subtitle {
-          margin-top: 4px;
-          font-size: 10px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #7c6b54;
+        .contact-card h2 {
+          margin: 0;
+          font-size: 15px;
+          letter-spacing: 0.03em;
+          color: #071533;
         }
-        .meta-card {
-          min-width: 195px;
-          padding: 14px 16px;
-          background: rgba(255,255,255,0.72);
-          border: 1px solid rgba(15,23,42,0.08);
-          border-radius: 18px;
-          box-shadow: 0 14px 28px rgba(15,23,42,0.05);
-        }
-        .meta-label {
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          color: #7c6b54;
-          font-weight: 700;
-        }
-        .meta-value {
-          margin-top: 4px;
+        .contact-card p {
+          margin: 5px 0;
           font-size: 12px;
-          font-weight: 700;
           color: #111827;
         }
-        .headline {
-          margin-top: 18px;
+        .ref-row {
+          position: relative;
+          z-index: 1;
           display: flex;
           justify-content: space-between;
-          gap: 18px;
-          align-items: flex-end;
+          align-items: end;
+          margin-top: 52px;
+          padding-bottom: 6px;
+          border-bottom: 1.5px solid #c98518;
+          font-size: 13px;
         }
-        .title {
+        .letter-title {
+          position: relative;
+          z-index: 1;
+          margin: 24px 0 26px;
+          text-align: center;
+        }
+        .letter-title h1 {
           margin: 0;
-          font-size: 26px;
-          line-height: 1.08;
+          color: #071533;
+          font-size: 31px;
+          line-height: 1;
+          letter-spacing: 0.03em;
           font-weight: 800;
-          color: #14151a;
         }
-        .subtitle {
-          margin-top: 8px;
-          max-width: 500px;
-          font-size: 11.5px;
-          line-height: 1.65;
-          color: #4b5563;
+        .ornament {
+          width: 145px;
+          height: 1px;
+          margin: 14px auto 0;
+          background: #c98518;
+          position: relative;
         }
-        .badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 7px 12px;
-          border-radius: 999px;
-          background: rgba(212,168,95,0.12);
-          border: 1px solid rgba(200,169,107,0.32);
-          color: #6d4e14;
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-        }
-        .summary-grid {
-          margin-top: 16px;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 10px;
-        }
-        .summary-card {
-          padding: 12px 14px;
-          border-radius: 16px;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(255,255,255,0.82);
-        }
-        .summary-card .label {
-          font-size: 9.5px;
-          text-transform: uppercase;
-          letter-spacing: 0.14em;
-          color: #7c6b54;
-          font-weight: 700;
-        }
-        .summary-card .value {
-          margin-top: 6px;
-          font-size: 12px;
-          font-weight: 700;
-          color: #111827;
+        .ornament::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: -5px;
+          width: 10px;
+          height: 10px;
+          border: 1px solid #c98518;
+          transform: translateX(-50%) rotate(45deg);
+          background: #fff;
         }
         .content {
-          margin-top: 16px;
-          display: grid;
-          grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-          gap: 12px;
+          position: relative;
+          z-index: 1;
+          font-size: 13.4px;
+          line-height: 1.48;
         }
-        .panel {
-          border-radius: 18px;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(255,255,255,0.82);
-          padding: 15px 16px;
+        .content p {
+          margin: 0 0 14px;
         }
-        .section-label {
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.18em;
-          color: #7c6b54;
+        .content strong,
+        .blue {
+          color: #071b55;
           font-weight: 800;
         }
-        .body {
-          margin-top: 10px;
-          font-size: 11.5px;
-          line-height: 1.68;
-          color: #374151;
+        .section {
+          margin-top: 17px;
         }
-        .terms {
-          margin: 10px 0 0;
-          padding-left: 16px;
-          color: #374151;
-          font-size: 10.5px;
-          line-height: 1.6;
+        .section-heading {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+          color: #bd7209;
+          font-size: 15px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
         }
-        .terms li { margin-bottom: 4px; }
-        .signature-wrap {
-          margin-top: 16px;
+        .icon-box {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          background: #bd7209;
+          display: inline-block;
+          position: relative;
+        }
+        .details {
+          margin-left: 32px;
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 18px;
+          grid-template-columns: 142px 1fr;
+          gap: 5px 10px;
+          font-size: 13px;
+        }
+        .details div:nth-child(odd) {
+          font-weight: 800;
+        }
+        ul,
+        ol {
+          margin: 0 0 0 36px;
+          padding-left: 16px;
+        }
+        li {
+          margin: 4px 0;
+        }
+        .closing {
+          margin-top: 20px;
+        }
+        .signature-row {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: 1fr 132px 1fr;
+          gap: 30px;
+          align-items: end;
+          margin-top: 24px;
+        }
+        .signature-card {
+          text-align: center;
         }
         .signature {
-          width: 168px;
-          height: auto;
-          max-width: 100%;
+          width: 155px;
+          height: 50px;
+          object-fit: contain;
         }
         .sig-line {
-          margin-top: 2px;
-          padding-top: 6px;
-          border-top: 1px solid rgba(15,23,42,0.18);
-          font-size: 10.5px;
-          color: #4b5563;
+          width: 180px;
+          margin: 0 auto;
+          border-top: 1.5px solid #c98518;
+          padding-top: 8px;
+          color: #071b55;
+          font-size: 13px;
+          font-weight: 800;
         }
-        .sig-line strong {
+        .sig-line span {
           display: block;
-          margin-bottom: 2px;
+          margin-top: 4px;
           color: #111827;
-          font-size: 11.5px;
+          font-size: 11px;
+          font-weight: 500;
         }
-        .footer {
-          margin-top: 12px;
+        .seal {
+          width: 120px;
+          height: 120px;
+          margin: 0 auto;
+          border-radius: 50%;
+          border: 3px solid #071b55;
           display: flex;
-          justify-content: space-between;
-          gap: 18px;
-          align-items: flex-end;
-          font-size: 10px;
-          color: #6b7280;
+          align-items: center;
+          justify-content: center;
+          background: #fff;
+          box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 7px #d5a03a;
+        }
+        .seal img {
+          width: 72px;
+          height: 86px;
+          object-fit: contain;
         }
       </style>
     </head>
     <body>
       <div class="page">
-        <img src="${logoDataUri}" alt="Navyan watermark" class="watermark" />
+        <div class="top-corner"></div>
+        <div class="bottom-band">
+          <div class="footer-contact">
+            <span>www.navyan.online</span>
+            <span>|</span>
+            <span>contact@navyan.online</span>
+            <span>|</span>
+            <span>India</span>
+          </div>
+        </div>
 
         <div class="header">
-          <div class="brand">
-            <img src="${logoDataUri}" alt="Navyan logo" class="logo" />
-            <div>
-              <div class="brand-name">${escapeHtml(organizationName)}</div>
-              <div class="brand-subtitle">Internship Offer Letter</div>
-            </div>
-          </div>
-
-          <div class="meta-card">
-            <div class="meta-label">Document ID</div>
-            <div class="meta-value">${escapeHtml(offerId)}</div>
-            <div class="meta-label" style="margin-top: 14px;">Issue date</div>
-            <div class="meta-value">${escapeHtml(issueDateStr)}</div>
+          <img src="${fullLogoDataUri}" alt="Navyan logo" class="logo" />
+          <div class="contact-card">
+            <h2>NAVYAN</h2>
+            <p>Internships and IT Services</p>
+            <p>www.navyan.online</p>
+            <p>contact@navyan.online</p>
+            <p>India</p>
           </div>
         </div>
 
-        <div class="headline">
-          <div>
-            <h1 class="title">Formal confirmation of your internship with ${escapeHtml(
-              organizationName
-            )}</h1>
-            <div class="subtitle">
-              This document confirms your selection into a structured internship role with a defined
-              timeline, assigned work, and performance-based evaluation.
-            </div>
-          </div>
-          <div class="badge">${escapeHtml(internshipType || "Structured internship")}</div>
+        <div class="ref-row">
+          <div>Ref. No.: ${escapeHtml(offerId)}</div>
+          <div>Date: ${escapeHtml(issueDateStr)}</div>
         </div>
 
-        <div class="summary-grid">
-          <div class="summary-card">
-            <div class="label">Candidate</div>
-            <div class="value">${escapeHtml(studentName)}</div>
-          </div>
-          <div class="summary-card">
-            <div class="label">Internship title</div>
-            <div class="value">${escapeHtml(internshipTitle)}</div>
-          </div>
-          <div class="summary-card">
-            <div class="label">Assigned role</div>
-            <div class="value">${escapeHtml(role || internshipTitle)}</div>
-          </div>
-          <div class="summary-card">
-            <div class="label">Mode</div>
-            <div class="value">${escapeHtml((mode || "remote").toUpperCase())}</div>
-          </div>
-          <div class="summary-card">
-            <div class="label">Duration</div>
-            <div class="value">${escapeHtml(durationLabel)}</div>
-          </div>
-          <div class="summary-card">
-            <div class="label">Program window</div>
-            <div class="value">${escapeHtml(startDateStr)} to ${escapeHtml(endDateStr)}</div>
-          </div>
+        <div class="letter-title">
+          <h1>OFFER LETTER</h1>
+          <div class="ornament"></div>
         </div>
 
         <div class="content">
-          <div class="panel">
-            <div class="section-label">Official note</div>
-            <div class="body">
-              Dear <strong>${escapeHtml(studentName)}</strong>,<br /><br />
-              We are pleased to offer you an internship opportunity with <strong>${escapeHtml(
-                organizationName
-              )}</strong>. You have been selected for the role of
-              <strong> ${escapeHtml(role || internshipTitle)}</strong> under the
-              <strong> ${escapeHtml(internshipTitle)}</strong> program. Your internship will run for
-              <strong> ${escapeHtml(durationLabel)}</strong>, beginning on
-              <strong> ${escapeHtml(startDateStr)}</strong> and concluding on
-              <strong> ${escapeHtml(endDateStr)}</strong>. You will receive project instructions,
-              work against timelines, and be assessed on quality, consistency, communication, and
-              completion of deliverables.
+          <p><strong>Dear ${escapeHtml(studentName)},</strong></p>
+          <p><strong>Congratulations!</strong></p>
+          <p>
+            We are pleased to offer you the position of
+            <span class="blue">${escapeHtml(resolvedRole)}</span> at
+            <span class="blue">${escapeHtml(organizationName)} (Internships and IT Services)</span>.
+            We were impressed with your skills, passion, and enthusiasm, and we believe you will be
+            a great addition to our team.
+          </p>
+
+          <div class="section">
+            <div class="section-heading"><span class="icon-box"></span> Internship Details</div>
+            <div class="details">
+              <div>Position</div><div>: ${escapeHtml(resolvedRole)}</div>
+              <div>Department</div><div>: ${escapeHtml(internshipTitle || "Development")}</div>
+              <div>Internship Duration</div><div>: ${escapeHtml(durationLabel)}</div>
+              <div>Start Date</div><div>: ${escapeHtml(startDateStr)}</div>
+              <div>End Date</div><div>: ${escapeHtml(endDateStr)}</div>
+              <div>Stipend</div><div>: ${escapeHtml(internshipType || "As applicable")}</div>
+              <div>Work Mode</div><div>: ${escapeHtml(formatMode(mode))}</div>
             </div>
           </div>
 
-          <div class="panel">
-            <div class="section-label">Terms and expectations</div>
-            <ol class="terms">
-              <li>The internship is governed by the structured workflow defined by ${escapeHtml(
-                organizationName
-              )}.</li>
-              <li>You are expected to maintain timely communication and professional conduct.</li>
-              <li>Project milestones, submissions, and revisions will be tracked through the platform.</li>
-              <li>Offer letter, task assignment, and certificate issuance remain linked to verified progress.</li>
-              <li>Serious misconduct or non-compliance may lead to discontinuation of the internship.</li>
+          <div class="section">
+            <div class="section-heading"><span class="icon-box"></span> Role & Responsibilities</div>
+            <ul>
+              <li>Work on assigned tasks and projects as per the guidance of the project coordinator.</li>
+              <li>Collaborate with the team to deliver high-quality results.</li>
+              <li>Learn, implement, and contribute innovative ideas.</li>
+              <li>Maintain professionalism, discipline, and commitment throughout the internship.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <div class="section-heading"><span class="icon-box"></span> Terms & Conditions</div>
+            <ol>
+              <li>This internship is purely for educational and skill development purposes.</li>
+              <li>You are expected to maintain confidentiality of all company information.</li>
+              <li>Any misconduct or failure to meet expectations may result in termination of the internship.</li>
+              <li>Upon successful completion, you will be awarded a Certificate of Internship.</li>
             </ol>
           </div>
+
+          <p class="closing">
+            We are excited to have you on board and look forward to a productive and rewarding
+            journey together.<br />Welcome to the <span class="blue">${escapeHtml(organizationName)}</span> family!
+          </p>
+          <p><strong>Best Regards,</strong></p>
         </div>
 
-        <div class="signature-wrap">
+        <div class="signature-row">
           <div class="signature-card">
             <img src="${founderSignatureDataUri}" alt="Shivanand Kumar signature" class="signature" />
-            <div class="sig-line">
-              <strong>Shivanand Kumar</strong>
-              Founder, ${escapeHtml(organizationName)}
-            </div>
+            <div class="sig-line">Shivanand Kumar<span>Founder<br />${escapeHtml(organizationName)}</span></div>
           </div>
+          <div class="seal"><img src="${halfLogoDataUri}" alt="Navyan seal" /></div>
           <div class="signature-card">
             <img src="${coFounderSignatureDataUri}" alt="Anamika Pandey signature" class="signature" />
-            <div class="sig-line">
-              <strong>Anamika Pandey</strong>
-              Co-Founder, ${escapeHtml(organizationName)}
-            </div>
+            <div class="sig-line">Anamika Pandey<span>Co-Founder<br />${escapeHtml(organizationName)}</span></div>
           </div>
-        </div>
-
-        <div class="footer">
-          <span>This document has been officially issued by the Navyan.</span>
-          <span>${escapeHtml(issueDateStr)}</span>
         </div>
       </div>
     </body>
@@ -433,10 +578,10 @@ export const createOfferLetterHtml = async ({
 export const renderOfferLetterPdf = async (html) => {
   return await generatePdfBufferFromHtml(html, {
     margin: {
-      top: "6mm",
-      right: "6mm",
-      bottom: "6mm",
-      left: "6mm"
+      top: "0",
+      right: "0",
+      bottom: "0",
+      left: "0"
     }
   });
 };
@@ -453,7 +598,9 @@ export const createCertificateHtml = async ({
   verifyUrl,
   qrCodeDataUrl
 }) => {
-  const logoDataUri = await getLogoDataUri();
+  const fullLogoDataUri = await getFullLogoDataUri();
+  const halfLogoDataUri = await getHalfLogoDataUri();
+  const resolvedRole = role || internshipTitle || "Internship";
 
   return `<!doctype html>
   <html>
@@ -465,276 +612,294 @@ export const createCertificateHtml = async ({
         body {
           margin: 0;
           font-family: "Inter", "Segoe UI", Arial, sans-serif;
-          color: #111827;
-          background: #f7f3eb;
+          color: #061432;
+          background: #fff;
         }
         .page {
           position: relative;
-          padding: 22px 24px 18px;
-          background:
-            radial-gradient(circle at top left, rgba(212,168,95,0.16), transparent 26%),
-            radial-gradient(circle at bottom right, rgba(109,40,217,0.08), transparent 24%),
-            linear-gradient(180deg, #fffcf8 0%, #f8f3ea 100%);
-          border: 1px solid rgba(200,169,107,0.28);
-          border-radius: 24px;
+          width: 297mm;
+          height: 210mm;
           overflow: hidden;
+          background: #fffdf9;
+          padding: 18px 44px 26px;
+          text-align: center;
         }
         .page::before {
           content: "";
           position: absolute;
-          inset: 12px;
-          border: 1px solid rgba(15,23,42,0.08);
-          border-radius: 18px;
+          inset: 13px;
+          border: 2px solid #c88414;
           pointer-events: none;
         }
-        .topbar {
-          position: relative;
-          display: flex;
-          justify-content: space-between;
-          gap: 18px;
-          align-items: flex-start;
-        }
-        .brand {
-          display: flex;
-          align-items: center;
-          gap: 14px;
+        ${createCornerStyles()}
+        .watermark {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 310px;
+          height: 360px;
+          object-fit: contain;
+          transform: translate(-50%, -37%);
+          opacity: 0.035;
         }
         .logo {
-          width: 82px;
+          position: relative;
+          z-index: 1;
+          width: 345px;
           height: auto;
-        }
-        .brand-name {
-          font-size: 13px;
-          font-weight: 800;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: #2b2113;
-        }
-        .brand-subtitle {
-          margin-top: 4px;
-          font-size: 11px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: #7c6b54;
-        }
-        .id-chip {
-          padding: 8px 14px;
-          border-radius: 999px;
-          background: rgba(212,168,95,0.12);
-          border: 1px solid rgba(200,169,107,0.28);
-          color: #6d4e14;
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-        }
-        .title-wrap {
-          margin-top: 14px;
-          text-align: center;
-        }
-        .eyebrow {
-          font-size: 10px;
-          font-weight: 800;
-          color: #7c6b54;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
+          margin: 14px auto 0;
+          display: block;
         }
         .title {
-          margin: 12px 0 0;
-          font-size: 34px;
-          line-height: 1.05;
-          font-weight: 800;
-          color: #15161c;
+          position: relative;
+          z-index: 1;
+          margin-top: 22px;
         }
-        .subtitle {
-          margin: 8px auto 0;
-          max-width: 680px;
-          font-size: 12px;
-          line-height: 1.7;
-          color: #4b5563;
+        .title h1 {
+          margin: 0;
+          color: #061432;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 58px;
+          line-height: 0.95;
+          font-weight: 500;
+          letter-spacing: 0.23em;
+          text-shadow: 0 1px 0 rgba(6,20,50,0.15);
         }
-        .recipient {
-          margin-top: 18px;
-          text-align: center;
-          padding: 18px 22px;
-          border-radius: 22px;
-          background: rgba(255,255,255,0.72);
-          border: 1px solid rgba(15,23,42,0.08);
-          box-shadow: 0 18px 40px rgba(15,23,42,0.06);
-        }
-        .recipient-name {
+        .title h2 {
+          display: inline-flex;
+          align-items: center;
+          gap: 22px;
+          margin: 14px 0 0;
+          color: #8e570b;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 30px;
-          font-weight: 800;
-          color: #1f1728;
-        }
-        .recipient-copy {
-          margin-top: 10px;
-          font-size: 12.5px;
-          line-height: 1.72;
-          color: #374151;
-        }
-        .grid {
-          margin-top: 16px;
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 10px;
-        }
-        .card {
-          border-radius: 18px;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(255,255,255,0.82);
-          padding: 13px 15px;
-        }
-        .card-label {
-          font-size: 9px;
-          font-weight: 800;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          color: #7c6b54;
-        }
-        .card-value {
-          margin-top: 6px;
-          font-size: 13px;
+          line-height: 1;
           font-weight: 700;
+          letter-spacing: 0.32em;
+        }
+        .title h2::before,
+        .title h2::after {
+          content: "";
+          width: 90px;
+          height: 1.5px;
+          background: #c88414;
+        }
+        .presented {
+          position: relative;
+          z-index: 1;
+          margin-top: 28px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 17px;
+          letter-spacing: 0.26em;
           color: #111827;
         }
-        .footer {
-          margin-top: 18px;
+        .student-name {
+          position: relative;
+          z-index: 1;
+          display: inline-block;
+          margin-top: 16px;
+          min-width: 520px;
+          padding: 0 28px 11px;
+          border-bottom: 2px solid #c88414;
+          color: #061432;
+          font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+          font-size: 66px;
+          line-height: 0.9;
+          font-weight: 500;
+        }
+        .certificate-copy {
+          position: relative;
+          z-index: 1;
+          max-width: 650px;
+          margin: 18px auto 0;
+          color: #161b28;
+          font-size: 15.8px;
+          line-height: 1.48;
+        }
+        .certificate-copy strong {
+          color: #061432;
+        }
+        .badge {
+          position: absolute;
+          z-index: 2;
+          right: 86px;
+          top: 135px;
+          width: 154px;
+          height: 154px;
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 50% 50%, #08214a 0 52%, transparent 53%),
+            conic-gradient(from 0deg, #a15f09, #f4cc68, #9e5b08, #f4cc68, #a15f09);
+          box-shadow: 0 16px 26px rgba(45,28,5,0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 18px;
+          font-weight: 800;
+          line-height: 1.35;
+          text-transform: uppercase;
+        }
+        .badge::before,
+        .badge::after {
+          content: "";
+          position: absolute;
+          bottom: -54px;
+          width: 35px;
+          height: 75px;
+          background: linear-gradient(#dba943, #b46b10);
+          z-index: -1;
+        }
+        .badge::before {
+          left: 38px;
+          transform: rotate(14deg);
+          clip-path: polygon(0 0, 100% 0, 82% 100%, 46% 76%, 0 100%);
+        }
+        .badge::after {
+          right: 38px;
+          transform: rotate(-14deg);
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 54% 76%, 18% 100%);
+        }
+        .footer-area {
+          position: absolute;
+          z-index: 2;
+          left: 190px;
+          right: 190px;
+          bottom: 56px;
           display: grid;
-          grid-template-columns: minmax(0, 1fr) 190px;
-          gap: 16px;
+          grid-template-columns: 1fr 140px 1fr;
+          gap: 48px;
           align-items: end;
         }
-        .signature-zone {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 18px;
-        }
         .signature-card {
-          padding-top: 4px;
-        }
-        .signature {
-          width: 168px;
-          height: auto;
-        }
-        .sig-line {
-          margin-top: 6px;
-          padding-top: 6px;
-          border-top: 1px solid rgba(15,23,42,0.18);
-          font-size: 11px;
-          color: #4b5563;
-        }
-        .sig-line strong {
-          display: block;
-          margin-bottom: 3px;
-          font-size: 12px;
-          color: #111827;
-        }
-        .verify-box {
-          padding: 13px;
-          border-radius: 20px;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(255,255,255,0.82);
           text-align: center;
         }
-        .verify-box img {
-          width: 90px;
-          height: 90px;
+        .signature {
+          width: 152px;
+          height: 54px;
+          object-fit: contain;
         }
-        .verify-title {
-          margin-top: 8px;
-          font-size: 10px;
+        .sig-line {
+          width: 190px;
+          margin: 0 auto;
+          border-top: 1.6px solid #c88414;
+          padding-top: 8px;
+          color: #071b55;
+          font-size: 14px;
           font-weight: 800;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          color: #7c6b54;
         }
-        .verify-url {
-          margin-top: 6px;
-          font-size: 8.8px;
-          color: #6b7280;
-          line-height: 1.45;
+        .sig-line span {
+          display: block;
+          margin-top: 5px;
+          color: #8e570b;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .center-seal {
+          width: 118px;
+          height: 118px;
+          margin: 0 auto;
+          border-radius: 50%;
+          border: 3px solid #071b55;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 7px #c88414;
+        }
+        .center-seal img {
+          width: 70px;
+          height: 86px;
+          object-fit: contain;
+        }
+        .verify {
+          position: absolute;
+          z-index: 3;
+          left: 42px;
+          bottom: 34px;
+          width: 88px;
+          text-align: center;
+          font-size: 6.6px;
+          color: #061432;
+          line-height: 1.25;
           word-break: break-all;
+        }
+        .verify img {
+          width: 58px;
+          height: 58px;
+          display: block;
+          margin: 0 auto 3px;
+        }
+        .cert-id {
+          position: absolute;
+          z-index: 2;
+          right: 42px;
+          bottom: 34px;
+          color: #061432;
+          font-size: 9px;
+          text-align: right;
+        }
+        .motto {
+          position: absolute;
+          z-index: 2;
+          left: 0;
+          right: 0;
+          bottom: 25px;
+          color: #161b28;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 15px;
         }
       </style>
     </head>
     <body>
       <div class="page">
-        <div class="topbar">
-          <div class="brand">
-            <img src="${logoDataUri}" alt="Navyan logo" class="logo" />
-            <div>
-              <div class="brand-name">${escapeHtml(organizationName)}</div>
-              <div class="brand-subtitle">Completion Credential</div>
-            </div>
-          </div>
-          <div class="id-chip">${escapeHtml(certificateId)}</div>
+        <div class="subtle-lines"></div>
+        <div class="corner-top"></div>
+        <div class="corner-bottom"></div>
+        <img src="${halfLogoDataUri}" alt="Navyan watermark" class="watermark" />
+        <img src="${fullLogoDataUri}" alt="Navyan logo" class="logo" />
+
+        <div class="badge">Learn<br />Perform<br />Grow</div>
+
+        <div class="title">
+          <h1>CERTIFICATE</h1>
+          <h2>OF INTERNSHIP</h2>
         </div>
 
-        <div class="title-wrap">
-          <div class="eyebrow">Official completion record</div>
-          <h1 class="title">Internship Completion Certificate</h1>
-          <div class="subtitle">
-            This certificate formally recognizes successful completion of a structured internship
-            program conducted by ${escapeHtml(organizationName)}.
-          </div>
+        <div class="presented">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
+        <div class="student-name">${escapeHtml(studentName)}</div>
+
+        <div class="certificate-copy">
+          For successfully completing the <strong>${escapeHtml(resolvedRole)}</strong> internship
+          program at ${escapeHtml(organizationName)}. During this internship, the individual has
+          shown dedication, consistency, and a strong willingness to learn and contribute.
+          We appreciate their efforts and wish them success in their future endeavors.
         </div>
 
-        <div class="recipient">
-          <div class="recipient-name">${escapeHtml(studentName)}</div>
-          <div class="recipient-copy">
-            is hereby certified for successful completion of the
-            <strong> ${escapeHtml(role)}</strong> internship under the
-            <strong> ${escapeHtml(internshipTitle)}</strong> program. The internship duration was
-            <strong> ${escapeHtml(durationLabel)}</strong>, completed on
-            <strong> ${escapeHtml(completionDateStr)}</strong>, and recorded as an official outcome
-            in the ${escapeHtml(organizationName)} credential registry.
+        <div class="footer-area">
+          <div class="signature-card">
+            <img src="${founderSignatureDataUri}" alt="Shivanand Kumar signature" class="signature" />
+            <div class="sig-line">Shivanand Kumar<span>Founder</span></div>
           </div>
-        </div>
-
-        <div class="grid">
-          <div class="card">
-            <div class="card-label">Role</div>
-            <div class="card-value">${escapeHtml(role)}</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Program</div>
-            <div class="card-value">${escapeHtml(internshipTitle)}</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Duration</div>
-            <div class="card-value">${escapeHtml(durationLabel)}</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Issue date</div>
-            <div class="card-value">${escapeHtml(issueDateStr)}</div>
+          <div class="center-seal"><img src="${halfLogoDataUri}" alt="Navyan seal" /></div>
+          <div class="signature-card">
+            <img src="${coFounderSignatureDataUri}" alt="Anamika Pandey signature" class="signature" />
+            <div class="sig-line">Anamika Pandey<span>Co-Founder</span></div>
           </div>
         </div>
 
-        <div class="footer">
-          <div class="signature-zone">
-            <div class="signature-card">
-              <img src="${founderSignatureDataUri}" alt="Shivanand Kumar signature" class="signature" />
-              <div class="sig-line">
-                <strong>Shivanand Kumar</strong>
-                Founder, ${escapeHtml(organizationName)}
-              </div>
-            </div>
-            <div class="signature-card">
-              <img src="${coFounderSignatureDataUri}" alt="Anamika Pandey signature" class="signature" />
-              <div class="sig-line">
-                <strong>Anamika Pandey</strong>
-                Co-Founder, ${escapeHtml(organizationName)}
-              </div>
-            </div>
-          </div>
-
-          <div class="verify-box">
-            <img src="${qrCodeDataUrl}" alt="Verification QR" />
-            <div class="verify-title">Verify credential</div>
-            <div class="verify-url">${escapeHtml(verifyUrl)}</div>
-          </div>
+        <div class="verify">
+          <img src="${qrCodeDataUrl}" alt="Verification QR" />
+          ${escapeHtml(verifyUrl)}
         </div>
+        <div class="cert-id">
+          Certificate ID: ${escapeHtml(certificateId)}<br />
+          Completed: ${escapeHtml(completionDateStr)}<br />
+          Issued: ${escapeHtml(issueDateStr)}
+        </div>
+        <div class="motto">"Learn, Perform, Grow"</div>
       </div>
     </body>
   </html>`;
@@ -744,10 +909,10 @@ export const renderCertificatePdf = async (html) => {
   return await generatePdfBufferFromHtml(html, {
     landscape: true,
     margin: {
-      top: "6mm",
-      right: "6mm",
-      bottom: "6mm",
-      left: "6mm"
+      top: "0",
+      right: "0",
+      bottom: "0",
+      left: "0"
     }
   });
 };

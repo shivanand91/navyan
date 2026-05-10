@@ -64,7 +64,7 @@ export function AdminLayout() {
         <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col bg-[#0f1318]/96 text-[#f5f7fa] lg:flex">
           <div className="shrink-0 border-b border-white/8 px-5 py-5">
             <Link to={dashboardHomePath}>
-              <BrandLogo imageClassName="h-12 md:h-14" />
+              <BrandLogo imageClassName="h-16 md:h-20" />
             </Link>
             <div className="mt-4 flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-primary/18 bg-primary/10 text-primary">

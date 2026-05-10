@@ -53,7 +53,7 @@ export function StudentLayout() {
         <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[292px] shrink-0 flex-col overflow-hidden bg-[#0f1318]/92 text-[#f5f7fa] lg:flex">
           <div className="border-b border-white/8 px-5 py-5">
             <Link to={dashboardHomePath}>
-              <BrandLogo imageClassName="h-12 md:h-14" />
+              <BrandLogo imageClassName="h-16 md:h-20" />
             </Link>
             <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[#7e8794]">Student Workspace</p>
           </div>
