@@ -83,27 +83,6 @@ export default function OfferLetterPreview() {
 
         <div className="absolute inset-[12px] border-[5px] border-[#0f2b56]" />
 
-        {/* TOP RIGHT DESIGN */}
-
-        <div className="absolute top-0 right-0 w-28 h-28 bg-[#0f2b56]" />
-
-        <div
-          className="absolute top-0 right-0 w-20 h-20 bg-[#d4af37]"
-          style={{
-            clipPath: "polygon(100% 0, 0 0, 100% 100%)",
-          }}
-        />
-
-        {/* BOTTOM LEFT DESIGN */}
-
-        <div className="absolute bottom-0 left-0 w-28 h-28 bg-[#0f2b56]" />
-
-        <div
-          className="absolute bottom-0 left-0 w-20 h-20 bg-[#d4af37]"
-          style={{
-            clipPath: "polygon(0 100%, 0 0, 100% 100%)",
-          }}
-        />
 
         {/* HEADER */}
 
