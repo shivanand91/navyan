@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/axios";
-import fullLogo from "@/assests/full_logo.png";
 import halfLogo from "@/assests/half_logo.png";
 
 export default function CertificatePreview() {
@@ -14,7 +13,6 @@ export default function CertificatePreview() {
         const { data } = await api.get(`/certificates/preview/${certificateId}`);
         setCertificate(data.certificate);
       } catch (err) {
-        // Fallback data for testing
         setCertificate({
           studentName: "Nitesh Pandey",
           role: "Web Development",
@@ -33,80 +31,62 @@ export default function CertificatePreview() {
     <div className="min-h-screen bg-[#07111f] py-10 px-4 print:p-0 print:bg-white">
       <DocumentToolbar />
 
-      <div className="overflow-auto print:overflow-visible">
-        {/* CERTIFICATE CONTAINER (A4 Landscape) */}
+      <div className="flex justify-center items-center overflow-auto print:block print:overflow-visible">
+        {/* CERTIFICATE CONTAINER */}
         <div
           id="certificate-content"
-          className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none"
+          className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-full"
         >
-          {/* --- DESIGN CORNERS (Exact Reference Style) --- */}
-          <div 
-            className="absolute top-0 left-0 w-[45%] h-[35%] bg-[#061a35]" 
-            style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
-          />
-          <div 
-            className="absolute top-0 left-0 w-[48%] h-[38%] border-r-[6px] border-b-[6px] border-[#d4af37] rounded-br-[100%]"
-            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', background: 'transparent' }}
-          />
-
-          <div 
-            className="absolute bottom-0 right-0 w-[45%] h-[35%] bg-[#061a35]" 
-            style={{ clipPath: 'polygon(100% 100%, 0 100%, 100% 0)' }}
-          />
-          <div 
-            className="absolute bottom-0 right-0 w-[48%] h-[38%] border-l-[6px] border-t-[6px] border-[#d4af37] rounded-tl-[100%]"
-          />
+          {/* --- CORNER DESIGN ELEMENTS --- */}
+          <div className="absolute top-0 left-0 w-[45%] h-[35%] bg-[#061a35]" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+          <div className="absolute top-0 left-0 w-[48%] h-[38%] border-r-[6px] border-b-[6px] border-[#d4af37] rounded-br-[100%]" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} />
+          <div className="absolute bottom-0 right-0 w-[45%] h-[35%] bg-[#061a35]" style={{ clipPath: 'polygon(100% 100%, 0 100%, 100% 0)' }} />
+          <div className="absolute bottom-0 right-0 w-[48%] h-[38%] border-l-[6px] border-t-[6px] border-[#d4af37] rounded-tl-[100%]" />
 
           {/* --- WATERMARK --- */}
-          <img
-            src={halfLogo}
-            alt=""
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] opacity-[0.03] pointer-events-none"
-          />
+          <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] opacity-[0.03] pointer-events-none" />
 
           {/* --- CONTENT --- */}
-          <div className="relative z-10 h-full flex flex-col items-center pt-10">
-            {/* Logo */}
-            <img src={fullLogo} alt="Navyan" className="w-[300px]" />
+          <div className="relative z-10 h-full flex flex-col items-center pt-12">
+            
+            {/* BRANDING HEADER (Half Logo + Text) */}
+            <div className="flex items-center gap-4">
+              <img src={halfLogo} alt="Logo" className="w-16 h-16" />
+              <div className="flex flex-col">
+                <h1 className="text-5xl font-black text-[#061a35] tracking-tighter leading-none">Navyan</h1>
+                <p className="text-sm font-bold text-[#061a35] tracking-[2px] uppercase opacity-80">Internships and IT Services</p>
+              </div>
+            </div>
 
             {/* Main Titles */}
-            <div className="text-center mt-6">
-              <h1 className="text-[78px] font-bold tracking-[4px] text-[#061a35] leading-none">
-                CERTIFICATE
-              </h1>
+            <div className="text-center mt-8">
+              <h1 className="text-[78px] font-bold tracking-[6px] text-[#061a35] leading-none">CERTIFICATE</h1>
               <div className="flex items-center justify-center gap-4 mt-1">
                 <div className="h-[2px] w-24 bg-[#d4af37]" />
-                <h2 className="text-[34px] font-semibold tracking-[8px] text-[#d4af37]">
-                  OF INTERNSHIP
-                </h2>
+                <h2 className="text-[34px] font-semibold tracking-[8px] text-[#d4af37]">OF INTERNSHIP</h2>
                 <div className="h-[2px] w-24 bg-[#d4af37]" />
               </div>
-              <div className="text-[#d4af37] text-2xl mt-1 tracking-[12px]">⬥❧⬥</div>
+              <div className="text-[#d4af37] text-2xl mt-1 tracking-[12px] leading-none">⬥❧⬥</div>
             </div>
 
             {/* Proudly Presented To */}
-            <div className="text-center mt-8">
-              <p className="text-[15px] tracking-[4px] text-slate-500 font-bold uppercase">
-                This Certificate is Proudly Presented To
-              </p>
-              <h3 className="mt-4 text-[72px] font-serif text-[#061a35] italic leading-tight">
-                {certificate.studentName}
-              </h3>
+            <div className="text-center mt-10">
+              <p className="text-[15px] tracking-[4px] text-slate-500 font-bold uppercase">This Certificate is Proudly Presented To</p>
+              <h3 className="mt-4 text-[72px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
               <div className="h-[2.5px] w-[580px] bg-[#d4af37] mx-auto mt-2" />
-              <div className="text-[#d4af37] mt-1 text-xl">⬥</div>
+              <div className="text-[#d4af37] mt-1 text-xl leading-none">⬥</div>
             </div>
 
-            {/* Dynamic Description */}
-            <div className="max-w-3xl mx-auto mt-6 text-center px-6">
-              <p className="text-[19px] leading-relaxed text-slate-700 font-medium">
+            {/* Description */}
+            <div className="max-w-3xl mx-auto mt-6 text-center px-10">
+              <p className="text-[20px] leading-relaxed text-slate-700 font-medium">
                 For successfully completing the <span className="font-bold text-[#061a35]">{certificate.role}</span> internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
                 The internship was conducted from <span className="font-bold text-[#061a35]">{certificate.startDate}</span> to <span className="font-bold text-[#061a35]">{certificate.endDate}</span>.
                 During this period, the individual has shown dedication, consistency, and a strong willingness to learn and contribute. 
-                We appreciate their efforts and wish them success in their future endeavors.
               </p>
             </div>
 
-            {/* Medal/Badge (Top Right) */}
+            {/* Badge/Medal (Top Right Floating) */}
             <div className="absolute top-[170px] right-24 scale-110">
                <div className="relative flex flex-col items-center">
                   <div className="absolute top-14 w-20 h-28 flex justify-between px-2">
@@ -115,21 +95,19 @@ export default function CertificatePreview() {
                   </div>
                   <div className="w-32 h-32 rounded-full bg-[#061a35] border-[5px] border-[#d4af37] flex flex-col items-center justify-center shadow-2xl z-20">
                     <div className="text-yellow-400 text-[8px] flex gap-0.5 mb-1">★★★</div>
-                    <p className="text-white text-[10px] font-bold leading-tight text-center tracking-widest">
-                      LEARN<br/>PERFORM<br/>GROW
-                    </p>
+                    <p className="text-white text-[10px] font-bold leading-tight text-center tracking-widest">LEARN<br/>PERFORM<br/>GROW</p>
                     <div className="text-yellow-400 text-[8px] mt-1">★</div>
                   </div>
                </div>
             </div>
 
-            {/* --- FOOTER SIGNATURES --- */}
+            {/* --- SIGNATURES --- */}
             <div className="absolute bottom-20 w-full flex justify-between px-28 items-end">
               <div className="text-center">
                 <p className="font-serif italic text-4xl text-slate-800 mb-1">Shivanand</p>
                 <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-xl font-bold text-[#061a35]">Shivanand Kumar</h4>
-                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase">Founder</p>
+                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase leading-none">Founder</p>
               </div>
 
               <div className="w-28 h-28 rounded-full border border-slate-100 flex items-center justify-center p-1 bg-white relative">
@@ -145,16 +123,14 @@ export default function CertificatePreview() {
                 <p className="font-serif italic text-4xl text-slate-800 mb-1">Anamika</p>
                 <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-xl font-bold text-[#061a35]">Anamika Pandey</h4>
-                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase">Co-Founder</p>
+                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase leading-none">Co-Founder</p>
               </div>
             </div>
 
-            {/* Bottom Slogan & ID */}
+            {/* Bottom Slogan */}
             <div className="absolute bottom-6 w-full text-center flex items-center justify-center gap-4">
               <div className="h-[1px] w-12 bg-[#d4af37]" />
-              <p className="italic text-[#061a35] text-lg font-bold">
-                “Learn, Perform, Grow”
-              </p>
+              <p className="italic text-[#061a35] text-lg font-bold">“Learn, Perform, Grow”</p>
               <div className="h-[1px] w-12 bg-[#d4af37]" />
             </div>
             
@@ -167,9 +143,22 @@ export default function CertificatePreview() {
 
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          body { background: white !important; -webkit-print-color-adjust: exact; }
+          @page { 
+            size: A4 landscape; 
+            margin: 0; 
+          }
+          body { 
+            background: white !important; 
+            -webkit-print-color-adjust: exact; 
+          }
           .print\\:hidden { display: none !important; }
-          @page { size: A4 landscape; margin: 0; }
+          #certificate-content {
+            width: 100vw !important;
+            height: 100vh !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
         }
       `}} />
     </div>
@@ -179,18 +168,8 @@ export default function CertificatePreview() {
 function DocumentToolbar() {
   return (
     <div className="flex justify-center gap-4 mb-8 print:hidden">
-      <button
-        onClick={() => window.history.back()}
-        className="px-6 py-2 rounded bg-white text-slate-900 font-semibold shadow hover:bg-slate-100 transition"
-      >
-        Back
-      </button>
-      <button
-        onClick={() => window.print()}
-        className="px-6 py-2 rounded bg-[#061a35] text-white font-semibold shadow hover:bg-slate-800 transition"
-      >
-        Print / Save PDF
-      </button>
+      <button onClick={() => window.history.back()} className="px-6 py-2 rounded bg-white text-slate-900 font-semibold shadow hover:bg-slate-100 transition">Back</button>
+      <button onClick={() => window.print()} className="px-6 py-2 rounded bg-[#061a35] text-white font-semibold shadow hover:bg-slate-800 transition">Print Certificate</button>
     </div>
   );
 }
