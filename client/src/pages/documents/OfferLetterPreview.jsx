@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api, { getApiErrorMessage } from "@/lib/axios";
-import fullLogo from "@/assests/full_logo.png";
 import halfLogo from "@/assests/half_logo.png";
 
 const fallbackDocument = {
@@ -65,11 +64,9 @@ export default function OfferLetterPreview() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
-        <DocumentToolbar />
-
-        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
-          <h1 className="text-3xl font-bold text-red-600">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="bg-white p-10 rounded-2xl">
+          <h1 className="text-2xl font-bold text-red-600">
             Offer Letter Unavailable
           </h1>
 
@@ -83,16 +80,14 @@ export default function OfferLetterPreview() {
 
   if (!document) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
-        <DocumentToolbar />
-
-        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
-          <h1 className="text-3xl font-bold text-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="bg-white p-10 rounded-2xl">
+          <h1 className="text-2xl font-bold text-slate-900">
             Preparing Offer Letter
           </h1>
 
           <p className="mt-4 text-slate-600">
-            Loading the official Navyan offer letter preview.
+            Loading official Navyan document...
           </p>
         </div>
       </div>
@@ -105,7 +100,7 @@ export default function OfferLetterPreview() {
     "Intern";
 
   return (
-    <div className="min-h-screen bg-[#07111f] py-10 px-4">
+    <div className="min-h-screen bg-[#0b1220] py-10 px-4">
       <DocumentToolbar />
 
       <div className="overflow-auto">
@@ -114,20 +109,19 @@ export default function OfferLetterPreview() {
             relative
             mx-auto
             bg-white
-            w-[1123px]
-            min-h-[1587px]
-            rounded-xl
+            w-[794px]
+            min-h-[1123px]
+            shadow-2xl
             overflow-hidden
-            shadow-[0_25px_80px_rgba(0,0,0,0.45)]
-            border-[12px]
+            border-[10px]
             border-[#0f2b56]
           "
         >
-          {/* Decorative Background */}
+          {/* Background Design */}
 
-          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-br-[220px]" />
+          <div className="absolute top-0 left-0 w-44 h-44 bg-gradient-to-br from-[#0f2b56] to-[#174ea6] rounded-br-full" />
 
-          <div className="absolute bottom-0 right-0 w-[320px] h-[320px] bg-gradient-to-tl from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-tl-[220px]" />
+          <div className="absolute bottom-0 right-0 w-52 h-52 bg-gradient-to-tl from-[#0f2b56] to-[#174ea6] rounded-tl-full" />
 
           {/* Watermark */}
 
@@ -140,50 +134,52 @@ export default function OfferLetterPreview() {
               left-1/2
               -translate-x-1/2
               -translate-y-1/2
-              w-[420px]
+              w-72
               opacity-[0.04]
             "
           />
 
           {/* Header */}
 
-          <div className="relative z-10 flex justify-between items-start px-16 pt-14">
-            <img
-              src={fullLogo}
-              alt="Navyan"
-              className="w-[340px]"
-            />
+          <div className="relative z-10 px-12 pt-10 flex justify-between items-start">
+            <div className="flex items-center gap-4">
+              <img
+                src={halfLogo}
+                alt="Navyan"
+                className="w-16 h-16"
+              />
 
-            <div className="text-right">
-              <h2 className="text-[#0f2b56] font-bold text-3xl">
-                NAVYAN
-              </h2>
+              <div>
+                <h1 className="text-4xl font-extrabold text-[#0f2b56]">
+                  Navyan
+                </h1>
 
-              <p className="text-slate-600 mt-2">
-                Internships and IT Services
-              </p>
-
-              <div className="mt-6 text-slate-600 text-lg leading-9">
-                <p>www.navyan.online</p>
-                <p>contact@navyan.online</p>
-                <p>India</p>
+                <p className="text-sm text-slate-600 font-medium">
+                  Internships and IT Services
+                </p>
               </div>
+            </div>
+
+            <div className="text-right text-sm text-slate-600 leading-6">
+              <p>www.navyan.online</p>
+              <p>contact@navyan.online</p>
+              <p>India</p>
             </div>
           </div>
 
-          {/* Ref + Date */}
+          {/* Meta */}
 
-          <div className="relative z-10 flex justify-between px-16 mt-14 text-xl text-slate-700 font-medium">
+          <div className="relative z-10 px-12 mt-8 flex justify-between text-sm text-slate-700">
             <div>
-              Ref No:{" "}
-              <span className="font-bold text-[#0f2b56]">
+              Ref No:
+              <span className="font-semibold text-[#0f2b56] ml-2">
                 {document.offerId}
               </span>
             </div>
 
             <div>
-              Date:{" "}
-              <span className="font-bold text-[#0f2b56]">
+              Date:
+              <span className="font-semibold text-[#0f2b56] ml-2">
                 {document.issueDateStr}
               </span>
             </div>
@@ -191,29 +187,29 @@ export default function OfferLetterPreview() {
 
           {/* Title */}
 
-          <div className="relative z-10 text-center mt-16">
-            <h1 className="text-[72px] font-black tracking-[8px] text-[#0f2b56]">
+          <div className="relative z-10 text-center mt-10">
+            <h2 className="text-5xl font-black tracking-[6px] text-[#0f2b56]">
               OFFER LETTER
-            </h1>
+            </h2>
 
-            <div className="w-[300px] h-[4px] bg-[#d4af37] mx-auto mt-5 rounded-full" />
+            <div className="w-40 h-1 bg-[#d4af37] mx-auto mt-4 rounded-full" />
           </div>
 
-          {/* Content */}
+          {/* Body */}
 
-          <div className="relative z-10 px-20 mt-16">
-            <p className="text-2xl text-slate-700 leading-[52px]">
+          <div className="relative z-10 px-12 mt-10 text-[15px] leading-8 text-slate-700">
+            <p>
               Dear{" "}
               <span className="font-bold text-[#0f2b56]">
                 {document.studentName}
               </span>,
             </p>
 
-            <p className="mt-10 text-2xl text-slate-700 leading-[52px]">
+            <p className="mt-6">
               Congratulations!
             </p>
 
-            <p className="mt-10 text-[25px] leading-[54px] text-slate-700">
+            <p className="mt-6">
               We are pleased to offer you the position of{" "}
               <span className="font-bold text-[#0f2b56]">
                 {role}
@@ -222,73 +218,71 @@ export default function OfferLetterPreview() {
               <span className="font-bold text-[#0f2b56]">
                 Navyan
               </span>.
-              We are impressed with your skills,
-              enthusiasm, and dedication, and we believe
-              you will be a valuable addition to our
-              internship program and learning community.
+              We are impressed with your enthusiasm,
+              dedication, and passion for learning.
+              We believe you will be a valuable part
+              of our internship program.
             </p>
 
             {/* Internship Details */}
 
-            <div className="mt-16">
-              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+            <div className="mt-10">
+              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
                 Internship Details
-              </h2>
+              </h3>
 
-              <div className="grid grid-cols-2 gap-y-8 mt-10 text-[23px]">
-                <div className="font-semibold text-slate-700">
+              <div className="grid grid-cols-2 gap-y-4 mt-6 text-[15px]">
+                <div className="font-semibold">
                   Position
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
-                  {role}
-                </div>
+                <div>{role}</div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   Department
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.internshipTitle}
                 </div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   Duration
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.durationLabel}
                 </div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   Start Date
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.startDateStr}
                 </div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   End Date
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.endDateStr}
                 </div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   Internship Type
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.internshipType}
                 </div>
 
-                <div className="font-semibold text-slate-700">
+                <div className="font-semibold">
                   Work Mode
                 </div>
 
-                <div className="text-[#0f2b56] font-bold">
+                <div>
                   {document.mode}
                 </div>
               </div>
@@ -296,93 +290,84 @@ export default function OfferLetterPreview() {
 
             {/* Responsibilities */}
 
-            <div className="mt-20">
-              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+            <div className="mt-10">
+              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
                 Role & Responsibilities
-              </h2>
+              </h3>
 
-              <ul className="mt-10 space-y-6 text-[24px] leading-[50px] text-slate-700 list-disc pl-10">
+              <ul className="list-disc pl-6 mt-5 space-y-2">
                 <li>
-                  Work on assigned tasks and projects under
-                  the guidance of the project coordinator.
+                  Work on assigned tasks and projects
+                  under guidance.
                 </li>
 
                 <li>
                   Collaborate with the team to deliver
-                  professional and high-quality outcomes.
+                  quality work.
                 </li>
 
                 <li>
-                  Maintain professionalism, discipline, and
-                  commitment throughout the internship.
+                  Maintain professionalism throughout
+                  the internship.
                 </li>
 
                 <li>
-                  Learn practical industry-level skills and
-                  contribute innovative ideas.
+                  Learn practical industry-level skills.
                 </li>
               </ul>
             </div>
 
             {/* Terms */}
 
-            <div className="mt-20">
-              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+            <div className="mt-10">
+              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
                 Terms & Conditions
-              </h2>
+              </h3>
 
-              <ol className="mt-10 space-y-6 text-[24px] leading-[50px] text-slate-700 list-decimal pl-10">
+              <ol className="list-decimal pl-6 mt-5 space-y-2">
                 <li>
-                  This internship is intended for educational
+                  This internship is for educational
                   and skill development purposes.
                 </li>
 
                 <li>
-                  Confidentiality of all company information
+                  Confidentiality of company information
                   must be maintained.
                 </li>
 
                 <li>
-                  Any misconduct or violation of internship
-                  policies may result in termination.
+                  Any misconduct may result in termination.
                 </li>
 
                 <li>
-                  A Certificate of Internship will be awarded
-                  upon successful completion.
+                  Certificate will be awarded upon
+                  successful completion.
                 </li>
               </ol>
             </div>
 
-            {/* Welcome */}
-
-            <p className="mt-20 text-[25px] leading-[54px] text-slate-700">
-              We are excited to have you onboard and look
-              forward to a productive and successful journey
-              together.
-              Welcome to the{" "}
-              <span className="font-bold text-[#0f2b56]">
-                Navyan
-              </span>{" "}
-              family.
+            <p className="mt-10">
+              We are excited to have you onboard and
+              look forward to a productive learning
+              experience together.
             </p>
           </div>
 
           {/* Signatures */}
 
-          <div className="relative z-10 flex justify-between items-center px-20 mt-28">
+          <div className="relative z-10 flex justify-between items-end px-12 mt-16">
             <div className="text-center">
-              <div className="text-[54px] italic text-slate-800">
+              <div className="text-4xl italic text-slate-800">
                 Shivanand
               </div>
 
-              <div className="w-[240px] h-[2px] bg-[#d4af37] mx-auto" />
+              <div className="w-44 h-[1px] bg-[#d4af37] mt-1" />
 
-              <h4 className="mt-4 text-[28px] font-bold text-[#0f2b56]">
+              <h4 className="mt-2 text-lg font-bold text-[#0f2b56]">
                 Shivanand Kumar
               </h4>
 
-              <p className="text-[#b8860b] font-semibold tracking-[3px]">
+              <p className="text-sm text-[#b8860b] font-semibold tracking-[2px]">
                 Founder
               </p>
             </div>
@@ -391,37 +376,37 @@ export default function OfferLetterPreview() {
 
             <div
               className="
-                w-[190px]
-                h-[190px]
+                w-28
+                h-28
                 rounded-full
-                border-[10px]
+                border-[6px]
                 border-[#174ea6]
                 flex
                 items-center
                 justify-center
                 bg-white
-                shadow-2xl
+                shadow-xl
               "
             >
               <img
                 src={halfLogo}
                 alt="seal"
-                className="w-[95px]"
+                className="w-14"
               />
             </div>
 
             <div className="text-center">
-              <div className="text-[54px] italic text-slate-800">
+              <div className="text-4xl italic text-slate-800">
                 Anamika
               </div>
 
-              <div className="w-[240px] h-[2px] bg-[#d4af37] mx-auto" />
+              <div className="w-44 h-[1px] bg-[#d4af37] mt-1" />
 
-              <h4 className="mt-4 text-[28px] font-bold text-[#0f2b56]">
+              <h4 className="mt-2 text-lg font-bold text-[#0f2b56]">
                 Anamika Pandey
               </h4>
 
-              <p className="text-[#b8860b] font-semibold tracking-[3px]">
+              <p className="text-sm text-[#b8860b] font-semibold tracking-[2px]">
                 Co-Founder
               </p>
             </div>
@@ -429,24 +414,8 @@ export default function OfferLetterPreview() {
 
           {/* Footer */}
 
-          <div
-            className="
-              relative
-              z-10
-              mt-20
-              bg-[#0f2b56]
-              text-white
-              py-8
-              flex
-              justify-center
-              gap-16
-              text-xl
-              font-medium
-            "
-          >
-            <span>www.navyan.online</span>
-            <span>contact@navyan.online</span>
-            <span>India</span>
+          <div className="relative z-10 mt-10 bg-[#0f2b56] text-white py-4 text-center text-sm font-medium">
+            Learn • Perform • Grow
           </div>
         </div>
       </div>
@@ -461,9 +430,9 @@ function DocumentToolbar() {
         type="button"
         onClick={goBack}
         className="
-          px-6
-          py-3
-          rounded-xl
+          px-5
+          py-2.5
+          rounded-lg
           bg-white
           text-slate-900
           font-semibold
@@ -479,9 +448,9 @@ function DocumentToolbar() {
         type="button"
         onClick={() => window.print()}
         className="
-          px-6
-          py-3
-          rounded-xl
+          px-5
+          py-2.5
+          rounded-lg
           bg-gradient-to-r
           from-[#174ea6]
           to-[#0f2b56]
