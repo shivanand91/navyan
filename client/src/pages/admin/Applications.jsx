@@ -658,6 +658,50 @@ export default function AdminApplications() {
                         </div>
                       </div>
 
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-3">
+                          Admin actions
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              selectedApplication.status === "Selected" ||
+                              updatingId === `${selectedApplication._id}:status:Selected`
+                            }
+                            onClick={() => handleStatusChange(selectedApplication._id, "Selected")}
+                          >
+                            🎯 Select
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              selectedApplication.status === "Rejected" ||
+                              updatingId === `${selectedApplication._id}:status:Rejected`
+                            }
+                            onClick={() => handleStatusChange(selectedApplication._id, "Rejected")}
+                          >
+                            ✋ Reject
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              selectedApplication.status === "Completed" ||
+                              updatingId === `${selectedApplication._id}:status:Completed`
+                            }
+                            onClick={() => handleStatusChange(selectedApplication._id, "Completed")}
+                          >
+                            ✅ Complete
+                          </Button>
+                        </div>
+                        <p className="mt-3 text-[12px] text-slate-500 dark:text-slate-400">
+                          Selecting a candidate generates the offer letter and sends the email automatically.
+                        </p>
+                      </div>
+
                       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
                         <Button
                           className="w-full"
