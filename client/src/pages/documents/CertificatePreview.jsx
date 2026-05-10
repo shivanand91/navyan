@@ -101,7 +101,7 @@ export default function CertificatePreview() {
             {/* --- SIGNATURES --- */}
             <div className="absolute bottom-20 w-full flex justify-between px-32 items-end">
               <div className="text-center">
-                <p className="font-serif italic text-4xl text-slate-800 mb-1">Shivanand</p>
+                <p className="font-serif italic text-xl text-slate-800 mb-1">Shivanand</p>
                 <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-xl font-bold text-[#061a35]">Shivanand Kumar</h4>
                 <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase leading-none">Founder</p>
@@ -117,7 +117,7 @@ export default function CertificatePreview() {
               </div>
 
               <div className="text-center">
-                <p className="font-serif italic text-4xl text-slate-800 mb-1">Anamika</p>
+                <p className="font-serif italic text-xl text-slate-800 mb-1">Anamika</p>
                 <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-xl font-bold text-[#061a35]">Anamika Pandey</h4>
                 <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase leading-none">Co-Founder</p>
