@@ -38,7 +38,7 @@ export default function CertificatePreview() {
           className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-full"
         >
           {/* --- CURVED MAIN BORDER --- */}
-          <div className="absolute inset-6 border-[12px] border-[#d4af37] rounded-[30px] z-20 pointer-events-none shadow-inner" />
+          <div className="absolute inset-6 border-[8px] border-[#d4af37] rounded-[30px] z-20 pointer-events-none shadow-inner" />
           <div className="absolute inset-8 border-[2px] border-[#061a35] rounded-[24px] z-20 pointer-events-none opacity-20" />
 
           {/* --- WATERMARK --- */}
@@ -52,7 +52,7 @@ export default function CertificatePreview() {
               <img src={halfLogo} alt="Logo" className="w-16 h-16" />
               <div className="flex flex-col">
                 <h1 className="text-5xl font-black text-[#061a35] tracking-tighter leading-none">Navyan</h1>
-                <p className="text-sm font-bold text-[#061a35] tracking-[2px] uppercase opacity-80">Internships and IT Services</p>
+                <p className="text-sm mt-1 font-bold text-[#061a35] tracking-[2px] uppercase opacity-80">Internships and IT Services</p>
               </div>
             </div>
 
