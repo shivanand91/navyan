@@ -65,10 +65,10 @@ export default function CertificatePreview() {
             </div>
 
             {/* Proudly Presented To */}
-            <div className="text-center mt-10">
+            <div className="text-center mt-2">
               <p className="text-[15px] tracking-[4px] text-slate-500 font-bold uppercase">This Certificate is Proudly Presented To</p>
-              <h3 className="mt-4 text-[72px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
-              <div className="h-[2.5px] w-[580px] bg-[#d4af37] mx-auto mt-2" />
+              <h3 className="mt-2 text-[72px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
+              <div className="h-[2.5px] w-[580px] bg-[#d4af37] mx-auto mt-1" />
               <div className="text-[#d4af37] mt-1 text-xl leading-none">⬥</div>
             </div>
 
