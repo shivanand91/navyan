@@ -26,7 +26,7 @@ export default function BrandLogo({
         src={logo}
         alt="Navyan logo"
         className={cn(
-          "h-16 w-auto object-contain md:h-20 lg:h-24",
+          "h-12 w-auto object-contain md:h-14 lg:h-16",
           surfaceToneClass,
           imageClassName
         )}
