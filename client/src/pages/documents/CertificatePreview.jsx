@@ -73,7 +73,7 @@ export default function CertificatePreview() {
             </div>
 
             {/* Description */}
-            <div className="max-w-3xl mx-auto mt-6 text-center px-10">
+            <div className="max-w-3xl mx-auto mt-4 text-center px-10">
               <p className="text-[20px] leading-relaxed text-slate-700 font-medium">
                 For successfully completing the <span className="font-bold text-[#061a35]">{certificate.role}</span> internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
                 The internship was conducted from <span className="font-bold text-[#061a35]">{certificate.startDate}</span> to <span className="font-bold text-[#061a35]">{certificate.endDate}</span>.
