@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;
