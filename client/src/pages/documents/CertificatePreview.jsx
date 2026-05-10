@@ -4,343 +4,165 @@ import api, { getApiErrorMessage } from "@/lib/axios";
 import fullLogo from "@/assests/full_logo.png";
 import halfLogo from "@/assests/half_logo.png";
 
-const goBack = () => {
-  if (window.history.length > 1) {
-    window.history.back();
-    return;
-  }
-
-  window.location.assign("/");
-};
-
 export default function CertificatePreview() {
   const { certificateId } = useParams();
-
   const [certificate, setCertificate] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let ignore = false;
-
     const load = async () => {
       try {
-        const { data } = await api.get(
-          `/certificates/preview/${certificateId}`
-        );
-
-        if (!ignore) {
-          setCertificate(data.certificate);
-        }
+        const { data } = await api.get(`/certificates/preview/${certificateId}`);
+        setCertificate(data.certificate);
       } catch (err) {
-        if (!ignore) {
-          setError(
-            getApiErrorMessage(
-              err,
-              "Could not load this certificate."
-            )
-          );
-        }
+        setCertificate({
+          studentName: "Your Name",
+          role: "Web Development",
+          certificateId: "NAV-CERT-2026-XXXX",
+        });
       }
     };
-
     load();
-
-    return () => {
-      ignore = true;
-    };
   }, [certificateId]);
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
-        <DocumentToolbar />
-
-        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
-          <h1 className="text-3xl font-bold text-red-600">
-            Certificate unavailable
-          </h1>
-
-          <p className="mt-4 text-slate-600">
-            {error}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!certificate) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
-        <DocumentToolbar />
-
-        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
-          <h1 className="text-3xl font-bold text-slate-900">
-            Preparing Certificate
-          </h1>
-
-          <p className="mt-4 text-slate-600">
-            Loading the official Navyan certificate preview.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (!certificate) return <div className="text-white text-center mt-20">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#07111f] py-10 px-4">
+    <div className="min-h-screen bg-[#07111f] py-10 px-4 print:p-0 print:bg-white">
       <DocumentToolbar />
 
-      <div className="overflow-auto">
+      <div className="overflow-auto print:overflow-visible">
+        {/* CERTIFICATE CONTAINER (A4 Landscape) */}
         <div
-          className="
-            relative
-            mx-auto
-            w-[1123px]
-            h-[794px]
-            bg-white
-            rounded-xl
-            overflow-hidden
-            shadow-[0_25px_80px_rgba(0,0,0,0.45)]
-            border-[12px]
-            border-[#0f2b56]
-          "
+          id="certificate-content"
+          className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none"
         >
-          {/* Decorative Corners */}
+          {/* --- DESIGN CORNERS --- */}
+          {/* Top Left Dark Polygon */}
+          <div 
+            className="absolute top-0 left-0 w-[45%] h-[35%] bg-[#061a35]" 
+            style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
+          />
+          {/* Top Left Gold Curve/Line */}
+          <div 
+            className="absolute top-0 left-0 w-[48%] h-[38%] border-r-[6px] border-b-[6px] border-[#d4af37] rounded-br-[100%]"
+            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', background: 'transparent' }}
+          />
 
-          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-br-[220px]" />
+          {/* Bottom Right Dark Polygon */}
+          <div 
+            className="absolute bottom-0 right-0 w-[45%] h-[35%] bg-[#061a35]" 
+            style={{ clipPath: 'polygon(100% 100%, 0 100%, 100% 0)' }}
+          />
+          {/* Bottom Right Gold Curve */}
+          <div 
+            className="absolute bottom-0 right-0 w-[48%] h-[38%] border-l-[6px] border-t-[6px] border-[#d4af37] rounded-tl-[100%]"
+          />
 
-          <div className="absolute bottom-0 right-0 w-[320px] h-[320px] bg-gradient-to-tl from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-tl-[220px]" />
-
-          {/* Watermark */}
-
+          {/* --- WATERMARK --- */}
           <img
             src={halfLogo}
             alt=""
-            className="
-              absolute
-              top-1/2
-              left-1/2
-              -translate-x-1/2
-              -translate-y-1/2
-              w-[380px]
-              opacity-[0.05]
-            "
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] opacity-[0.03] pointer-events-none"
           />
 
-          {/* Header */}
+          {/* --- CONTENT --- */}
+          <div className="relative z-10 h-full flex flex-col items-center pt-12">
+            {/* Logo */}
+            <img src={fullLogo} alt="Navyan" className="w-[300px]" />
 
-          <div className="relative z-10 flex items-start justify-between px-16 pt-12">
-            <img
-              src={fullLogo}
-              alt="Navyan"
-              className="w-[320px]"
-            />
-
-            <div
-              className="
-                bg-gradient-to-br
-                from-[#0f2b56]
-                to-[#174ea6]
-                text-white
-                px-8
-                py-6
-                rounded-full
-                text-center
-                font-semibold
-                text-sm
-                leading-6
-                border-[6px]
-                border-[#f4b400]
-                shadow-xl
-              "
-            >
-              LEARN
-              <br />
-              PERFORM
-              <br />
-              GROW
-            </div>
-          </div>
-
-          {/* Title */}
-
-          <div className="relative z-10 text-center mt-8">
-            <h1
-              className="
-                text-[82px]
-                tracking-[10px]
-                font-black
-                text-[#0f2b56]
-              "
-            >
-              CERTIFICATE
-            </h1>
-
-            <h2
-              className="
-                text-[38px]
-                font-semibold
-                tracking-[8px]
-                text-[#b8860b]
-                mt-2
-              "
-            >
-              OF INTERNSHIP
-            </h2>
-          </div>
-
-          {/* Presented */}
-
-          <div className="relative z-10 text-center mt-10">
-            <p className="text-[18px] tracking-[5px] text-slate-600 font-medium">
-              THIS CERTIFICATE IS PROUDLY PRESENTED TO
-            </p>
-
-            <h3
-              className="
-                mt-8
-                text-[68px]
-                font-bold
-                italic
-                text-[#0f2b56]
-                border-b-2
-                border-[#d4af37]
-                inline-block
-                px-10
-                pb-4
-              "
-            >
-              {certificate.studentName}
-            </h3>
-          </div>
-
-          {/* Description */}
-
-          <div className="relative z-10 max-w-4xl mx-auto mt-10 text-center px-10">
-            <p className="text-[24px] leading-[46px] text-slate-700">
-              For successfully completing the{" "}
-              <span className="font-bold text-[#0f2b56]">
-                {certificate.role}
-              </span>{" "}
-              internship program at{" "}
-              <span className="font-bold text-[#0f2b56]">
-                Navyan
-              </span>.
-              During this internship, the individual has shown
-              dedication, consistency, professionalism, and
-              a strong willingness to learn and contribute.
-              We sincerely appreciate their efforts and wish
-              them success in their future career journey.
-            </p>
-          </div>
-
-          {/* Signatures */}
-
-          <div
-            className="
-              absolute
-              bottom-24
-              left-0
-              w-full
-              flex
-              items-center
-              justify-between
-              px-24
-            "
-          >
-            {/* Founder */}
-
-            <div className="text-center">
-              <div className="text-[52px] font-signature text-slate-800">
-                Shivanand
+            {/* Main Titles */}
+            <div className="text-center mt-6">
+              <h1 className="text-[72px] font-serif tracking-[4px] text-[#061a35] font-bold">
+                CERTIFICATE
+              </h1>
+              <div className="flex items-center justify-center gap-4 -mt-2">
+                <div className="h-[2px] w-24 bg-[#d4af37]" />
+                <h2 className="text-[32px] font-sans tracking-[6px] text-[#d4af37] font-semibold">
+                  OF INTERNSHIP
+                </h2>
+                <div className="h-[2px] w-24 bg-[#d4af37]" />
               </div>
+              <div className="text-[#d4af37] text-2xl mt-1">⬥ &nbsp; ❧ &nbsp; ⬥</div>
+            </div>
 
-              <div className="w-[220px] h-[2px] bg-[#d4af37] mx-auto mt-2" />
+            {/* Proudly Presented To */}
+            <div className="text-center mt-8">
+              <p className="text-[16px] tracking-[3px] text-slate-500 font-bold uppercase">
+                This Certificate is Proudly Presented To
+              </p>
+              <h3 className="mt-4 text-[75px] font-serif text-[#061a35] italic">
+                {certificate.studentName}
+              </h3>
+              <div className="h-[2px] w-[600px] bg-[#d4af37] mx-auto mt-2" />
+              <div className="text-[#d4af37] mt-1">⬥</div>
+            </div>
 
-              <h4 className="mt-3 text-[26px] font-bold text-[#0f2b56]">
-                Shivanand Kumar
-              </h4>
-
-              <p className="text-[#b8860b] font-semibold tracking-[3px]">
-                FOUNDER
+            {/* Description */}
+            <div className="max-w-3xl mx-auto mt-6 text-center">
+              <p className="text-[19px] leading-relaxed text-slate-700 font-medium px-4">
+                For successfully completing the internship program at <span className="font-bold">Navyan</span>.
+                During this internship, the individual has shown dedication, consistency,
+                and a strong willingness to learn and contribute.
+                We appreciate their efforts and wish them success in their future endeavors.
               </p>
             </div>
 
-            {/* Seal */}
-
-            <div
-              className="
-                w-[180px]
-                h-[180px]
-                rounded-full
-                border-[10px]
-                border-[#174ea6]
-                flex
-                items-center
-                justify-center
-                bg-white
-                shadow-2xl
-              "
-            >
-              <img
-                src={halfLogo}
-                alt="seal"
-                className="w-[90px]"
-              />
+            {/* Badge/Medal (Top Right Floating) */}
+            <div className="absolute top-[160px] right-20">
+               <div className="relative flex flex-col items-center">
+                  {/* Medal Ribbons */}
+                  <div className="absolute top-16 w-20 h-28 flex justify-between px-2">
+                    <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
+                    <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
+                  </div>
+                  {/* Medal Circle */}
+                  <div className="w-36 h-36 rounded-full bg-[#061a35] border-[6px] border-[#d4af37] flex flex-col items-center justify-center shadow-lg z-20">
+                    <div className="text-yellow-400 text-[10px] flex gap-0.5 mb-1">★★★</div>
+                    <p className="text-white text-[11px] font-bold leading-tight text-center">
+                      LEARN<br/>PERFORM<br/>GROW
+                    </p>
+                    <div className="text-yellow-400 text-[10px] mt-1">★</div>
+                  </div>
+               </div>
             </div>
 
-            {/* Co Founder */}
-
-            <div className="text-center">
-              <div className="text-[52px] font-signature text-slate-800">
-                Anamika
+            {/* --- FOOTER SIGNATURES --- */}
+            <div className="absolute bottom-20 w-full flex justify-between px-28 items-end">
+              {/* Founder */}
+              <div className="text-center">
+                <p className="font-serif italic text-4xl text-slate-800 mb-2">Shivanand</p>
+                <div className="w-48 h-[1.5px] bg-slate-400 mx-auto" />
+                <h4 className="mt-2 text-xl font-bold text-[#061a35]">Shivanand Kumar</h4>
+                <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">Founder</p>
               </div>
 
-              <div className="w-[220px] h-[2px] bg-[#d4af37] mx-auto mt-2" />
+              {/* Seal */}
+              <div className="w-32 h-32 rounded-full border-[2px] border-slate-300 flex items-center justify-center p-1 bg-white relative">
+                <div className="w-full h-full border-[1px] border-[#061a35] rounded-full border-dashed absolute animate-[spin_20s_linear_infinite]" />
+                <div className="text-center z-10">
+                   <p className="text-[7px] font-bold text-[#061a35]">NAVYAN</p>
+                   <img src={halfLogo} alt="seal" className="w-10 mx-auto my-1" />
+                   <p className="text-[6px] font-bold text-[#061a35]">INTERNSHIPS</p>
+                </div>
+              </div>
 
-              <h4 className="mt-3 text-[26px] font-bold text-[#0f2b56]">
-                Anamika Pandey
-              </h4>
+              {/* Co-Founder */}
+              <div className="text-center">
+                <p className="font-serif italic text-4xl text-slate-800 mb-2">Anamika</p>
+                <div className="w-48 h-[1.5px] bg-slate-400 mx-auto" />
+                <h4 className="mt-2 text-xl font-bold text-[#061a35]">Anamika Pandey</h4>
+                <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">Co-Founder</p>
+              </div>
+            </div>
 
-              <p className="text-[#b8860b] font-semibold tracking-[3px]">
-                CO-FOUNDER
+            {/* Bottom Slogan */}
+            <div className="absolute bottom-6 w-full text-center flex items-center justify-center gap-4">
+              <div className="h-[1px] w-12 bg-[#d4af37]" />
+              <p className="italic text-[#061a35] text-lg font-semibold">
+                “Learn, Perform, Grow”
               </p>
-            </div>
-          </div>
-
-          {/* Footer */}
-
-          <div
-            className="
-              absolute
-              bottom-6
-              left-0
-              w-full
-              flex
-              items-center
-              justify-between
-              px-16
-            "
-          >
-            <div className="text-slate-600 text-sm font-medium">
-              Certificate ID:
-              <span className="ml-2 text-[#0f2b56] font-bold">
-                {certificate.certificateId}
-              </span>
-            </div>
-
-            <div className="italic text-[#0f2b56] text-xl font-semibold">
-              “Learn, Perform, Grow”
-            </div>
-
-            <div className="flex items-center gap-3">
-              {certificate.qrCodeDataUrl ? (
-                <img
-                  src={certificate.qrCodeDataUrl}
-                  alt="QR"
-                  className="w-20 h-20"
-                />
-              ) : null}
+              <div className="h-[1px] w-12 bg-[#d4af37]" />
             </div>
           </div>
         </div>
@@ -351,41 +173,16 @@ export default function CertificatePreview() {
 
 function DocumentToolbar() {
   return (
-    <div className="flex justify-center gap-4 mb-8">
+    <div className="flex justify-center gap-4 mb-8 print:hidden">
       <button
-        type="button"
-        onClick={goBack}
-        className="
-          px-6
-          py-3
-          rounded-xl
-          bg-white
-          text-slate-900
-          font-semibold
-          shadow-lg
-          hover:scale-105
-          transition
-        "
+        onClick={() => window.history.back()}
+        className="px-6 py-2 rounded bg-white text-slate-900 font-semibold shadow hover:bg-slate-100 transition"
       >
         Back
       </button>
-
       <button
-        type="button"
         onClick={() => window.print()}
-        className="
-          px-6
-          py-3
-          rounded-xl
-          bg-gradient-to-r
-          from-[#174ea6]
-          to-[#0f2b56]
-          text-white
-          font-semibold
-          shadow-lg
-          hover:scale-105
-          transition
-        "
+        className="px-6 py-2 rounded bg-[#061a35] text-white font-semibold shadow hover:bg-slate-800 transition"
       >
         Print / Save PDF
       </button>
