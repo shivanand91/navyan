@@ -45,9 +45,10 @@ export default function OfferLetterPreview() {
            style={{ width: "210mm", height: "297mm", padding: "0" }}>
         
         {/* DESIGN ELEMENTS (Top Right & Bottom Left Triangles) */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}></div>
-        <div className="absolute top-0 right-0 w-22 h-22 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(100% 0, 20% 0, 100% 80%)" }}></div>
         
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(0 20%, 0 100%, 80% 100%)" }}></div>
+
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(0 20%, 0 100%, 80% 100%)" }}></div>
 
@@ -57,7 +58,7 @@ export default function OfferLetterPreview() {
             <img src={halfLogo} alt="logo" className="w-20" />
             <div>
               <h1 className="text-5xl font-bold text-[#0b2347] tracking-tight">Navyan</h1>
-              <p className="text-xs font-semibold text-[#0b2347]">Internships and IT Services</p>
+              <p className="text-xs font-semibold text-[#0b2347] mt-1">Internships and IT Services</p>
             </div>
           </div>
           <div className="text-right text-[12px] text-[#0b2347] font-medium leading-tight">
