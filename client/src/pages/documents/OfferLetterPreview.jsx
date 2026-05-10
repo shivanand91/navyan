@@ -1,188 +1,147 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/axios";
-import halfLogo from "@/assests/half_logo.png"; // Make sure this is your 'N' icon
+import fullLogo from "@/assests/full_logo.png";
+import halfLogo from "@/assests/half_logo.png";
 
-export default function OfferLetterPreview() {
-  const { accessToken } = useParams();
-  const [document, setDocument] = useState(null);
+export default function CertificatePreview() {
+  const { certificateId } = useParams();
+  const [certificate, setCertificate] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await api.get(`/applications/offer-letter/${accessToken}/preview`);
-        setDocument(data.document);
+        const { data } = await api.get(`/certificates/preview/${certificateId}`);
+        setDocument(data.certificate);
       } catch {
-        setDocument({
-          studentName: "Candidate Name",
-          internshipTitle: "Development",
-          role: "Web Development Intern",
-          durationLabel: "4 Weeks / 3 Months / 6 Months",
-          mode: "Remote / Hybrid / On-site",
-          startDateStr: "[Start Date]",
-          endDateStr: "[End Date]",
-          issueDateStr: "20 May 2024",
-          offerId: "NAV/2024/OL/XXXX",
-          
+        // PDF content ke hisab se fallback data [cite: 6, 18]
+        setCertificate({
+          studentName: "Nitesh pandey", 
+          certificateId: "NAV-CERT-2026-23C7AB",
         });
       }
     };
     load();
-  }, [accessToken]);
+  }, [certificateId]);
 
-  if (!document) return <div className="flex justify-center mt-20">Loading...</div>;
+  if (!certificate) return <div className="text-white text-center mt-20">Loading...</div>;
 
   return (
-    <div className="bg-slate-200 min-h-screen py-10 print:p-0 print:bg-white">
-      {/* ACTIONS */}
-      <div className="flex justify-center gap-4 mb-6 print:hidden">
-        <button onClick={() => window.history.back()} className="bg-white border px-6 py-2 rounded shadow-sm">Back</button>
-        <button onClick={() => window.print()} className="bg-[#0b2347] text-white px-6 py-2 rounded shadow-sm">Print Offer Letter</button>
+    <div className="min-h-screen bg-[#07111f] py-10 px-4 print:p-0 print:bg-white">
+      {/* TOOLBAR */}
+      <div className="flex justify-center gap-4 mb-8 print:hidden">
+        <button onClick={() => window.history.back()} className="px-6 py-2 rounded bg-white text-slate-900 font-semibold shadow hover:bg-slate-100 transition">Back</button>
+        <button onClick={() => window.print()} className="px-6 py-2 rounded bg-[#061a35] text-white font-semibold shadow hover:bg-slate-800 transition">Print Certificate</button>
       </div>
 
-      {/* A4 PAGE */}
-      <div className="mx-auto bg-white shadow-2xl print:shadow-none relative overflow-hidden" 
-           style={{ width: "210mm", height: "297mm", padding: "0" }}>
-        {/* HEADER SECTION */}
-        <div className="px-16 pt-12 flex justify-between relative z-10">
-          <div className="flex items-center gap-3">
-            <img src={halfLogo} alt="logo" className="w-20" />
-            <div>
-              <h1 className="text-5xl font-bold text-[#0b2347] tracking-tight">Navyan</h1>
-              <p className="text-xs font-semibold text-[#0b2347] mt-1">Internships and IT Services</p>
-            </div>
-          </div>
-          <div className="text-right text-[12px] text-[#0b2347] font-medium leading-tight">
-            <p className="font-bold text-sm">NAVYAN</p>
-            <p>Internships and IT Services</p>
-            <div className="mt-2 flex flex-col items-end gap-1">
-              <span className="flex items-center gap-1">🌐 www.navyan.online</span>
-              <span className="flex items-center gap-1">✉️ contact@navyan.online</span>
-              <span className="flex items-center gap-1">📍 India</span>
-            </div>
-          </div>
-        </div>
-
-        {/* REF & DATE */}
-        <div className="px-16 mt-10 flex justify-between text-sm font-semibold text-slate-700 relative z-10">
-          <p>Ref. No.: {document.offerId}</p>
-          <p>Date: {document.issueDateStr}</p>
-        </div>
-        <div className="mx-16 mt-1 border-b border-[#d4a017]"></div>
-
-        {/* TITLE */}
-        <div className="text-center mt-1">
-          <h2 className="text-3xl font-bold text-[#0b2347] tracking-widest">OFFER LETTER</h2>
-          <div className="flex justify-center items-center gap-2 mt-1">
-             <div className="h-[1px] w-8 bg-[#d4a017]"></div>
-             <span className="text-[#d4a017]">⬥</span>
-             <div className="h-[1px] w-8 bg-[#d4a017]"></div>
-          </div>
-        </div>
-
-        {/* CONTENT BODY */}
-        <div className="px-16 mt-1 text-[13.5px] leading-relaxed text-slate-900">
-          <p className="font-bold">Dear {document.studentName}, <span className="font-bold text-[#0b2347]">Congratulations!</span> </p>
+      <div className="overflow-auto print:overflow-visible">
+        {/* CERTIFICATE CONTAINER (A4 Landscape) */}
+        <div className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none font-sans">
           
-          <p className="mt-1">
-            We are pleased to offer you the position of <span className="font-bold text-[#0b2347]">{document.role}</span> at <span className="font-bold text-[#0b2347]">Navyan - Internships and IT Services</span>. 
-            We were impressed with your skills, passion, and enthusiasm, and we believe you will be a great addition to our team.
-          </p>
+          {/* --- TOP LEFT DESIGN --- */}
+          <div className="absolute top-0 left-0 w-[42%] h-[32%] bg-[#061a35]" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+          <div className="absolute top-0 left-0 w-[44%] h-[34%] border-r-[5px] border-b-[5px] border-[#d4af37] rounded-br-[100%]" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} />
 
-          {/* INTERNSHIP DETAILS SECTION */}
-          <div className="mt-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">💼</span>
-              <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Internship Details</h3>
+          {/* --- BOTTOM RIGHT DESIGN --- */}
+          <div className="absolute bottom-0 right-0 w-[42%] h-[32%] bg-[#061a35]" style={{ clipPath: 'polygon(100% 100%, 0 100%, 100% 0)' }} />
+          <div className="absolute bottom-0 right-0 w-[44%] h-[34%] border-l-[5px] border-t-[5px] border-[#d4af37] rounded-tl-[100%]" />
+
+          {/* --- WATERMARK --- */}
+          <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] opacity-[0.03] pointer-events-none" />
+
+          {/* --- MAIN CONTENT --- */}
+          <div className="relative z-10 h-full flex flex-col items-center pt-10">
+            {/* Logo [cite: 8] */}
+            <img src={fullLogo} alt="Navyan" className="w-[280px]" />
+
+            {/* Header Titles  */}
+            <div className="text-center mt-6">
+              <h1 className="text-[78px] font-bold tracking-[5px] text-[#061a35] leading-none">CERTIFICATE</h1>
+              <div className="flex items-center justify-center gap-4 mt-1">
+                <div className="h-[2px] w-24 bg-[#d4af37]" />
+                <h2 className="text-[32px] font-semibold tracking-[8px] text-[#d4af37]">OF INTERNSHIP</h2>
+                <div className="h-[2px] w-24 bg-[#d4af37]" />
+              </div>
+              <div className="text-[#d4af37] text-2xl mt-1 tracking-[12px] opacity-80">⬥❧⬥</div>
             </div>
-            <div className="grid grid-cols-[160px_1fr] gap-y-1 ml-2">
-              <span className="font-bold">Position</span> : {document.role}
-              <span className="font-bold">Department</span> : {document.internshipTitle}
-              <span className="font-bold">Internship Duration</span> : {document.durationLabel}
-              <span className="font-bold">Start Date</span> : {document.startDateStr}
-              <span className="font-bold">End Date</span> : {document.endDateStr}
-              <span className="font-bold">Work Mode</span> : {document.mode}
+
+            {/* Presentation Text [cite: 5] */}
+            <div className="text-center mt-10">
+              <p className="text-[14px] tracking-[4px] text-slate-500 font-bold uppercase">THIS CERTIFICATE IS PROUDLY PRESENTED TO</p>
+              <h3 className="mt-4 text-[70px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
+              <div className="h-[2.5px] w-[580px] bg-[#d4af37] mx-auto mt-2" />
+              <div className="text-[#d4af37] mt-1 text-xl">⬥</div>
             </div>
-          </div>
 
-          {/* ROLE & RESPONSIBILITIES */}
-          <div className="mt-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">👤</span>
-              <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Role & Responsibilities</h3>
+            {/* Description [cite: 9, 15] */}
+            <div className="max-w-3xl mx-auto mt-6 text-center">
+              <p className="text-[18px] leading-[1.6] text-slate-700 font-medium px-8">
+                For successfully completing the internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
+                During this internship, the individual has shown dedication, consistency, and a strong willingness to learn and contribute. 
+                We appreciate their efforts and wish them success in their future endeavors.
+              </p>
             </div>
-            <ul className="list-disc pl-7 space-y-1">
-              <li>Work on assigned tasks and projects as per the guidance of the project coordinator.</li>
-              <li>Collaborate with the team to deliver high-quality results.</li>
-              <li>Learn, implement, and contribute innovative ideas.</li>
-              <li>Maintain professionalism, discipline, and commitment throughout the internship.</li>
-            </ul>
-          </div>
 
-          {/* TERMS & CONDITIONS */}
-          <div className="mt-5">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="p-1 bg-[#d4a017] rounded text-white text-[10px]">📄</span>
-              <h3 className="text-[#d4a017] font-bold uppercase tracking-wide">Terms & Conditions</h3>
-            </div>
-            <ol className="list-decimal pl-7 space-y-1">
-              <li>This internship is purely for educational and skill development purposes.</li>
-              <li>You are expected to maintain confidentiality of all company information.</li>
-              <li>Any misconduct or failure to meet expectations may result in termination of the internship.</li>
-              <li>Upon successful completion, you will be awarded a Certificate of Internship.</li>
-            </ol>
-          </div>
-
-          <p className="mt-2">We are excited to have you on board and look forward to a productive and rewarding journey together.</p>
-          <p className="mt-2 font-bold">Welcome to the <span className="text-[#0b2347]">Navyan</span> family!</p>
-        </div>
-
-        {/* SIGNATURES SECTION */}
-        <div className="px-16 mt-10 flex justify-between items-center relative z-10">
-          <div className="text-center">
-            <p className="font-serif italic text-2xl text-slate-700">Shivanand</p>
-            <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
-            <p className="font-bold text-[#0b2347]">Shivanand Kumar</p>
-            <p className="text-xs text-slate-500">Founder</p>
-            <p className="text-xs text-slate-500">Navyan</p>
-          </div>
-
-          {/* SEAL */}
-          <div className="relative flex items-center justify-center">
-             <div className="w-24 h-24 rounded-full border-2 border-[#0b2347] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 border-[6px] border-[#0b2347] opacity-10 rounded-full"></div>
-                <div className="text-[10px] font-bold text-[#0b2347] text-center leading-none">
-                   <p className="tracking-tighter">NAVYAN</p>
-                   <img src={halfLogo} className="w-6 mx-auto my-1" alt="seal-logo"/>
-                   <p className="text-[8px]">INTERNSHIPS</p>
+            {/* Medal/Badge  */}
+            <div className="absolute top-[165px] right-24">
+              <div className="relative flex flex-col items-center">
+                <div className="absolute top-14 w-20 h-24 flex justify-between px-2">
+                  <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}} />
+                  <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}} />
                 </div>
-             </div>
-          </div>
+                <div className="w-32 h-32 rounded-full bg-[#061a35] border-[5px] border-[#d4af37] flex flex-col items-center justify-center shadow-2xl z-20">
+                  <div className="text-yellow-400 text-[8px] mb-1 tracking-widest">★★★</div>
+                  <p className="text-white text-[10px] font-bold text-center leading-tight tracking-wider">LEARN<br/>PERFORM<br/>GROW</p>
+                  <div className="text-yellow-400 text-[8px] mt-1">★</div>
+                </div>
+              </div>
+            </div>
 
-          <div className="text-center">
-            <p className="font-serif italic text-2xl text-slate-700">Anamika</p>
-            <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
-            <p className="font-bold text-[#0b2347]">Anamika Pandey</p>
-            <p className="text-xs text-slate-500">Co-Founder</p>
-            <p className="text-xs text-slate-500">Navyan</p>
-          </div>
-        </div>
+            {/* --- SIGNATURES [cite: 12, 15] --- */}
+            <div className="absolute bottom-20 w-full flex justify-between px-28 items-end">
+              <div className="text-center">
+                <p className="font-serif italic text-4xl text-slate-800 mb-1">Shivanand</p>
+                <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
+                <h4 className="mt-2 text-xl font-bold text-[#061a35]">Shivanand Kumar</h4>
+                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase">FOUNDER</p>
+              </div>
 
-        {/* FOOTER BAR */}
-        <div className="absolute bottom-0 w-full bg-[#0b2347] text-white py-1 flex justify-around items-center text-[10px] px-16">
-          <span className="flex items-center gap-1">🌐 www.navyan.online</span>
-          <span className="flex items-center gap-1">✉️ contact@navyan.online</span>
-          <span className="flex items-center gap-1">📍 India</span>
+              <div className="w-28 h-28 rounded-full border border-slate-100 flex items-center justify-center p-1 bg-white relative">
+                <div className="w-full h-full border border-[#061a35] border-dashed rounded-full absolute opacity-20" />
+                <div className="text-center z-10">
+                  <p className="text-[7px] font-bold text-[#061a35] tracking-tighter">NAVYAN</p>
+                  <img src={halfLogo} alt="seal" className="w-10 mx-auto my-1" />
+                  <p className="text-[6px] font-bold text-[#061a35]">INTERNSHIPS</p>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="font-serif italic text-4xl text-slate-800 mb-1">Anamika</p>
+                <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
+                <h4 className="mt-2 text-xl font-bold text-[#061a35]">Anamika Pandey</h4>
+                <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase">CO-FOUNDER</p>
+              </div>
+            </div>
+
+            {/* --- SLOGAN & ID [cite: 17, 18] --- */}
+            <div className="absolute bottom-7 w-full text-center flex items-center justify-center gap-4">
+              <div className="h-[1px] w-12 bg-[#d4af37] opacity-50" />
+              <p className="italic text-[#061a35] text-lg font-bold">“Learn, Perform, Grow”</p>
+              <div className="h-[1px] w-12 bg-[#d4af37] opacity-50" />
+            </div>
+            
+            <p className="absolute bottom-6 left-12 text-[10px] font-bold text-slate-400">Verification ID: {certificate.certificateId}</p>
+          </div>
         </div>
       </div>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          body { background: none; margin: 0; padding: 0; }
-          .print\:hidden { display: none !important; }
-          @page { size: A4; margin: 0; }
+          body { background: white !important; -webkit-print-color-adjust: exact; }
+          .print\\:hidden { display: none !important; }
+          @page { size: A4 landscape; margin: 0; }
         }
-      `}</style>
+      `}} />
     </div>
   );
 }
