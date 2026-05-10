@@ -23,7 +23,7 @@ export default function OfferLetterPreview() {
           endDateStr: "[End Date]",
           issueDateStr: "20 May 2024",
           offerId: "NAV/2024/OL/XXXX",
-          stipend: "[Mention Amount]",
+          
         });
       }
     };
@@ -45,10 +45,10 @@ export default function OfferLetterPreview() {
            style={{ width: "210mm", height: "297mm", padding: "0" }}>
         
         {/* DESIGN ELEMENTS (Top Right & Bottom Left Triangles) */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}></div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(100% 0, 20% 0, 100% 80%)" }}></div>
         
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(0 20%, 0 100%, 80% 100%)" }}></div>
 
         {/* HEADER SECTION */}
@@ -110,7 +110,6 @@ export default function OfferLetterPreview() {
               <span className="font-bold">Internship Duration</span> : {document.durationLabel}
               <span className="font-bold">Start Date</span> : {document.startDateStr}
               <span className="font-bold">End Date</span> : {document.endDateStr}
-              <span className="font-bold">Stipend</span> : {document.stipend}
               <span className="font-bold">Work Mode</span> : {document.mode}
             </div>
           </div>
