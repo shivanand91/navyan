@@ -37,12 +37,15 @@ export default function CertificatePreview() {
           id="certificate-content"
           className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-full"
         >
+          {/* --- CURVED MAIN BORDER --- */}
+          <div className="absolute inset-6 border-[12px] border-[#d4af37] rounded-[30px] z-20 pointer-events-none shadow-inner" />
+          <div className="absolute inset-8 border-[2px] border-[#061a35] rounded-[24px] z-20 pointer-events-none opacity-20" />
 
           {/* --- WATERMARK --- */}
           <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] opacity-[0.03] pointer-events-none" />
 
           {/* --- CONTENT --- */}
-          <div className="relative z-10 h-full flex flex-col items-center pt-12">
+          <div className="relative z-10 h-full flex flex-col items-center pt-16">
             
             {/* BRANDING HEADER (Half Logo + Text) */}
             <div className="flex items-center gap-4">
@@ -67,7 +70,7 @@ export default function CertificatePreview() {
             {/* Proudly Presented To */}
             <div className="text-center mt-2">
               <p className="text-[15px] tracking-[4px] text-slate-500 font-bold uppercase">This Certificate is Proudly Presented To</p>
-              <h3 className="mt-2 text-[52px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
+              <h3 className="mt-2 text-[42px] font-serif text-[#061a35] italic leading-tight">{certificate.studentName}</h3>
               <div className="h-[2.5px] w-[580px] bg-[#d4af37] mx-auto mt-1" />
             </div>
 
@@ -81,7 +84,7 @@ export default function CertificatePreview() {
             </div>
 
             {/* Badge/Medal (Top Right Floating) */}
-            <div className="absolute top-[170px] right-24 scale-110">
+            <div className="absolute top-[180px] right-[110px] scale-110 z-30">
                <div className="relative flex flex-col items-center">
                   <div className="absolute top-14 w-20 h-28 flex justify-between px-2">
                     <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
@@ -96,7 +99,7 @@ export default function CertificatePreview() {
             </div>
 
             {/* --- SIGNATURES --- */}
-            <div className="absolute bottom-20 w-full flex justify-between px-28 items-end">
+            <div className="absolute bottom-20 w-full flex justify-between px-32 items-end">
               <div className="text-center">
                 <p className="font-serif italic text-4xl text-slate-800 mb-1">Shivanand</p>
                 <div className="w-44 h-[1.5px] bg-[#d4af37] mx-auto" />
@@ -122,13 +125,13 @@ export default function CertificatePreview() {
             </div>
 
             {/* Bottom Slogan */}
-            <div className="absolute bottom-6 w-full text-center flex items-center justify-center gap-4">
+            <div className="absolute bottom-10 w-full text-center flex items-center justify-center gap-4">
               <div className="h-[1px] w-12 bg-[#d4af37]" />
               <p className="italic text-[#061a35] text-lg font-bold">“Learn, Perform, Grow”</p>
               <div className="h-[1px] w-12 bg-[#d4af37]" />
             </div>
             
-            <p className="absolute bottom-6 left-12 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <p className="absolute bottom-10 left-16 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Verification ID: {certificate.certificateId}
             </p>
           </div>
