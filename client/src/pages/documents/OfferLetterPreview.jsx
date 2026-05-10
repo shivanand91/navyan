@@ -85,7 +85,7 @@ export default function OfferLetterPreview() {
           <p className="font-bold">Dear {document.studentName}, <span className="font-bold text-[#0b2347]">Congratulations!</span> </p>
           
           <p className="mt-1">
-            We are pleased to offer you the position of <span className="font-bold text-[#0b2347]">{document.role}</span> at <span className="font-bold text-[#0b2347]">Navyan (Internships and IT Services)</span>. 
+            We are pleased to offer you the position of <span className="font-bold text-[#0b2347]">{document.role}</span> at <span className="font-bold text-[#0b2347]">Navyan - Internships and IT Services</span>. 
             We were impressed with your skills, passion, and enthusiasm, and we believe you will be a great addition to our team.
           </p>
 
@@ -141,7 +141,7 @@ export default function OfferLetterPreview() {
         <div className="px-16 mt-10 flex justify-between items-center relative z-10">
           <div className="text-center">
             <p className="font-serif italic text-2xl text-slate-700">Shivanand</p>
-            <div className="w-32 h-[1px] border-[#d4a017] mx-auto my-1"></div>
+            <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
             <p className="font-bold text-[#0b2347]">Shivanand Kumar</p>
             <p className="text-xs text-slate-500">Founder</p>
             <p className="text-xs text-slate-500">Navyan</p>
@@ -161,7 +161,7 @@ export default function OfferLetterPreview() {
 
           <div className="text-center">
             <p className="font-serif italic text-2xl text-slate-700">Anamika</p>
-            <div className="w-32 h-[1px] border-[#d4a017] mx-auto my-1"></div>
+            <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
             <p className="font-bold text-[#0b2347]">Anamika Pandey</p>
             <p className="text-xs text-slate-500">Co-Founder</p>
             <p className="text-xs text-slate-500">Navyan</p>
