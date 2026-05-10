@@ -37,6 +37,15 @@ const TASK_BRIEF_VISIBLE_STATUSES = new Set([
   "Completed"
 ]);
 
+const OFFER_LETTER_VISIBLE_STATUSES = new Set([
+  "Selected",
+  "In Progress",
+  "Submission Pending",
+  "Submitted",
+  "Revision Requested",
+  "Completed"
+]);
+
 const getWorkflowBucket = (application) => {
   if (["Completed", "Rejected"].includes(application.status)) {
     return "completed";
@@ -451,12 +460,12 @@ export default function AdminApplications() {
             Review candidates through focused workflow buckets instead of one long mixed queue.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Input
             placeholder="Search name, email, phone, notes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-9 w-52 text-xs"
+            className="h-9 w-full max-w-[14rem] text-xs md:w-52"
           />
           <Button size="sm" variant="outline" onClick={load}>
             Search
@@ -606,19 +615,28 @@ export default function AdminApplications() {
                         <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">
                           Quick Links
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedApplication.offerLetter?.accessToken ? (
+                        <div className="flex flex-wrap gap-2 break-words">
+                          {OFFER_LETTER_VISIBLE_STATUSES.has(selectedApplication.status) &&
+                          selectedApplication.offerLetter?.accessToken ? (
                             <Link to={`/documents/offer-letter/${selectedApplication.offerLetter.accessToken}`}>
                               <Button size="sm" variant="outline">
                                 📄 Offer Letter
                               </Button>
                             </Link>
-                          ) : selectedApplication.offerLetter?.url ? (
+                          ) : OFFER_LETTER_VISIBLE_STATUSES.has(selectedApplication.status) &&
+                            selectedApplication.offerLetter?.url ? (
                             <a href={selectedApplication.offerLetter.url} target="_blank" rel="noreferrer">
                               <Button size="sm" variant="outline">
                                 📄 Offer Letter
                               </Button>
                             </a>
+                          ) : null}
+                          {selectedApplication.status === "Completed" && selectedApplication.certificate?.certificateId ? (
+                            <Link to={`/documents/certificate/${selectedApplication.certificate.certificateId}`}>
+                              <Button size="sm" variant="outline">
+                                🎓 View Certificate
+                              </Button>
+                            </Link>
                           ) : null}
                           {getApplicantProfile(selectedApplication).phone ? (
                             <a href={`tel:${normalizePhoneLink(getApplicantProfile(selectedApplication).phone)}`}>
