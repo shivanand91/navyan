@@ -43,15 +43,6 @@ export default function OfferLetterPreview() {
       {/* A4 PAGE */}
       <div className="mx-auto bg-white shadow-2xl print:shadow-none relative overflow-hidden" 
            style={{ width: "210mm", height: "297mm", padding: "0" }}>
-        
-        {/* DESIGN ELEMENTS (Top Right & Bottom Left Triangles) */}
-        
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(0 20%, 0 100%, 80% 100%)" }}></div>
-
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#0b2347] print:bg-[#0b2347]" style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }}></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#d4a017] print:bg-[#d4a017]" style={{ clipPath: "polygon(0 20%, 0 100%, 80% 100%)" }}></div>
-
         {/* HEADER SECTION */}
         <div className="px-16 pt-12 flex justify-between relative z-10">
           <div className="flex items-center gap-3">
