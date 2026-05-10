@@ -37,11 +37,6 @@ export default function CertificatePreview() {
           id="certificate-content"
           className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-full"
         >
-          {/* --- CORNER DESIGN ELEMENTS --- */}
-          <div className="absolute top-0 left-0 w-[45%] h-[35%] bg-[#061a35]" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-          <div className="absolute top-0 left-0 w-[48%] h-[38%] border-r-[6px] border-b-[6px] border-[#d4af37] rounded-br-[100%]" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} />
-          <div className="absolute bottom-0 right-0 w-[45%] h-[35%] bg-[#061a35]" style={{ clipPath: 'polygon(100% 100%, 0 100%, 100% 0)' }} />
-          <div className="absolute bottom-0 right-0 w-[48%] h-[38%] border-l-[6px] border-t-[6px] border-[#d4af37] rounded-tl-[100%]" />
 
           {/* --- WATERMARK --- */}
           <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] opacity-[0.03] pointer-events-none" />
