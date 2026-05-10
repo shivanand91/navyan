@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 export default function VerifyCertificate() {
   const { certificateId: routeCertificateId } = useParams();
@@ -81,6 +81,12 @@ export default function VerifyCertificate() {
                 <p>Role: {result.certificate.role}</p>
                 <p>Duration: {result.certificate.durationKey}</p>
                 <p>Issued on: {new Date(result.certificate.completionDate).toDateString()}</p>
+                <Link
+                  to={`/documents/certificate/${result.certificate.certificateId}`}
+                  className="inline-block pt-2 text-primary"
+                >
+                  Preview and print certificate
+                </Link>
                 {result.certificate.verifyUrl && (
                   <a
                     href={result.certificate.verifyUrl}

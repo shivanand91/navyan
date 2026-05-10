@@ -14,6 +14,8 @@ const Jobs = lazy(() => import("@/pages/public/Jobs"));
 const About = lazy(() => import("@/pages/public/About"));
 const Contact = lazy(() => import("@/pages/public/Contact"));
 const VerifyCertificate = lazy(() => import("@/pages/public/VerifyCertificate"));
+const OfferLetterPreview = lazy(() => import("@/pages/documents/OfferLetterPreview"));
+const CertificatePreview = lazy(() => import("@/pages/documents/CertificatePreview"));
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
 const StudentDashboard = lazy(() => import("@/pages/student/Dashboard"));
@@ -76,6 +78,9 @@ export default function App() {
       <ScrollToTop />
 
       <Routes>
+        <Route path="/documents/offer-letter/:accessToken" element={<LazyPage><OfferLetterPreview /></LazyPage>} />
+        <Route path="/documents/certificate/:certificateId" element={<LazyPage><CertificatePreview /></LazyPage>} />
+
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LazyPage><Home /></LazyPage>} />
           <Route path="/courses" element={<LazyPage><Courses /></LazyPage>} />

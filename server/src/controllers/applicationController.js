@@ -33,7 +33,7 @@ import {
   resolveInternshipDomainLabel,
   shouldExposeAssignedTask
 } from "../services/taskAssignmentService.js";
-import { buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
+import { buildClientUrl, buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
 const PAYMENT_INTENT_TTL_MINUTES = 30;
@@ -81,6 +81,17 @@ const getOfferLetterPublicPath = (application) =>
 const getOfferLetterAbsoluteUrl = (req, application) =>
   buildServerUrl(req, getOfferLetterPublicPath(application));
 
+const getOfferLetterPreviewAbsoluteUrl = (req, application) =>
+  buildClientUrl(
+    req,
+    `/documents/offer-letter/${encodeURIComponent(ensureOfferLetterAccessToken(application))}`
+  );
+
+const getCertificatePreviewAbsoluteUrl = (req, certificate) =>
+  certificate?.certificateId
+    ? buildClientUrl(req, `/documents/certificate/${encodeURIComponent(certificate.certificateId)}`)
+    : "";
+
 const serializeOfferLetterForResponse = (application, req) => {
   if (!application.offerLetter) {
     return application.offerLetter;
@@ -91,7 +102,8 @@ const serializeOfferLetterForResponse = (application, req) => {
     accessToken: application.offerLetter.accessToken,
     mimeType: application.offerLetter.mimeType,
     issuedAt: application.offerLetter.issuedAt,
-    url: getOfferLetterAbsoluteUrl(req, application)
+    url: getOfferLetterAbsoluteUrl(req, application),
+    previewUrl: getOfferLetterPreviewAbsoluteUrl(req, application)
   };
 };
 
@@ -818,10 +830,13 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
           status: application.status,
           previousStatus: prevStatus,
           offerLetterUrl: application.offerLetter?.id
-            ? getOfferLetterAbsoluteUrl(req, application)
+            ? getOfferLetterPreviewAbsoluteUrl(req, application)
             : application.offerLetter?.url,
           taskPdfUrl: application.internshipMeta?.taskPdfUrl,
-          certificateUrl: generatedCertificate?.pdfUrl || application.certificate?.pdfUrl
+          certificateUrl:
+            getCertificatePreviewAbsoluteUrl(req, generatedCertificate || application.certificate) ||
+            generatedCertificate?.pdfUrl ||
+            application.certificate?.pdfUrl
         });
       } catch (error) {
         warnings.push(
@@ -891,6 +906,42 @@ export const getPublicOfferLetterPdf = async (req, res, next) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `inline; filename=\"${offerId}.pdf\"`);
     res.send(pdfBuffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getPublicOfferLetterPreview = async (req, res, next) => {
+  try {
+    const application = await Application.findOne({
+      "offerLetter.accessToken": req.params.accessToken
+    })
+      .populate("user")
+      .populate("internship");
+
+    if (!application) {
+      return res.status(404).json({ message: "Offer letter not found" });
+    }
+
+    if (!application.offerLetter?.id && !OFFER_LETTER_VISIBLE_STATUSES.has(application.status)) {
+      return res.status(404).json({ message: "Offer letter not available yet" });
+    }
+
+    const { offerId, startDate, endDate, htmlPayload } = getOfferLetterDocumentPayload(application);
+
+    res.json({
+      document: {
+        ...htmlPayload,
+        offerId,
+        accessToken: application.offerLetter?.accessToken,
+        status: application.status,
+        durationKey: application.durationKey,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        taskPdfUrl: application.internshipMeta?.taskPdfUrl || "",
+        pdfUrl: getOfferLetterAbsoluteUrl(req, application)
+      }
+    });
   } catch (err) {
     next(err);
   }

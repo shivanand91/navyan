@@ -7,6 +7,7 @@ import {
   adminUpdateApplicationStatus,
   getOfferLetterPdf,
   getPublicOfferLetterPdf,
+  getPublicOfferLetterPreview,
   sendTaskSubmissionReminder
 } from "../controllers/applicationController.js";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
@@ -17,6 +18,7 @@ const router = express.Router();
 router.post("/payment-intent", protect, createPaymentIntent);
 router.post("/", protect, applyToInternship);
 router.get("/me", protect, listMyApplications);
+router.get("/offer-letter/:accessToken/preview", getPublicOfferLetterPreview);
 router.get("/offer-letter/:accessToken", getPublicOfferLetterPdf);
 router.get("/:id/offer-letter", protect, getOfferLetterPdf);
 

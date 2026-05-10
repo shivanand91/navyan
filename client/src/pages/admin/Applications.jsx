@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { getApiErrorMessage } from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -606,7 +607,13 @@ export default function AdminApplications() {
                           Quick Links
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {selectedApplication.offerLetter?.url ? (
+                          {selectedApplication.offerLetter?.accessToken ? (
+                            <Link to={`/documents/offer-letter/${selectedApplication.offerLetter.accessToken}`}>
+                              <Button size="sm" variant="outline">
+                                📄 Offer Letter
+                              </Button>
+                            </Link>
+                          ) : selectedApplication.offerLetter?.url ? (
                             <a href={selectedApplication.offerLetter.url} target="_blank" rel="noreferrer">
                               <Button size="sm" variant="outline">
                                 📄 Offer Letter

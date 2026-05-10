@@ -52,14 +52,12 @@ export default function Certificates() {
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <a
-                    href={c.pdfUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                  <Link
+                    to={`/documents/certificate/${c.certificateId}`}
                     className="text-[11px] text-primary"
                   >
-                    Download
-                  </a>
+                    Preview / print
+                  </Link>
                   <Link
                     to={`/verify-certificate?cid=${c.certificateId}`}
                     className="text-[11px] text-slate-500 underline dark:text-slate-400"

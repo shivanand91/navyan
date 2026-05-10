@@ -85,6 +85,40 @@ router.get("/download/:certificateId", async (req, res, next) => {
   }
 });
 
+router.get("/preview/:certificateId", async (req, res, next) => {
+  try {
+    const certificate = await Certificate.findOne({ certificateId: req.params.certificateId })
+      .populate("internship")
+      .populate("user");
+
+    if (!certificate) {
+      return res.status(404).json({ message: "Certificate not found" });
+    }
+
+    const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
+    const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
+
+    res.json({
+      certificate: {
+        certificateId: certificate.certificateId,
+        studentName: certificate.fullName,
+        internshipTitle: certificate.internship?.title || certificate.role || "Internship",
+        role: certificate.role || certificate.internship?.role || "Intern",
+        durationKey: certificate.durationKey,
+        durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
+        completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
+        issueDateStr: format(certificate.issueDate || certificate.createdAt, "dd MMM yyyy"),
+        organizationName: "Navyan",
+        verifyUrl,
+        qrCodeDataUrl,
+        verificationStatus: certificate.verificationStatus
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Public verification (Phase 4 will enrich output; Phase 2 keeps contract stable)
 router.get("/verify/:certificateId", async (req, res, next) => {
   try {

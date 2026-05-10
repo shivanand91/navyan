@@ -301,14 +301,21 @@ export default function StudentDashboard() {
 
                         {/* Actions */}
                         <div className="flex flex-wrap gap-2">
-                          {application.offerLetter?.url && (
+                          {application.offerLetter?.accessToken ? (
+                            <Link to={`/documents/offer-letter/${application.offerLetter.accessToken}`}>
+                              <Button size="sm" variant="outline">
+                                <FileText className="h-4 w-4 mr-2" />
+                                Offer Letter
+                              </Button>
+                            </Link>
+                          ) : application.offerLetter?.url ? (
                             <a href={application.offerLetter.url} target="_blank" rel="noreferrer">
                               <Button size="sm" variant="outline">
                                 <FileText className="h-4 w-4 mr-2" />
                                 Offer Letter
                               </Button>
                             </a>
-                          )}
+                          ) : null}
                           {TASK_LINK_VISIBLE_STATUSES.includes(application.status) && application.internshipMeta?.taskPdfUrl && (
                             <a href={application.internshipMeta.taskPdfUrl} target="_blank" rel="noreferrer">
                               <Button size="sm" variant="outline">

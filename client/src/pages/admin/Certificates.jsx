@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -54,9 +55,9 @@ export default function AdminCertificates() {
                   <span className="rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
                     {certificate.verificationStatus}
                   </span>
-                  <a href={certificate.pdfUrl} target="_blank" rel="noreferrer" className="text-primary">
-                    Download PDF
-                  </a>
+                  <Link to={`/documents/certificate/${certificate.certificateId}`} className="text-primary">
+                    Preview / print
+                  </Link>
                   {certificate.verifyUrl && (
                     <a href={certificate.verifyUrl} target="_blank" rel="noreferrer" className="text-primary">
                       Verify

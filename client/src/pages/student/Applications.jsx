@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -187,11 +188,18 @@ export default function Applications() {
                 {(app.offerLetter?.url ||
                   (TASK_LINK_VISIBLE_STATUSES.includes(app.status) && app.internshipMeta?.taskPdfUrl)) && (
                   <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
-                    {app.offerLetter?.url && (
+                    {app.offerLetter?.accessToken ? (
+                      <Link
+                        to={`/documents/offer-letter/${app.offerLetter.accessToken}`}
+                        className="text-primary"
+                      >
+                        Preview offer letter
+                      </Link>
+                    ) : app.offerLetter?.url ? (
                       <a href={app.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary">
                         Offer letter
                       </a>
-                    )}
+                    ) : null}
                     {TASK_LINK_VISIBLE_STATUSES.includes(app.status) && app.internshipMeta?.taskPdfUrl && (
                       <a
                         href={app.internshipMeta.taskPdfUrl}
