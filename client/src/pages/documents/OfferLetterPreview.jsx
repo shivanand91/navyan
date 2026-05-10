@@ -3,19 +3,18 @@ import { useParams } from "react-router-dom";
 import api, { getApiErrorMessage } from "@/lib/axios";
 import fullLogo from "@/assests/full_logo.png";
 import halfLogo from "@/assests/half_logo.png";
-import "./documentPreview.css";
 
 const fallbackDocument = {
   studentName: "Candidate Name",
   internshipTitle: "Web Development Intern",
   role: "Web Development Intern",
-  durationLabel: "4 weeks",
+  durationLabel: "4 Weeks",
   mode: "Remote",
   startDateStr: "Start Date",
   endDateStr: "End Date",
   issueDateStr: "Issue Date",
   offerId: "NAV/OFFER/XXXX",
-  internshipType: "Merit-based internship"
+  internshipType: "Merit-Based Internship",
 };
 
 const goBack = () => {
@@ -29,6 +28,7 @@ const goBack = () => {
 
 export default function OfferLetterPreview() {
   const { accessToken } = useParams();
+
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
 
@@ -37,13 +37,21 @@ export default function OfferLetterPreview() {
 
     const load = async () => {
       try {
-        const { data } = await api.get(`/applications/offer-letter/${accessToken}/preview`);
+        const { data } = await api.get(
+          `/applications/offer-letter/${accessToken}/preview`
+        );
+
         if (!ignore) {
           setDocument(data.document || fallbackDocument);
         }
       } catch (err) {
         if (!ignore) {
-          setError(getApiErrorMessage(err, "Could not load this offer letter."));
+          setError(
+            getApiErrorMessage(
+              err,
+              "Could not load this offer letter."
+            )
+          );
         }
       }
     };
@@ -57,11 +65,17 @@ export default function OfferLetterPreview() {
 
   if (error) {
     return (
-      <div className="navyan-doc-screen">
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
         <DocumentToolbar />
-        <div className="navyan-doc-state">
-          <h1>Offer letter unavailable</h1>
-          <p>{error}</p>
+
+        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
+          <h1 className="text-3xl font-bold text-red-600">
+            Offer Letter Unavailable
+          </h1>
+
+          <p className="mt-4 text-slate-600">
+            {error}
+          </p>
         </div>
       </div>
     );
@@ -69,134 +83,372 @@ export default function OfferLetterPreview() {
 
   if (!document) {
     return (
-      <div className="navyan-doc-screen">
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
         <DocumentToolbar />
-        <div className="navyan-doc-state">
-          <h1>Preparing offer letter</h1>
-          <p>Loading the official Navyan document preview.</p>
+
+        <div className="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-xl w-full">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Preparing Offer Letter
+          </h1>
+
+          <p className="mt-4 text-slate-600">
+            Loading the official Navyan offer letter preview.
+          </p>
         </div>
       </div>
     );
   }
 
-  const role = document.role || document.internshipTitle || "Intern";
+  const role =
+    document.role ||
+    document.internshipTitle ||
+    "Intern";
 
   return (
-    <div className="navyan-doc-screen">
+    <div className="min-h-screen bg-[#07111f] py-10 px-4">
       <DocumentToolbar />
-      <div className="navyan-doc-stage">
-        <article className="navyan-offer-page" aria-label="Navyan internship offer letter">
-          <div className="doc-corner-gold offer-gold-top" />
-          <div className="doc-corner-navy offer-corner-top" />
-          <div className="doc-corner-gold offer-gold-bottom" />
-          <div className="doc-corner-navy offer-corner-bottom" />
 
-          <header className="offer-header">
-            <img src={fullLogo} alt="Navyan" className="offer-logo" />
-            <div className="offer-contact-card">
-              <strong>NAVYAN</strong>
-              <span>Internships and IT Services</span>
-              <br />
-              <span>www.navyan.online</span>
-              <br />
-              <span>contact@navyan.online</span>
-              <br />
-              <span>India</span>
+      <div className="overflow-auto">
+        <div
+          className="
+            relative
+            mx-auto
+            bg-white
+            w-[1123px]
+            min-h-[1587px]
+            rounded-xl
+            overflow-hidden
+            shadow-[0_25px_80px_rgba(0,0,0,0.45)]
+            border-[12px]
+            border-[#0f2b56]
+          "
+        >
+          {/* Decorative Background */}
+
+          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-br-[220px]" />
+
+          <div className="absolute bottom-0 right-0 w-[320px] h-[320px] bg-gradient-to-tl from-[#0f2b56] via-[#174ea6] to-[#f4b400] rounded-tl-[220px]" />
+
+          {/* Watermark */}
+
+          <img
+            src={halfLogo}
+            alt=""
+            className="
+              absolute
+              top-1/2
+              left-1/2
+              -translate-x-1/2
+              -translate-y-1/2
+              w-[420px]
+              opacity-[0.04]
+            "
+          />
+
+          {/* Header */}
+
+          <div className="relative z-10 flex justify-between items-start px-16 pt-14">
+            <img
+              src={fullLogo}
+              alt="Navyan"
+              className="w-[340px]"
+            />
+
+            <div className="text-right">
+              <h2 className="text-[#0f2b56] font-bold text-3xl">
+                NAVYAN
+              </h2>
+
+              <p className="text-slate-600 mt-2">
+                Internships and IT Services
+              </p>
+
+              <div className="mt-6 text-slate-600 text-lg leading-9">
+                <p>www.navyan.online</p>
+                <p>contact@navyan.online</p>
+                <p>India</p>
+              </div>
             </div>
-          </header>
-
-          <div className="offer-meta">
-            <span>Ref. No.: {document.offerId}</span>
-            <span>Date: {document.issueDateStr}</span>
           </div>
 
-          <section className="offer-title">
-            <h1>OFFER LETTER</h1>
-            <div className="title-rule">NAVYAN</div>
-          </section>
+          {/* Ref + Date */}
 
-          <section className="offer-body">
-            <p>
-              <strong>Dear {document.studentName},</strong>
-            </p>
-            <p>
-              <strong>Congratulations!</strong>
-            </p>
-            <p>
-              We are pleased to offer you the position of <strong>{role}</strong> at{" "}
-              <strong>Navyan (Internships and IT Services)</strong>. We are impressed with
-              your skills, passion, and enthusiasm, and we believe you will be a great
-              addition to our learning community.
+          <div className="relative z-10 flex justify-between px-16 mt-14 text-xl text-slate-700 font-medium">
+            <div>
+              Ref No:{" "}
+              <span className="font-bold text-[#0f2b56]">
+                {document.offerId}
+              </span>
+            </div>
+
+            <div>
+              Date:{" "}
+              <span className="font-bold text-[#0f2b56]">
+                {document.issueDateStr}
+              </span>
+            </div>
+          </div>
+
+          {/* Title */}
+
+          <div className="relative z-10 text-center mt-16">
+            <h1 className="text-[72px] font-black tracking-[8px] text-[#0f2b56]">
+              OFFER LETTER
+            </h1>
+
+            <div className="w-[300px] h-[4px] bg-[#d4af37] mx-auto mt-5 rounded-full" />
+          </div>
+
+          {/* Content */}
+
+          <div className="relative z-10 px-20 mt-16">
+            <p className="text-2xl text-slate-700 leading-[52px]">
+              Dear{" "}
+              <span className="font-bold text-[#0f2b56]">
+                {document.studentName}
+              </span>,
             </p>
 
-            <div className="offer-section">
-              <h2>Internship Details</h2>
-              <div className="offer-details-grid">
-                <span>Position</span>
-                <span>: {role}</span>
-                <span>Department</span>
-                <span>: {document.internshipTitle || role}</span>
-                <span>Internship Duration</span>
-                <span>: {document.durationLabel}</span>
-                <span>Start Date</span>
-                <span>: {document.startDateStr}</span>
-                <span>End Date</span>
-                <span>: {document.endDateStr}</span>
-                <span>Internship Type</span>
-                <span>: {document.internshipType}</span>
-                <span>Work Mode</span>
-                <span>: {document.mode || "Remote"}</span>
+            <p className="mt-10 text-2xl text-slate-700 leading-[52px]">
+              Congratulations!
+            </p>
+
+            <p className="mt-10 text-[25px] leading-[54px] text-slate-700">
+              We are pleased to offer you the position of{" "}
+              <span className="font-bold text-[#0f2b56]">
+                {role}
+              </span>{" "}
+              at{" "}
+              <span className="font-bold text-[#0f2b56]">
+                Navyan
+              </span>.
+              We are impressed with your skills,
+              enthusiasm, and dedication, and we believe
+              you will be a valuable addition to our
+              internship program and learning community.
+            </p>
+
+            {/* Internship Details */}
+
+            <div className="mt-16">
+              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+                Internship Details
+              </h2>
+
+              <div className="grid grid-cols-2 gap-y-8 mt-10 text-[23px]">
+                <div className="font-semibold text-slate-700">
+                  Position
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {role}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  Department
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.internshipTitle}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  Duration
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.durationLabel}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  Start Date
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.startDateStr}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  End Date
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.endDateStr}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  Internship Type
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.internshipType}
+                </div>
+
+                <div className="font-semibold text-slate-700">
+                  Work Mode
+                </div>
+
+                <div className="text-[#0f2b56] font-bold">
+                  {document.mode}
+                </div>
               </div>
             </div>
 
-            <div className="offer-section">
-              <h2>Role & Responsibilities</h2>
-              <ul className="offer-list">
-                <li>Work on assigned tasks and projects as per project coordinator guidance.</li>
-                <li>Collaborate with the team to deliver clean, high-quality results.</li>
-                <li>Learn, implement, and contribute disciplined engineering ideas.</li>
-                <li>Maintain professionalism and commitment throughout the internship.</li>
+            {/* Responsibilities */}
+
+            <div className="mt-20">
+              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+                Role & Responsibilities
+              </h2>
+
+              <ul className="mt-10 space-y-6 text-[24px] leading-[50px] text-slate-700 list-disc pl-10">
+                <li>
+                  Work on assigned tasks and projects under
+                  the guidance of the project coordinator.
+                </li>
+
+                <li>
+                  Collaborate with the team to deliver
+                  professional and high-quality outcomes.
+                </li>
+
+                <li>
+                  Maintain professionalism, discipline, and
+                  commitment throughout the internship.
+                </li>
+
+                <li>
+                  Learn practical industry-level skills and
+                  contribute innovative ideas.
+                </li>
               </ul>
             </div>
 
-            <div className="offer-section">
-              <h2>Terms & Conditions</h2>
-              <ol className="offer-list">
-                <li>This internship is for educational and skill development purposes.</li>
-                <li>You are expected to maintain confidentiality of company information.</li>
-                <li>Any misconduct or failure to meet expectations may lead to termination.</li>
-                <li>Upon successful completion, you will receive a Certificate of Internship.</li>
+            {/* Terms */}
+
+            <div className="mt-20">
+              <h2 className="text-[36px] font-bold text-[#0f2b56] border-b-4 border-[#d4af37] inline-block pb-3">
+                Terms & Conditions
+              </h2>
+
+              <ol className="mt-10 space-y-6 text-[24px] leading-[50px] text-slate-700 list-decimal pl-10">
+                <li>
+                  This internship is intended for educational
+                  and skill development purposes.
+                </li>
+
+                <li>
+                  Confidentiality of all company information
+                  must be maintained.
+                </li>
+
+                <li>
+                  Any misconduct or violation of internship
+                  policies may result in termination.
+                </li>
+
+                <li>
+                  A Certificate of Internship will be awarded
+                  upon successful completion.
+                </li>
               </ol>
             </div>
 
-            <p>
-              We are excited to have you on board and look forward to a productive and
-              rewarding journey together. Welcome to the <strong>Navyan</strong> family!
+            {/* Welcome */}
+
+            <p className="mt-20 text-[25px] leading-[54px] text-slate-700">
+              We are excited to have you onboard and look
+              forward to a productive and successful journey
+              together.
+              Welcome to the{" "}
+              <span className="font-bold text-[#0f2b56]">
+                Navyan
+              </span>{" "}
+              family.
             </p>
-          </section>
+          </div>
 
-          <section className="offer-signatures" aria-label="Authorized signatures">
-            <div>
-              <div className="signature-mark">Shivanand</div>
-              <div className="signature-name">Shivanand Kumar</div>
-              <div className="signature-role">Founder, Navyan</div>
-            </div>
-            <div className="offer-seal">
-              <img src={halfLogo} alt="Navyan seal" />
-            </div>
-            <div>
-              <div className="signature-mark">Anamika</div>
-              <div className="signature-name">Anamika Pandey</div>
-              <div className="signature-role">Co-Founder, Navyan</div>
-            </div>
-          </section>
+          {/* Signatures */}
 
-          <footer className="offer-footer">
+          <div className="relative z-10 flex justify-between items-center px-20 mt-28">
+            <div className="text-center">
+              <div className="text-[54px] italic text-slate-800">
+                Shivanand
+              </div>
+
+              <div className="w-[240px] h-[2px] bg-[#d4af37] mx-auto" />
+
+              <h4 className="mt-4 text-[28px] font-bold text-[#0f2b56]">
+                Shivanand Kumar
+              </h4>
+
+              <p className="text-[#b8860b] font-semibold tracking-[3px]">
+                Founder
+              </p>
+            </div>
+
+            {/* Seal */}
+
+            <div
+              className="
+                w-[190px]
+                h-[190px]
+                rounded-full
+                border-[10px]
+                border-[#174ea6]
+                flex
+                items-center
+                justify-center
+                bg-white
+                shadow-2xl
+              "
+            >
+              <img
+                src={halfLogo}
+                alt="seal"
+                className="w-[95px]"
+              />
+            </div>
+
+            <div className="text-center">
+              <div className="text-[54px] italic text-slate-800">
+                Anamika
+              </div>
+
+              <div className="w-[240px] h-[2px] bg-[#d4af37] mx-auto" />
+
+              <h4 className="mt-4 text-[28px] font-bold text-[#0f2b56]">
+                Anamika Pandey
+              </h4>
+
+              <p className="text-[#b8860b] font-semibold tracking-[3px]">
+                Co-Founder
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+
+          <div
+            className="
+              relative
+              z-10
+              mt-20
+              bg-[#0f2b56]
+              text-white
+              py-8
+              flex
+              justify-center
+              gap-16
+              text-xl
+              font-medium
+            "
+          >
             <span>www.navyan.online</span>
             <span>contact@navyan.online</span>
             <span>India</span>
-          </footer>
-        </article>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -204,11 +456,42 @@ export default function OfferLetterPreview() {
 
 function DocumentToolbar() {
   return (
-    <div className="navyan-doc-toolbar">
-      <button type="button" onClick={goBack}>
+    <div className="flex justify-center gap-4 mb-8">
+      <button
+        type="button"
+        onClick={goBack}
+        className="
+          px-6
+          py-3
+          rounded-xl
+          bg-white
+          text-slate-900
+          font-semibold
+          shadow-lg
+          hover:scale-105
+          transition
+        "
+      >
         Back
       </button>
-      <button type="button" className="primary-action" onClick={() => window.print()}>
+
+      <button
+        type="button"
+        onClick={() => window.print()}
+        className="
+          px-6
+          py-3
+          rounded-xl
+          bg-gradient-to-r
+          from-[#174ea6]
+          to-[#0f2b56]
+          text-white
+          font-semibold
+          shadow-lg
+          hover:scale-105
+          transition
+        "
+      >
         Print / Save PDF
       </button>
     </div>
