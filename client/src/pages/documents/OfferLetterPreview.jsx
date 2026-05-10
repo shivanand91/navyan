@@ -9,9 +9,9 @@ const fallbackDocument = {
   role: "Web Development Intern",
   durationLabel: "4 Weeks",
   mode: "Remote",
-  startDateStr: "Start Date",
-  endDateStr: "End Date",
-  issueDateStr: "Issue Date",
+  startDateStr: "09 Apr 2026",
+  endDateStr: "07 May 2026",
+  issueDateStr: "10 May 2026",
   offerId: "NAV/OFFER/XXXX",
   internshipType: "Merit-Based Internship",
 };
@@ -100,28 +100,36 @@ export default function OfferLetterPreview() {
     "Intern";
 
   return (
-    <div className="min-h-screen bg-[#0b1220] py-10 px-4">
+    <div className="min-h-screen bg-[#0b1220] py-10 px-4 print:bg-white">
       <DocumentToolbar />
 
-      <div className="overflow-auto">
+      <div className="overflow-auto print:overflow-visible">
         <div
           className="
             relative
             mx-auto
             bg-white
-            w-[794px]
-            min-h-[1123px]
-            shadow-2xl
+            w-[210mm]
+            h-[297mm]
             overflow-hidden
-            border-[10px]
+            shadow-2xl
+            border-[8px]
             border-[#0f2b56]
+            print:shadow-none
+            print:border-[6px]
           "
         >
-          {/* Background Design */}
+          {/* Top Design */}
 
-          <div className="absolute top-0 left-0 w-44 h-44 bg-gradient-to-br from-[#0f2b56] to-[#174ea6] rounded-br-full" />
+          <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-[#0f2b56] to-[#174ea6] rounded-br-full" />
 
-          <div className="absolute bottom-0 right-0 w-52 h-52 bg-gradient-to-tl from-[#0f2b56] to-[#174ea6] rounded-tl-full" />
+          <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-[#d4af37] to-[#f4b400] rounded-bl-full" />
+
+          {/* Bottom Design */}
+
+          <div className="absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-[#d4af37] to-[#f4b400] rounded-tr-full" />
+
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-[#0f2b56] to-[#174ea6] rounded-tl-full" />
 
           {/* Watermark */}
 
@@ -141,26 +149,26 @@ export default function OfferLetterPreview() {
 
           {/* Header */}
 
-          <div className="relative z-10 px-12 pt-10 flex justify-between items-start">
-            <div className="flex items-center gap-4">
+          <div className="relative z-10 px-10 pt-8 flex justify-between items-start">
+            <div className="flex items-center gap-3">
               <img
                 src={halfLogo}
                 alt="Navyan"
-                className="w-16 h-16"
+                className="w-14 h-14"
               />
 
               <div>
-                <h1 className="text-4xl font-extrabold text-[#0f2b56]">
+                <h1 className="text-[42px] leading-[42px] font-black text-[#0f2b56]">
                   Navyan
                 </h1>
 
-                <p className="text-sm text-slate-600 font-medium">
+                <p className="text-[13px] text-slate-600 font-medium tracking-wide">
                   Internships and IT Services
                 </p>
               </div>
             </div>
 
-            <div className="text-right text-sm text-slate-600 leading-6">
+            <div className="text-right text-[12px] text-slate-600 leading-5">
               <p>www.navyan.online</p>
               <p>contact@navyan.online</p>
               <p>India</p>
@@ -169,35 +177,39 @@ export default function OfferLetterPreview() {
 
           {/* Meta */}
 
-          <div className="relative z-10 px-12 mt-8 flex justify-between text-sm text-slate-700">
+          <div className="relative z-10 px-10 mt-8 flex justify-between text-[13px] text-slate-700">
             <div>
               Ref No:
-              <span className="font-semibold text-[#0f2b56] ml-2">
+              <span className="font-bold text-[#0f2b56] ml-2">
                 {document.offerId}
               </span>
             </div>
 
             <div>
               Date:
-              <span className="font-semibold text-[#0f2b56] ml-2">
+              <span className="font-bold text-[#0f2b56] ml-2">
                 {document.issueDateStr}
               </span>
             </div>
           </div>
 
+          {/* Divider */}
+
+          <div className="w-[90%] mx-auto h-[1px] bg-[#d4af37] mt-4" />
+
           {/* Title */}
 
-          <div className="relative z-10 text-center mt-10">
-            <h2 className="text-5xl font-black tracking-[6px] text-[#0f2b56]">
+          <div className="relative z-10 text-center mt-8">
+            <h2 className="text-[44px] font-black tracking-[4px] text-[#0f2b56]">
               OFFER LETTER
             </h2>
 
-            <div className="w-40 h-1 bg-[#d4af37] mx-auto mt-4 rounded-full" />
+            <div className="w-32 h-[3px] bg-[#d4af37] mx-auto mt-3 rounded-full" />
           </div>
 
           {/* Body */}
 
-          <div className="relative z-10 px-12 mt-10 text-[15px] leading-8 text-slate-700">
+          <div className="relative z-10 px-10 mt-8 text-[14px] leading-7 text-slate-700">
             <p>
               Dear{" "}
               <span className="font-bold text-[#0f2b56]">
@@ -205,11 +217,11 @@ export default function OfferLetterPreview() {
               </span>,
             </p>
 
-            <p className="mt-6">
+            <p className="mt-5 font-semibold">
               Congratulations!
             </p>
 
-            <p className="mt-6">
+            <p className="mt-5">
               We are pleased to offer you the position of{" "}
               <span className="font-bold text-[#0f2b56]">
                 {role}
@@ -219,19 +231,19 @@ export default function OfferLetterPreview() {
                 Navyan
               </span>.
               We are impressed with your enthusiasm,
-              dedication, and passion for learning.
-              We believe you will be a valuable part
-              of our internship program.
+              dedication, and passion for learning,
+              and we believe you will be a valuable
+              addition to our internship program.
             </p>
 
             {/* Internship Details */}
 
-            <div className="mt-10">
-              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
+            <div className="mt-8">
+              <h3 className="text-[18px] font-bold text-[#c48b10] uppercase tracking-wide">
                 Internship Details
               </h3>
 
-              <div className="grid grid-cols-2 gap-y-4 mt-6 text-[15px]">
+              <div className="grid grid-cols-2 gap-y-3 mt-4">
                 <div className="font-semibold">
                   Position
                 </div>
@@ -247,7 +259,7 @@ export default function OfferLetterPreview() {
                 </div>
 
                 <div className="font-semibold">
-                  Duration
+                  Internship Duration
                 </div>
 
                 <div>
@@ -290,15 +302,15 @@ export default function OfferLetterPreview() {
 
             {/* Responsibilities */}
 
-            <div className="mt-10">
-              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
+            <div className="mt-8">
+              <h3 className="text-[18px] font-bold text-[#c48b10] uppercase tracking-wide">
                 Role & Responsibilities
               </h3>
 
-              <ul className="list-disc pl-6 mt-5 space-y-2">
+              <ul className="list-disc pl-5 mt-4 space-y-2">
                 <li>
                   Work on assigned tasks and projects
-                  under guidance.
+                  under project coordinator guidance.
                 </li>
 
                 <li>
@@ -307,8 +319,8 @@ export default function OfferLetterPreview() {
                 </li>
 
                 <li>
-                  Maintain professionalism throughout
-                  the internship.
+                  Maintain professionalism and commitment
+                  throughout the internship.
                 </li>
 
                 <li>
@@ -319,12 +331,12 @@ export default function OfferLetterPreview() {
 
             {/* Terms */}
 
-            <div className="mt-10">
-              <h3 className="text-xl font-bold text-[#0f2b56] border-b-2 border-[#d4af37] inline-block pb-1">
+            <div className="mt-8">
+              <h3 className="text-[18px] font-bold text-[#c48b10] uppercase tracking-wide">
                 Terms & Conditions
               </h3>
 
-              <ol className="list-decimal pl-6 mt-5 space-y-2">
+              <ol className="list-decimal pl-5 mt-4 space-y-2">
                 <li>
                   This internship is for educational
                   and skill development purposes.
@@ -346,28 +358,36 @@ export default function OfferLetterPreview() {
               </ol>
             </div>
 
-            <p className="mt-10">
+            <p className="mt-8">
               We are excited to have you onboard and
-              look forward to a productive learning
-              experience together.
+              look forward to a productive and rewarding
+              learning experience together.
+            </p>
+
+            <p className="mt-5">
+              Welcome to the{" "}
+              <span className="font-bold text-[#0f2b56]">
+                Navyan
+              </span>{" "}
+              family!
             </p>
           </div>
 
           {/* Signatures */}
 
-          <div className="relative z-10 flex justify-between items-end px-12 mt-16">
+          <div className="relative z-10 flex justify-between items-end px-10 mt-12">
             <div className="text-center">
-              <div className="text-4xl italic text-slate-800">
+              <div className="text-3xl italic text-slate-800">
                 Shivanand
               </div>
 
-              <div className="w-44 h-[1px] bg-[#d4af37] mt-1" />
+              <div className="w-40 h-[1px] bg-[#d4af37] mt-1 mx-auto" />
 
-              <h4 className="mt-2 text-lg font-bold text-[#0f2b56]">
+              <h4 className="mt-2 text-[16px] font-bold text-[#0f2b56]">
                 Shivanand Kumar
               </h4>
 
-              <p className="text-sm text-[#b8860b] font-semibold tracking-[2px]">
+              <p className="text-[13px] text-[#b8860b] font-semibold tracking-[2px]">
                 Founder
               </p>
             </div>
@@ -376,37 +396,37 @@ export default function OfferLetterPreview() {
 
             <div
               className="
-                w-28
-                h-28
+                w-24
+                h-24
                 rounded-full
-                border-[6px]
+                border-[5px]
                 border-[#174ea6]
                 flex
                 items-center
                 justify-center
                 bg-white
-                shadow-xl
+                shadow-lg
               "
             >
               <img
                 src={halfLogo}
                 alt="seal"
-                className="w-14"
+                className="w-12"
               />
             </div>
 
             <div className="text-center">
-              <div className="text-4xl italic text-slate-800">
+              <div className="text-3xl italic text-slate-800">
                 Anamika
               </div>
 
-              <div className="w-44 h-[1px] bg-[#d4af37] mt-1" />
+              <div className="w-40 h-[1px] bg-[#d4af37] mt-1 mx-auto" />
 
-              <h4 className="mt-2 text-lg font-bold text-[#0f2b56]">
+              <h4 className="mt-2 text-[16px] font-bold text-[#0f2b56]">
                 Anamika Pandey
               </h4>
 
-              <p className="text-sm text-[#b8860b] font-semibold tracking-[2px]">
+              <p className="text-[13px] text-[#b8860b] font-semibold tracking-[2px]">
                 Co-Founder
               </p>
             </div>
@@ -414,7 +434,7 @@ export default function OfferLetterPreview() {
 
           {/* Footer */}
 
-          <div className="relative z-10 mt-10 bg-[#0f2b56] text-white py-4 text-center text-sm font-medium">
+          <div className="absolute bottom-0 left-0 w-full bg-[#0f2b56] text-white py-3 text-center text-[13px] font-medium">
             Learn • Perform • Grow
           </div>
         </div>
@@ -425,7 +445,7 @@ export default function OfferLetterPreview() {
 
 function DocumentToolbar() {
   return (
-    <div className="flex justify-center gap-4 mb-8">
+    <div className="flex justify-center gap-4 mb-8 print:hidden">
       <button
         type="button"
         onClick={goBack}
