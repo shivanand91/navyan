@@ -36,59 +36,58 @@ export default function CertificatePreview() {
       </div>
 
       {/* CERTIFICATE CONTAINER */}
-      <div className="w-full flex justify-center print:block overflow-x-auto">
+      <div className="overflow-auto w-full flex justify-center print:block">
         <div
           id="certificate-content"
-          className="relative bg-white shadow-2xl overflow-visible print:overflow-hidden print:shadow-none"
+          className="relative bg-white shadow-2xl overflow-hidden print:shadow-none"
           style={{ 
-            width: "min(100vw - 2rem, 297mm)", 
-            height: "auto",
-            aspectRatio: "297 / 210",
-            minWidth: "320px",
+            width: "297mm", 
+            height: "210mm", 
+            minWidth: "297mm", 
             position: "relative",
             backgroundColor: "white"
           }}
         >
           {/* --- BORDER DESIGN --- */}
-          <div className="absolute inset-[15px] sm:inset-[20px] md:inset-[30px] border-[4px] sm:border-[6px] md:border-[8px] border-[#d4af37] rounded-[20px] sm:rounded-[30px] md:rounded-[40px] z-20 pointer-events-none" />
+          <div className="absolute inset-[30px] border-[8px] border-[#d4af37] rounded-[40px] z-20 pointer-events-none" />
 
           {/* --- WATERMARK --- */}
-          <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 sm:w-96 md:w-[500px] opacity-[0.03] pointer-events-none z-0" />
+          <img src={halfLogo} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] opacity-[0.03] pointer-events-none z-0" />
 
           {/* --- MAIN CONTENT --- */}
-          <div className="relative z-10 h-full w-full flex flex-col items-center pt-14 px-6 sm:px-12 md:px-24 overflow-hidden">
+          <div className="relative z-10 h-full w-full flex flex-col items-center pt-14 px-24">
             
             {/* Header Branding */}
-            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-              <img src={halfLogo} alt="Logo" className="w-10 h-10 sm:w-14 sm:h-14" />
+            <div className="flex items-center gap-4">
+              <img src={halfLogo} alt="Logo" className="w-14 h-14" />
               <div className="flex flex-col">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#061a35] tracking-tighter leading-none">Navyan</h1>
-                <p className="text-[8px] sm:text-[10px] font-bold text-[#061a35] tracking-[2px] uppercase opacity-80 mt-1">Internships and IT Services</p>
+                <h1 className="text-5xl font-black text-[#061a35] tracking-tighter leading-none">Navyan</h1>
+                <p className="text-[10px] font-bold text-[#061a35] tracking-[2px] uppercase opacity-80 mt-1">Internships and IT Services</p>
               </div>
             </div>
 
             {/* Certificate Title */}
-            <div className="text-center mt-8 sm:mt-10 md:mt-12 flex-shrink-0">
-              <h1 className="text-5xl sm:text-6xl md:text-[90px] font-bold tracking-[4px] sm:tracking-[6px] md:tracking-[8px] text-[#061a35] leading-none">CERTIFICATE</h1>
-              <div className="flex items-center justify-center gap-3 sm:gap-4 md:gap-6 mt-1">
-                <div className="h-[2px] w-16 sm:w-24 md:w-32 bg-[#d4af37]" />
-                <h2 className="text-lg sm:text-2xl md:text-[32px] font-semibold tracking-[4px] sm:tracking-[6px] md:tracking-[8px] text-[#d4af37] uppercase">Of Internship</h2>
-                <div className="h-[2px] w-16 sm:w-24 md:w-32 bg-[#d4af37]" />
+            <div className="text-center mt-12">
+              <h1 className="text-[90px] font-bold tracking-[8px] text-[#061a35] leading-none">CERTIFICATE</h1>
+              <div className="flex items-center justify-center gap-6 mt-1">
+                <div className="h-[2px] w-32 bg-[#d4af37]" />
+                <h2 className="text-[32px] font-semibold tracking-[8px] text-[#d4af37] uppercase">Of Internship</h2>
+                <div className="h-[2px] w-32 bg-[#d4af37]" />
               </div>
               {/* Decorative Diamonds */}
-              <div className="text-[#d4af37] text-lg sm:text-xl md:text-2xl mt-1 tracking-[6px] sm:tracking-[8px] md:tracking-[10px]">⬥ ☙ ⬥</div>
+              <div className="text-[#d4af37] text-2xl mt-2 tracking-[10px]">⬥ ☙ ⬥</div>
             </div>
 
             {/* Recipient Name */}
-            <div className="text-center mt-2 w-full flex-shrink-0">
-              <p className="text-[10px] sm:text-[12px] md:text-[14px] tracking-[2px] sm:tracking-[3px] md:tracking-[4px] text-slate-500 font-bold uppercase mb-1 sm:mb-2">This Certificate is Proudly Presented To</p>
-              <h3 className="text-2xl sm:text-3xl md:text-[42px] font-serif text-[#061a35] italic leading-none break-words px-2">{certificate.studentName}</h3>
-              <div className="h-[2px] w-40 sm:w-60 md:w-[700px] bg-[#d4af37] mx-auto mt-1 sm:mt-2" />
+            <div className="text-center mt-2 w-full">
+              <p className="text-[14px] tracking-[4px] text-slate-500 font-bold uppercase mb-4">This Certificate is Proudly Presented To</p>
+              <h3 className="text-[42px] font-serif text-[#061a35] italic leading-none">{certificate.studentName}</h3>
+              <div className="h-[2.5px] w-[700px] bg-[#d4af37] mx-auto mt-1" />
             </div>
 
             {/* Description */}
-            <div className="max-w-[900px] mx-auto mt-2 text-center flex-shrink-0">
-              <p className="text-xs sm:text-sm md:text-[20px] leading-[1.4] sm:leading-[1.5] md:leading-[1.6] text-slate-700 font-medium px-2 sm:px-4">
+            <div className="max-w-[900px] mx-auto mt-2 text-center">
+              <p className="text-[20px] leading-[1.6] text-slate-700 font-medium px-4">
                 For successfully completing the <span className="font-bold text-[#061a35]">{certificate.role}</span> internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
                 The internship was conducted from <span className="font-bold text-[#061a35]">{certificate.startDate}</span> to <span className="font-bold text-[#061a35]">{certificate.endDate}</span>.
                 During this period, the individual has shown dedication, consistency, and a strong willingness to learn and contribute. 
@@ -106,7 +105,7 @@ export default function CertificatePreview() {
                   {/* Circle Badge */}
                   <div className="w-32 h-32 rounded-full bg-[#061a35] border-[5px] border-[#d4af37] flex flex-col items-center justify-center shadow-2xl z-20">
                     <div className="text-yellow-400 text-[10px] mb-1">★★★</div>
-                    <p className="text-white text-[11px] font-bold leading-tight text-center tracking-[2px]">LEARN<br/>PERFORM<br/>GROW</p>
+                    <p className="text-white text-[11px] font-bold leading-tight text-center tracking-[2px]">Verified<br/>By<br/>Navyan</p>
                     <div className="text-yellow-400 text-[10px] mt-1">★</div>
                   </div>
                </div>
@@ -133,7 +132,7 @@ export default function CertificatePreview() {
                   </div>
                 </div>
                 {/* Motto */}
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-3 mt-4">
                    <div className="h-[1px] w-12 bg-[#d4af37]" />
                    <p className="italic text-[#061a35] text-lg font-bold">“Learn, Perform, Grow”</p>
                    <div className="h-[1px] w-12 bg-[#d4af37]" />
