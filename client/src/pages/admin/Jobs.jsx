@@ -236,13 +236,32 @@ export default function AdminJobs() {
             </div>
 
             <div className="md:col-span-4">
-              <Field label="Description">
+              <Field label="Description (use line breaks for formatting)">
                 <Textarea
                   name="description"
-                  rows={5}
+                  rows={7}
                   value={form.description}
                   onChange={handleChange}
+                  placeholder="Enter job description. Use line breaks to separate key points, responsibilities, and requirements. Example:
+Responsibilities:
+• Develop frontend features
+• Write unit tests
+• Code reviews
+
+Requirements:
+• 3+ years React experience
+• Strong CSS knowledge
+• Team player"
+                  className="font-mono"
                 />
+                <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/8 dark:bg-white/5">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                    Preview:
+                  </p>
+                  <p className="whitespace-pre-wrap text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+                    {form.description || "(Description will appear here)"}
+                  </p>
+                </div>
               </Field>
             </div>
 
@@ -326,7 +345,7 @@ export default function AdminJobs() {
                       </div>
                     </div>
 
-                    <p className="mt-4 text-sm leading-7 text-slate-700 dark:text-[#d7deea]">
+                    <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-[#d7deea]">
                       {job.description}
                     </p>
                   </div>

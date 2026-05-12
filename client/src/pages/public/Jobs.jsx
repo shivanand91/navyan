@@ -226,44 +226,48 @@ export default function Jobs() {
                         </div>
                       </CardHeader>
                       <CardContent className="flex h-full flex-col">
-                        <p className="text-sm leading-7 text-slate-700 dark:text-[#c7cfdb]">
-                          {job.description}
-                        </p>
-
-                        <div className="mt-5 flex items-center gap-2 text-xs text-slate-500 dark:text-[#7e8794]">
-                          <BriefcaseBusiness className="h-4 w-4" />
-                          <span>{job.companyName}</span>
-                          {job.location ? (
-                            <>
-                              <span>•</span>
-                              <MapPin className="h-4 w-4" />
-                              <span>{job.location}</span>
-                            </>
-                          ) : null}
+                        <div className="mb-5 space-y-3">
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-[#c7cfdb]">
+                            {job.description}
+                          </p>
                         </div>
 
-                        <div className="mt-6">
-                          {job.isInternal ? (
-                            user?.role === "student" ? (
-                              <Link to="/student/jobs">
+                        <div className="mt-auto space-y-3">
+                          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-[#7e8794]">
+                            <BriefcaseBusiness className="h-4 w-4" />
+                            <span>{job.companyName}</span>
+                            {job.location ? (
+                              <>
+                                <span>•</span>
+                                <MapPin className="h-4 w-4" />
+                                <span>{job.location}</span>
+                              </>
+                            ) : null}
+                          </div>
+
+                          <div>
+                            {job.isInternal ? (
+                              user?.role === "student" ? (
+                                <Link to="/student/jobs">
+                                  <Button className="w-full">
+                                    Apply from dashboard
+                                    <ArrowUpRight className="ml-2 h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              ) : (
+                                <Link to="/login">
+                                  <Button className="w-full">Log in to apply</Button>
+                                </Link>
+                              )
+                            ) : (
+                              <a href={normalizeExternalUrl(job.applyUrl)} target="_blank" rel="noreferrer">
                                 <Button className="w-full">
-                                  Apply from dashboard
+                                  Open company apply link
                                   <ArrowUpRight className="ml-2 h-4 w-4" />
                                 </Button>
-                              </Link>
-                            ) : (
-                              <Link to="/login">
-                                <Button className="w-full">Log in to apply</Button>
-                              </Link>
-                            )
-                          ) : (
-                            <a href={normalizeExternalUrl(job.applyUrl)} target="_blank" rel="noreferrer">
-                              <Button className="w-full">
-                                Open company apply link
-                                <ArrowUpRight className="ml-2 h-4 w-4" />
-                              </Button>
-                            </a>
-                          )}
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
