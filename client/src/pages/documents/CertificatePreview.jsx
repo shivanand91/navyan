@@ -35,7 +35,8 @@ export default function CertificatePreview() {
         {/* CERTIFICATE CONTAINER */}
         <div
           id="certificate-content"
-          className="relative mx-auto w-[1123px] h-[794px] bg-white shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-full"
+          className="relative mx-auto w-full max-w-[1123px] bg-white shadow-2xl overflow-hidden print:shadow-none print:block print:overflow-visible"
+          style={{ width: "297mm", minHeight: "210mm", padding: 0 }}
         >
           {/* --- CURVED MAIN BORDER --- */}
           <div className="absolute inset-6 border-[8px] border-[#d4af37] rounded-[30px] z-20 pointer-events-none shadow-inner" />
@@ -145,16 +146,23 @@ export default function CertificatePreview() {
             margin: 0; 
           }
           body { 
+            margin: 0;
+            padding: 0;
             background: white !important; 
             -webkit-print-color-adjust: exact; 
+            color-adjust: exact;
           }
           .print\\:hidden { display: none !important; }
           #certificate-content {
-            width: 100vw !important;
-            height: 100vh !important;
+            width: 297mm !important;
+            min-height: 210mm !important;
+            max-width: 100% !important;
+            height: auto !important;
             border: none !important;
-            margin: 0 !important;
+            margin: 0 auto !important;
             padding: 0 !important;
+            overflow: visible !important;
+            page-break-inside: avoid !important;
           }
         }
       `}} />
