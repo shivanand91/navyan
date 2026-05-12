@@ -75,18 +75,18 @@ export default function CertificatePreview() {
                 <div className="h-[2px] w-32 bg-[#d4af37]" />
               </div>
               {/* Decorative Diamonds */}
-              <div className="text-[#d4af37] text-2xl mt-2 tracking-[10px]">⬥ ☙ ⬥</div>
+              <div className="text-[#d4af37] text-2xl mt-1 tracking-[10px]">⬥ ☙ ⬥</div>
             </div>
 
             {/* Recipient Name */}
-            <div className="text-center mt-4 w-full">
-              <p className="text-[14px] tracking-[4px] text-slate-500 font-bold uppercase mb-4">This Certificate is Proudly Presented To</p>
+            <div className="text-center mt-2 w-full">
+              <p className="text-[14px] tracking-[4px] text-slate-500 font-bold uppercase mb-2">This Certificate is Proudly Presented To</p>
               <h3 className="text-[52px] font-serif text-[#061a35] italic leading-none">{certificate.studentName}</h3>
               <div className="h-[2.5px] w-[700px] bg-[#d4af37] mx-auto mt-4" />
             </div>
 
             {/* Description */}
-            <div className="max-w-[900px] mx-auto mt-6 text-center">
+            <div className="max-w-[900px] mx-auto mt-2 text-center">
               <p className="text-[20px] leading-[1.6] text-slate-700 font-medium px-4">
                 For successfully completing the <span className="font-bold text-[#061a35]">{certificate.role}</span> internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
                 The internship was conducted from <span className="font-bold text-[#061a35]">{certificate.startDate}</span> to <span className="font-bold text-[#061a35]">{certificate.endDate}</span>.
@@ -122,7 +122,7 @@ export default function CertificatePreview() {
               </div>
 
               {/* Central Seal */}
-              <div className="flex flex-col items-center mb-[-20px]">
+              <div className="flex flex-col items-center mt-2 mb-[-20px]">
                 <div className="w-28 h-28 rounded-full border border-slate-200 p-1 bg-white relative flex items-center justify-center shadow-sm">
                   <div className="absolute inset-0 border border-dashed border-[#061a35] opacity-20 rounded-full" />
                   <div className="text-center z-10">
@@ -132,7 +132,7 @@ export default function CertificatePreview() {
                   </div>
                 </div>
                 {/* Motto */}
-                <div className="flex items-center gap-3 mt-4">
+                <div className="flex items-center gap-3 mt-2">
                    <div className="h-[1px] w-12 bg-[#d4af37]" />
                    <p className="italic text-[#061a35] text-lg font-bold">“Learn, Perform, Grow”</p>
                    <div className="h-[1px] w-12 bg-[#d4af37]" />
