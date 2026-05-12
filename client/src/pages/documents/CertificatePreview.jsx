@@ -96,18 +96,18 @@ export default function CertificatePreview() {
             </div>
 
             {/* Badge (Floating Right) */}
-            <div className="absolute top-[150px] sm:top-[180px] md:top-[220px] right-[40px] sm:right-[60px] md:right-[100px] z-30">
+            <div className="absolute top-[220px] right-[100px] z-30">
                <div className="relative flex flex-col items-center">
                   {/* Ribbons */}
-                  <div className="absolute top-8 sm:top-10 md:top-14 w-12 sm:w-16 md:w-20 h-20 sm:h-24 md:h-32 flex justify-between px-1 sm:px-2">
-                    <div className="w-4 sm:w-6 md:w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
-                    <div className="w-4 sm:w-6 md:w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
+                  <div className="absolute top-14 w-20 h-32 flex justify-between px-2">
+                    <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
+                    <div className="w-8 h-full bg-[#d4af37]" style={{clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'}}></div>
                   </div>
                   {/* Circle Badge */}
-                  <div className="w-20 sm:w-24 md:w-32 h-20 sm:h-24 md:h-32 rounded-full bg-[#061a35] border-[3px] sm:border-[4px] md:border-[5px] border-[#d4af37] flex flex-col items-center justify-center shadow-2xl z-20">
-                    <div className="text-yellow-400 text-[8px] sm:text-[9px] md:text-[10px] mb-0.5 sm:mb-1">★★★</div>
-                    <p className="text-white text-[8px] sm:text-[9px] md:text-[11px] font-bold leading-tight text-center tracking-[1px] sm:tracking-[1.5px]">Certified<br/>By<br/>Navyan</p>
-                    <div className="text-yellow-400 text-[8px] sm:text-[9px] md:text-[10px] mt-0.5 sm:mt-1">★</div>
+                  <div className="w-32 h-32 rounded-full bg-[#061a35] border-[5px] border-[#d4af37] flex flex-col items-center justify-center shadow-2xl z-20">
+                    <div className="text-yellow-400 text-[10px] mb-1">★★★</div>
+                    <p className="text-white text-[11px] font-bold leading-tight text-center tracking-[2px]">LEARN<br/>PERFORM<br/>GROW</p>
+                    <div className="text-yellow-400 text-[10px] mt-1">★</div>
                   </div>
                </div>
             </div>
