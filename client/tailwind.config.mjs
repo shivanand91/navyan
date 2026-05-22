@@ -5,17 +5,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#F8FBFF",
-        backgroundSecondary: "#F3F8FF",
-        tertiary: "#EAF2FF",
-        surface: "#FFFFFF",
-        elevated: "#FFFFFF",
-        sidebar: "#FFFFFF",
-        border: "rgba(255,255,255,0.08)",
-        softBorder: "rgba(255,255,255,0.05)",
-        textPrimary: "#0F172A",
-        textSecondary: "#475569",
-        textMuted: "#64748B",
+        background: "var(--bg)",
+        backgroundSecondary: "var(--bg-secondary)",
+        tertiary: "var(--bg-tertiary)",
+        surface: "var(--card)",
+        elevated: "var(--card-elevated)",
+        sidebar: "var(--sidebar)",
+        border: "var(--border)",
+        softBorder: "var(--soft-border)",
+        textPrimary: "var(--text)",
+        textSecondary: "var(--text-secondary)",
+        textMuted: "var(--text-muted)",
         primary: {
           DEFAULT: "#2563EB"
         },

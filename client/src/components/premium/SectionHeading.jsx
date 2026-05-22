@@ -24,11 +24,11 @@ export function SectionHeading({
       <div className={cn("max-w-2xl space-y-3", align === "center" && "items-center")}>
         {eyebrow ? <div className="navyan-pill">{eyebrow}</div> : null}
         <div className="space-y-2">
-          <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] text-slate-950 dark:text-[#f5f7fa] md:text-[2rem]">
+          <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] text-[color:var(--text)] md:text-[2rem]">
             {title}
           </h2>
           {description ? (
-            <p className="max-w-2xl text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+            <p className="max-w-2xl text-sm leading-7 text-[color:var(--text-secondary)]">
               {description}
             </p>
           ) : null}

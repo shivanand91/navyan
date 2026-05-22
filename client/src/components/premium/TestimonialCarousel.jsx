@@ -28,14 +28,14 @@ export function TestimonialCarousel({ items }) {
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/18 bg-primary/10 text-primary">
                   <Quote className="h-4 w-4" />
                 </div>
-                <p className="mt-5 text-base leading-8 text-slate-700 dark:text-[#d9dee6]">
+                <p className="mt-5 text-base leading-8 text-[color:var(--text-secondary)]">
                   {item.quote}
                 </p>
                 <div className="mt-6">
-                  <p className="font-display text-lg font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                  <p className="font-display text-lg font-semibold text-[color:var(--text)]">
                     {item.name}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-[#7e8794]">{item.role}</p>
+                  <p className="text-sm text-[color:var(--text-muted)]">{item.role}</p>
                 </div>
               </div>
             </div>

@@ -76,7 +76,7 @@ export default function ServiceInquiries() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] text-slate-50">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                     {inq.status}
                   </span>
                   {statuses.map((status) => (
