@@ -39,7 +39,7 @@ export function ModalShell({
   return createPortal(
     <div className="fixed inset-0 z-[120] p-3 md:p-6">
       <div
-        className="absolute inset-0 bg-[#05070a]/76 backdrop-blur-md"
+        className="absolute inset-0 bg-slate-950/45 backdrop-blur-md dark:bg-[#05070a]/76"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -47,19 +47,19 @@ export function ModalShell({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative mx-auto flex max-h-[calc(100vh-1.5rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-white/10 bg-[rgba(11,13,16,0.96)] text-[#f5f7fa] shadow-[0_30px_120px_rgba(0,0,0,0.52)] md:max-h-[calc(100vh-3rem)]",
+          "relative mx-auto flex max-h-[calc(100vh-1.5rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] text-[color:var(--text)] shadow-[0_30px_120px_rgba(15,23,42,0.24)] dark:shadow-[0_30px_120px_rgba(0,0,0,0.52)] md:max-h-[calc(100vh-3rem)]",
           className
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-white/8 px-5 py-4 md:px-6">
+        <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border)] px-5 py-4 md:px-6">
           <div className="space-y-1">
             {title ? (
-              <h2 className="font-display text-xl font-semibold tracking-[-0.04em] text-[#f5f7fa] md:text-2xl">
+              <h2 className="font-display text-xl font-semibold tracking-[-0.04em] text-[color:var(--text)] md:text-2xl">
                 {title}
               </h2>
             ) : null}
             {description ? (
-              <p className="max-w-2xl text-sm text-[#b7c0cc]">{description}</p>
+              <p className="max-w-2xl text-sm text-[color:var(--text-secondary)]">{description}</p>
             ) : null}
           </div>
           <Button type="button" variant="icon" size="icon" onClick={onClose} className="shrink-0">

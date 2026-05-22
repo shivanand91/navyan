@@ -207,7 +207,7 @@ export default function AdminCourses() {
                         </span>
                       ) : null}
                       {course.level ? (
-                        <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-[#d7deea]">
+                        <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
                           {course.level}
                         </span>
                       ) : null}

@@ -61,8 +61,8 @@ export function AdminLayout() {
   return (
     <div className="navyan-shell min-h-screen">
       <div className="mx-auto flex max-w-[1560px] gap-5 px-3 py-3 md:px-5 md:py-5">
-        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col bg-[#0f1318]/96 text-[#f5f7fa] lg:flex">
-          <div className="shrink-0 border-b border-white/8 px-5 py-5">
+        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col bg-[color:var(--sidebar)] text-[color:var(--text)] lg:flex">
+          <div className="shrink-0 border-b border-[color:var(--border)] px-5 py-5">
             <Link to={dashboardHomePath}>
               <BrandLogo imageClassName="h-12 md:h-14" />
             </Link>
@@ -71,10 +71,10 @@ export function AdminLayout() {
                 <ShieldCheck className="h-4 w-4" />
               </div>
               <div>
-                <p className="font-display text-base font-semibold text-[#f5f7fa]">
+                <p className="font-display text-base font-semibold text-[color:var(--text)]">
                   Admin control
                 </p>
-                <p className="text-xs text-[#7e8794]">Operational oversight and workflow intelligence</p>
+                <p className="text-xs text-[color:var(--text-muted)]">Operational oversight and workflow intelligence</p>
               </div>
             </div>
           </div>
@@ -86,7 +86,7 @@ export function AdminLayout() {
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[#b7c0cc] transition hover:border-white/8 hover:bg-white/5 hover:text-[#f5f7fa]",
+                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/10 hover:text-[color:var(--text)]",
                     isActive && "border-primary/20 bg-primary/10 text-primary"
                   )
                 }
@@ -94,7 +94,7 @@ export function AdminLayout() {
                 <link.icon className="h-4 w-4" />
                 <div>
                   <p>{link.label}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#7e8794]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     {link.caption}
                   </p>
                 </div>
@@ -102,14 +102,14 @@ export function AdminLayout() {
             ))}
           </nav>
 
-          <div className="mt-auto shrink-0 border-t border-white/8 p-4">
-            <div className="rounded-[22px] border border-white/8 bg-white/5 p-4">
+          <div className="mt-auto shrink-0 border-t border-[color:var(--border)] p-4">
+            <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-display text-base font-semibold text-[#f5f7fa]">
+                  <p className="truncate font-display text-base font-semibold text-[color:var(--text)]">
                     {user?.fullName}
                   </p>
-                  <p className="truncate text-xs text-[#7e8794]">{user?.email}</p>
+                  <p className="truncate text-xs text-[color:var(--text-muted)]">{user?.email}</p>
                 </div>
                 <ThemeToggle variant="ghost" />
               </div>
@@ -126,7 +126,7 @@ export function AdminLayout() {
         </aside>
 
         <div className="min-w-0 flex-1 space-y-4">
-          <div className="navyan-panel sticky top-3 z-40 bg-[#0f1318]/90 px-4 py-3 text-[#f5f7fa] md:px-5">
+          <div className="navyan-panel sticky top-3 z-40 bg-[color:var(--sidebar)] px-4 py-3 text-[color:var(--text)] md:px-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="lg:hidden">
@@ -146,10 +146,10 @@ export function AdminLayout() {
                   />
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-[#f5f7fa] md:text-xl">
+                  <p className="font-display text-lg font-semibold text-[color:var(--text)] md:text-xl">
                     Admin console
                   </p>
-                  <p className="text-xs text-[#7e8794]">
+                  <p className="text-xs text-[color:var(--text-muted)]">
                     Review, decide, and operate the full Navyan workflow from one control layer.
                   </p>
                 </div>

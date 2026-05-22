@@ -34,7 +34,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
   return (
     <div className={cn("grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", className)}>
       <div className="space-y-5">
-        <div className="overflow-hidden rounded-[28px] border border-white/8 bg-[#0f1318]">
+        <div className="overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
           {internship.coverImageUrl ? (
             <img
               src={internship.coverImageUrl}
@@ -42,7 +42,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
               className="h-[240px] w-full object-cover md:h-[300px]"
             />
           ) : (
-            <div className="flex h-[240px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,168,95,0.18),transparent_58%),linear-gradient(180deg,#111418_0%,#171b21_100%)] text-sm text-[#b7c0cc] md:h-[300px]">
+            <div className="flex h-[240px] items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)] md:h-[300px]">
               Navyan internship preview
             </div>
           )}
@@ -54,66 +54,66 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
               <Sparkles className="h-3.5 w-3.5" />
               Live opportunity
             </span>
-            <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-[#b7c0cc]">
+            <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
               {internship.mode?.toUpperCase() || "REMOTE"}
             </span>
             {internship.role ? (
-              <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-[#b7c0cc]">
+              <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                 {internship.role}
               </span>
             ) : null}
           </div>
 
           <div>
-            <h3 className="font-display text-3xl font-semibold tracking-[-0.05em] text-[#f5f7fa]">
+            <h3 className="font-display text-3xl font-semibold tracking-[-0.05em] text-[color:var(--text)]">
               {internship.title}
             </h3>
-            <p className="mt-3 max-w-3xl text-sm leading-8 text-[#b7c0cc]">
+            <p className="mt-3 max-w-3xl text-sm leading-8 text-[color:var(--text-secondary)]">
               {internship.shortDescription || internship.description}
             </p>
           </div>
 
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-[24px] border border-white/8 bg-white/5 p-4">
-              <div className="flex items-center gap-2 text-[#7e8794]">
+            <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+              <div className="flex items-center gap-2 text-[color:var(--text-muted)]">
                 <BriefcaseBusiness className="h-4 w-4 text-primary" />
                 <span className="text-[11px] uppercase tracking-[0.18em]">Role</span>
               </div>
-              <p className="mt-3 text-sm font-semibold text-[#f5f7fa]">
+              <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
                 {internship.role || "Applied internship track"}
               </p>
             </div>
-            <div className="rounded-[24px] border border-white/8 bg-white/5 p-4">
-              <div className="flex items-center gap-2 text-[#7e8794]">
+            <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+              <div className="flex items-center gap-2 text-[color:var(--text-muted)]">
                 <Laptop className="h-4 w-4 text-primary" />
                 <span className="text-[11px] uppercase tracking-[0.18em]">Mode</span>
               </div>
-              <p className="mt-3 text-sm font-semibold text-[#f5f7fa]">
+              <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
                 {internship.mode?.toUpperCase() || "REMOTE"}
               </p>
             </div>
-            <div className="rounded-[24px] border border-white/8 bg-white/5 p-4">
-              <div className="flex items-center gap-2 text-[#7e8794]">
+            <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+              <div className="flex items-center gap-2 text-[color:var(--text-muted)]">
                 <Users2 className="h-4 w-4 text-primary" />
                 <span className="text-[11px] uppercase tracking-[0.18em]">Openings</span>
               </div>
-              <p className="mt-3 text-sm font-semibold text-[#f5f7fa]">
+              <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
                 {internship.openings ? `${internship.openings} seats` : "Limited seats"}
               </p>
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+          <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
               What you will work on
             </p>
-            <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[#b7c0cc]">
+            <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[color:var(--text-secondary)]">
               {internship.description || internship.shortDescription}
             </p>
           </div>
 
-          <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-            <div className="flex items-center gap-2 text-[#7e8794]">
+          <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+            <div className="flex items-center gap-2 text-[color:var(--text-muted)]">
               <Target className="h-4 w-4 text-primary" />
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">
                 Skills in focus
@@ -124,13 +124,13 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
                 internship.skillsRequired.map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-full border border-white/8 bg-[#0f1318] px-3 py-1 text-xs font-medium text-[#dce2e9]"
+                    className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-xs font-medium text-[color:var(--text-secondary)]"
                   >
                     {skill}
                   </span>
                 ))
               ) : (
-                <span className="text-sm text-[#b7c0cc]">General engineering readiness</span>
+                <span className="text-sm text-[color:var(--text-secondary)]">General engineering readiness</span>
               )}
             </div>
           </div>
@@ -138,29 +138,29 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
       </div>
 
       <div className="space-y-4">
-        <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+        <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
             Internship details
           </p>
           <div className="mt-4 space-y-3">
-            <div className="flex items-start gap-3 rounded-[22px] border border-white/8 bg-[#0f1318] p-4">
+            <div className="flex items-start gap-3 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4">
               <CalendarDays className="mt-0.5 h-4 w-4 text-primary" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8794]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                   Last date to apply
                 </p>
-                <p className="mt-1 text-sm font-semibold text-[#f5f7fa]">
+                <p className="mt-1 text-sm font-semibold text-[color:var(--text)]">
                   {formatDate(internship.lastDateToApply)}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 rounded-[22px] border border-white/8 bg-[#0f1318] p-4">
+            <div className="flex items-start gap-3 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4">
               <Clock3 className="mt-0.5 h-4 w-4 text-primary" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8794]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                   Duration options
                 </p>
-                <p className="mt-1 text-sm font-semibold text-[#f5f7fa]">
+                <p className="mt-1 text-sm font-semibold text-[color:var(--text)]">
                   {(internship.durations || []).map(getDurationLabel).join(" • ") || "Custom"}
                 </p>
               </div>
@@ -168,20 +168,20 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+        <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
             Duration and pricing
           </p>
           <div className="mt-4 space-y-3">
             {(internship.durations || []).map((duration) => (
               <div
                 key={duration.key}
-                className="rounded-[22px] border border-white/8 bg-[#0f1318] p-4"
+                className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-[#f5f7fa]">{getDurationLabel(duration)}</p>
-                    <p className="mt-1 text-xs text-[#b7c0cc]">
+                    <p className="text-sm font-semibold text-[color:var(--text)]">{getDurationLabel(duration)}</p>
+                    <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
                       {duration.isPaid || duration.price > 0
                         ? `Paid cohort${duration.price ? ` • Rs ${duration.price}` : ""}`
                         : "Free internship track"}
@@ -203,7 +203,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
                     {duration.benefits.map((benefit) => (
                       <span
                         key={benefit}
-                        className="rounded-full border border-white/8 bg-white/5 px-2.5 py-1 text-[11px] text-[#b7c0cc]"
+                        className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]"
                       >
                         {benefit}
                       </span>

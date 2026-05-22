@@ -54,35 +54,35 @@ export function CommandPalette({ items, title = "Search actions", className }) {
       >
         <Search className="h-4 w-4" />
         {title}
-        <span className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.14em] text-slate-400 dark:text-[#7e8794]">
+        <span className="rounded-md border border-[color:var(--border)] bg-black/[0.03] px-1.5 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--text-muted)] dark:bg-white/5">
           Ctrl K
         </span>
       </Button>
 
       {open ? (
-        <div className="fixed inset-0 z-[90] bg-[#06080b]/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[90] bg-slate-950/45 backdrop-blur-sm dark:bg-[#06080b]/80">
           <div className="mx-auto flex min-h-screen max-w-2xl items-start px-4 pt-24">
             <Command
               label="Command Palette"
-              className="navyan-panel w-full overflow-hidden border border-white/10 bg-[#101419]/95 text-[#f5f7fa]"
+              className="navyan-panel w-full overflow-hidden border border-[color:var(--border)] bg-[color:var(--card-elevated)] text-[color:var(--text)]"
             >
-              <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-                <Search className="h-4 w-4 text-[#7e8794]" />
+              <div className="flex items-center gap-3 border-b border-[color:var(--border)] px-4 py-3">
+                <Search className="h-4 w-4 text-[color:var(--text-muted)]" />
                 <Command.Input
                   autoFocus
                   placeholder="Search pages, workflows, and actions..."
-                  className="h-10 w-full bg-transparent text-sm text-[#f5f7fa] outline-none placeholder:text-[#7e8794]"
+                  className="h-10 w-full bg-transparent text-sm text-[color:var(--text)] outline-none placeholder:text-[color:var(--text-muted)]"
                 />
               </div>
               <Command.List className="max-h-[60vh] overflow-y-auto p-3">
-                <Command.Empty className="px-3 py-8 text-center text-sm text-[#7e8794]">
+                <Command.Empty className="px-3 py-8 text-center text-sm text-[color:var(--text-muted)]">
                   No matching action.
                 </Command.Empty>
                 {Object.entries(grouped).map(([group, entries]) => (
                   <Command.Group
                     key={group}
                     heading={group}
-                    className="mb-4 overflow-hidden text-[11px] uppercase tracking-[0.18em] text-[#7e8794]"
+                    className="mb-4 overflow-hidden text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]"
                   >
                     <div className="mt-2 space-y-1">
                       {entries.map((item) => (
@@ -93,12 +93,12 @@ export function CommandPalette({ items, title = "Search actions", className }) {
                           className="flex cursor-pointer items-center justify-between rounded-2xl border border-transparent px-3 py-3 text-left transition data-[selected=true]:border-primary/25 data-[selected=true]:bg-primary/10"
                         >
                           <div>
-                            <p className="text-sm font-semibold text-[#f5f7fa]">{item.label}</p>
+                            <p className="text-sm font-semibold text-[color:var(--text)]">{item.label}</p>
                             {item.description ? (
-                              <p className="mt-1 text-xs text-[#7e8794]">{item.description}</p>
+                              <p className="mt-1 text-xs text-[color:var(--text-muted)]">{item.description}</p>
                             ) : null}
                           </div>
-                          <CornerDownLeft className="h-4 w-4 text-[#7e8794]" />
+                          <CornerDownLeft className="h-4 w-4 text-[color:var(--text-muted)]" />
                         </Command.Item>
                       ))}
                     </div>

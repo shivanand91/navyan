@@ -434,20 +434,20 @@ export default function StudentInternships() {
           aside={
             activeInternship && currentDuration ? (
               <div className="space-y-4">
-                <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
+                <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
                   <div className="flex items-center gap-2 text-primary">
                     <Sparkles className="h-4 w-4" />
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">
                       Application workflow
                     </p>
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-[#b7c0cc]">
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--text-secondary)]">
                     Select a duration first. Paid tracks require UPI payment and manual payment
                     verification before the application can move forward.
                   </p>
 
                   {applicationsLocked ? (
-                    <div className="mt-4 rounded-[20px] border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs leading-6 text-amber-100">
+                    <div className="mt-4 rounded-[20px] border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs leading-6 text-amber-800 dark:text-amber-100">
                       New applications are locked while your current internship workflow is active.
                     </div>
                   ) : null}
@@ -466,21 +466,21 @@ export default function StudentInternships() {
                         className={`w-full rounded-[22px] border px-4 py-3 text-left transition ${
                           currentDuration.key === duration.key
                             ? "border-primary/25 bg-primary/10"
-                            : "border-white/8 bg-[#0f1318] hover:border-primary/15 hover:bg-white/5"
+                            : "border-[color:var(--border)] bg-[color:var(--card-elevated)] hover:border-primary/20"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-[#f5f7fa]">
+                            <p className="text-sm font-semibold text-[color:var(--text)]">
                               {getDurationLabel(duration)}
                             </p>
-                            <p className="mt-1 text-xs text-[#b7c0cc]">
+                            <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
                               {duration.isPaid || duration.price > 0
                                 ? `Paid cohort${duration.price ? ` • Rs ${duration.price}` : ""}`
                                 : "Free track"}
                             </p>
                           </div>
-                          <span className="rounded-full border border-white/8 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#dce2e9]">
+                          <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-secondary)]">
                             {currentDuration.key === duration.key ? "Selected" : "Choose"}
                           </span>
                         </div>
@@ -489,8 +489,8 @@ export default function StudentInternships() {
                   </div>
                 </div>
 
-                <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+                <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
                     Why this role
                   </p>
                   <Textarea
@@ -502,8 +502,8 @@ export default function StudentInternships() {
                   />
                 </div>
 
-                <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+                <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
                     Referral code
                   </p>
                   <Input
@@ -518,7 +518,7 @@ export default function StudentInternships() {
                       )
                     }
                   />
-                  <p className="mt-3 text-xs leading-6 text-[#b7c0cc]">
+                  <p className="mt-3 text-xs leading-6 text-[color:var(--text-secondary)]">
                     If someone shared a Navyan referral code with you, enter it here before applying.
                   </p>
                 </div>
@@ -526,14 +526,14 @@ export default function StudentInternships() {
                 {currentDuration.isPaid || currentDuration.price > 0 ? (
                   <div className="rounded-[28px] border border-primary/18 bg-primary/10 p-5">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/18 bg-[#0f1318] text-primary">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/18 bg-[color:var(--card)] text-primary">
                         <CreditCard className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#f5f7fa]">
+                        <p className="text-sm font-semibold text-[color:var(--text)]">
                           Paid application for {getDurationLabel(currentDuration)}
                         </p>
-                        <p className="mt-1 text-xs leading-6 text-[#b7c0cc]">
+                        <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
                           UPI payment is required. Only a 12-digit UPI reference number is
                           accepted, and every paid application moves into admin verification before
                           review.
@@ -543,11 +543,11 @@ export default function StudentInternships() {
 
                     {!currentPaymentSession ? (
                       <div className="mt-5 space-y-3">
-                        <div className="rounded-[22px] border border-white/8 bg-[#0f1318] p-4">
-                          <p className="text-sm font-semibold text-[#f5f7fa]">
+                        <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                          <p className="text-sm font-semibold text-[color:var(--text)]">
                             Amount to pay: {getPriceLabel(currentDuration)}
                           </p>
-                          <p className="mt-1 text-xs text-[#b7c0cc]">
+                          <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
                             Generate a fresh QR code, complete payment from your UPI app, then
                             enter the UTR number here.
                           </p>
@@ -564,7 +564,7 @@ export default function StudentInternships() {
                       </div>
                     ) : (
                       <div className="mt-5 space-y-4">
-                        <div className="rounded-[24px] border border-white/8 bg-[#0f1318] p-4">
+                        <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
                           <div className="flex flex-col items-center gap-4">
                             <img
                               src={currentPaymentSession.qrCodeDataUrl}
@@ -572,21 +572,21 @@ export default function StudentInternships() {
                               className="h-52 w-52 rounded-[24px] border border-slate-200 bg-white p-3"
                             />
                             <div className="space-y-1 text-center">
-                              <p className="text-sm font-semibold text-[#f5f7fa]">
+                              <p className="text-sm font-semibold text-[color:var(--text)]">
                                 Pay Rs {currentPaymentSession.amount}
                               </p>
-                              <p className="text-[11px] text-[#b7c0cc]">
+                              <p className="text-[11px] text-[color:var(--text-secondary)]">
                                 Payment reference: {currentPaymentSession.paymentReference}
                               </p>
-                              <p className="text-[11px] text-[#b7c0cc]">
+                              <p className="text-[11px] text-[color:var(--text-secondary)]">
                                 UTR accepted after {currentPaymentSession.minimumConfirmationSeconds}s from QR generation.
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="rounded-[22px] border border-white/8 bg-[#0f1318] p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8794]">
+                        <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             UPI reference number
                           </p>
                           <Input
@@ -613,7 +613,7 @@ export default function StudentInternships() {
                                 ? "UTR format valid"
                                 : "12 digits required"}
                             </span>
-                            <span className="rounded-full border border-white/8 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#b7c0cc]">
+                            <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-secondary)]">
                               {remainingWaitSeconds > 0
                                 ? `Wait ${remainingWaitSeconds}s`
                                 : "Ready to submit"}
@@ -653,14 +653,14 @@ export default function StudentInternships() {
                 ) : (
                   <div className="rounded-[28px] border border-success/18 bg-success/12 p-5">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-success/18 bg-[#0f1318] text-success">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-success/18 bg-[color:var(--card)] text-success">
                         <ShieldCheck className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#f5f7fa]">
+                        <p className="text-sm font-semibold text-[color:var(--text)]">
                           Free application for {getDurationLabel(currentDuration)}
                         </p>
-                        <p className="mt-1 text-xs leading-6 text-[#b7c0cc]">
+                        <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
                           No payment is required for this track. Your profile data will be used
                           automatically when the application is submitted.
                         </p>

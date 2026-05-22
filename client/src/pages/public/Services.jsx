@@ -111,7 +111,7 @@ export default function Services() {
             </p>
             <div className="mt-6 space-y-4">
               {deliveryModel.map((item) => (
-                <div key={item} className="flex items-start gap-3 rounded-[20px] border border-white/8 bg-white/5 px-4 py-4">
+                <div key={item} className="flex items-start gap-3 rounded-[20px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-4">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 text-success" />
                   <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">{item}</p>
                 </div>
@@ -189,7 +189,7 @@ export default function Services() {
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl space-y-3">
                 <div className="navyan-pill">Start the conversation</div>
-                <h2 className="font-display text-4xl font-semibold tracking-[-0.05em] text-[#f5f7fa]">
+                <h2 className="font-display text-4xl font-semibold tracking-[-0.05em] text-white">
                   Need a product partner who can move fast without lowering the standard?
                 </h2>
                 <p className="text-base leading-8 text-[#b7c0cc]">

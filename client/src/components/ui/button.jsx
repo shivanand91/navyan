@@ -19,7 +19,7 @@ const buttonVariants = cva(
         danger:
           "border border-danger/18 bg-danger/12 text-danger hover:-translate-y-0.5 hover:bg-danger/18",
         icon:
-          "h-10 w-10 rounded-2xl border border-white/10 bg-[#171b21] text-[#f5f7fa] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] hover:-translate-y-0.5 hover:border-primary/35 hover:text-primary"
+          "h-10 w-10 rounded-2xl border border-black/10 bg-white/80 text-slate-800 hover:-translate-y-0.5 hover:border-primary/35 hover:text-primary dark:border-white/10 dark:bg-[#171b21] dark:text-[#f5f7fa]"
       },
       size: {
         sm: "h-9 px-4",

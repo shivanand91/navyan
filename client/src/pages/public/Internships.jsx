@@ -117,7 +117,7 @@ export default function Internships() {
                 <RevealInView key={internship._id} delay={index * 0.03}>
                   <div className="navyan-card overflow-hidden p-0">
                     <div className="grid gap-0 lg:grid-cols-[280px_minmax(0,1fr)]">
-                      <div className="relative min-h-[220px] border-b border-white/8 bg-[#0f1318] lg:min-h-full lg:border-b-0 lg:border-r">
+                      <div className="relative min-h-[220px] border-b border-[color:var(--border)] bg-[color:var(--card)] lg:min-h-full lg:border-b-0 lg:border-r">
                         {internship.coverImageUrl ? (
                           <img
                             src={internship.coverImageUrl}
@@ -125,11 +125,11 @@ export default function Internships() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,168,95,0.16),transparent_56%),linear-gradient(180deg,#111418_0%,#171b21_100%)] px-6 text-center text-sm text-[#b7c0cc]">
+                          <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
                             Navyan internship Live
                           </div>
                         )}
-                        <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-primary/18 bg-[#0f1318]/82 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
+                        <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-[color:var(--card)]/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                           <Sparkles className="h-3.5 w-3.5" />
                           Open now
                         </div>
@@ -140,14 +140,14 @@ export default function Internships() {
                           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                             <div className="space-y-2">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-[#b7c0cc]">
+                                <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                                   {internship.role || "Internship track"}
                                 </span>
-                                <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-[#b7c0cc]">
+                                <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                                   {internship.mode?.toUpperCase() || "REMOTE"}
                                 </span>
                                 {internship.openings ? (
-                                  <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-[#b7c0cc]">
+                                  <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                                     {internship.openings} openings
                                   </span>
                                 ) : null}
@@ -182,7 +182,7 @@ export default function Internships() {
                             {(internship.skillsRequired || []).slice(0, 6).map((skill) => (
                               <span
                                 key={skill}
-                                className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
+                                className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
                               >
                                 {skill}
                               </span>
@@ -193,12 +193,12 @@ export default function Internships() {
                             {(internship.durations || []).map((duration) => (
                               <div
                                 key={duration.key}
-                                className="rounded-[22px] border border-black/8 bg-black/[0.025] px-4 py-3 dark:border-white/8 dark:bg-[#101419]/94"
+                                className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3"
                               >
-                                <p className="text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
+                                <p className="text-xs font-semibold text-[color:var(--text)]">
                                   {getDurationLabel(duration)}
                                 </p>
-                                <p className="mt-1 text-[11px] text-slate-500 dark:text-[#7e8794]">
+                                <p className="mt-1 text-[11px] text-[color:var(--text-muted)]">
                                   {duration.isPaid || duration.price > 0
                                     ? `Paid${duration.price ? ` • Rs ${duration.price}` : ""}`
                                     : "Free"}
@@ -208,8 +208,8 @@ export default function Internships() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-3 border-t border-black/8 pt-4 dark:border-white/8 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-xs text-slate-500 dark:text-[#7e8794]">
+                        <div className="flex flex-col gap-3 border-t border-[color:var(--border)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-xs text-[color:var(--text-muted)]">
                             Open a preview to inspect the role, durations, benefits, and workflow before applying.
                           </p>
                           <div className="flex flex-wrap gap-2">
@@ -244,11 +244,11 @@ export default function Internships() {
           internship={activeInternship}
           aside={
             activeInternship ? (
-              <div className="rounded-[28px] border border-white/8 bg-white/5 p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8794]">
+              <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
                   Next step
                 </p>
-                <p className="mt-4 text-sm leading-7 text-[#b7c0cc]">
+                <p className="mt-4 text-sm leading-7 text-[color:var(--text-secondary)]">
                   Open the student workspace to apply with your profile, choose a duration, and
                   complete payment only when the selected track requires it.
                 </p>

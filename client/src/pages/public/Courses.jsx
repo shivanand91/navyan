@@ -58,7 +58,7 @@ export default function Courses() {
               {courses.map((course, index) => (
                 <RevealInView key={course._id} delay={index * 0.04}>
                   <Card className="h-full overflow-hidden p-0">
-                    <div className="aspect-video overflow-hidden border-b border-black/8 bg-slate-950 dark:border-white/8">
+                    <div className="aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card-elevated)]">
                       <iframe
                         src={course.embedUrl}
                         title={course.title}
@@ -76,7 +76,7 @@ export default function Courses() {
                           </span>
                         ) : null}
                         {course.level ? (
-                          <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-semibold text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
+                          <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
                             {course.level}
                           </span>
                         ) : null}

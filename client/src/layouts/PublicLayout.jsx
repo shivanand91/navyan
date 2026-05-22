@@ -154,9 +154,9 @@ export function PublicLayout() {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-3 rounded-2xl border border-black/8 bg-black/[0.025] px-3 py-3 text-sm text-[color:var(--text-secondary)] transition hover:border-primary/20 hover:bg-primary/10 hover:text-[color:var(--text)] dark:border-white/8 dark:bg-white/5"
+                  className="group flex items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-3 text-sm text-[color:var(--text-secondary)] transition hover:border-primary/20 hover:bg-primary/10 hover:text-[color:var(--text)]"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-black/8 bg-white/70 text-[color:var(--text)] transition group-hover:border-primary/20 group-hover:text-primary dark:border-white/8 dark:bg-[#0f1318]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--card-elevated)] text-[color:var(--text)] transition group-hover:border-primary/20 group-hover:text-primary">
                     <link.icon className="h-4 w-4" />
                   </span>
                   <span>{link.label}</span>

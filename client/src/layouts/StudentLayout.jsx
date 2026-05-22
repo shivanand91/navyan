@@ -50,12 +50,12 @@ export function StudentLayout() {
   return (
     <div className="navyan-shell min-h-screen">
       <div className="mx-auto flex max-w-[1500px] gap-5 px-3 py-3 md:px-5 md:py-5">
-        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[292px] shrink-0 flex-col overflow-hidden bg-[#0f1318]/92 text-[#f5f7fa] lg:flex">
-          <div className="border-b border-white/8 px-5 py-5">
+        <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[292px] shrink-0 flex-col overflow-hidden bg-[color:var(--sidebar)] text-[color:var(--text)] lg:flex">
+          <div className="border-b border-[color:var(--border)] px-5 py-5">
             <Link to={dashboardHomePath}>
               <BrandLogo imageClassName="h-12 md:h-14" />
             </Link>
-            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[#7e8794]">Student Workspace</p>
+            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">Student Workspace</p>
           </div>
           <nav className="flex-1 space-y-2 px-4 py-5">
             {links.map((link) => (
@@ -64,7 +64,7 @@ export function StudentLayout() {
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[#b7c0cc] transition hover:border-white/8 hover:bg-white/5 hover:text-[#f5f7fa]",
+                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/10 hover:text-[color:var(--text)]",
                     isActive && "border-primary/20 bg-primary/10 text-primary"
                   )
                 }
@@ -72,21 +72,21 @@ export function StudentLayout() {
                 <link.icon className="h-4 w-4" />
                 <div>
                   <p>{link.label}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#7e8794]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     {link.caption}
                   </p>
                 </div>
               </NavLink>
             ))}
           </nav>
-          <div className="mt-auto border-t border-white/8 p-4">
-            <div className="rounded-[22px] border border-white/8 bg-white/5 p-4">
+          <div className="mt-auto border-t border-[color:var(--border)] p-4">
+            <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="font-display text-base font-semibold text-[#f5f7fa]">
+                  <p className="font-display text-base font-semibold text-[color:var(--text)]">
                     {user?.fullName}
                   </p>
-                  <p className="text-xs text-[#7e8794]">{user?.email}</p>
+                  <p className="text-xs text-[color:var(--text-muted)]">{user?.email}</p>
                 </div>
                 <ThemeToggle variant="ghost" />
               </div>
@@ -98,7 +98,7 @@ export function StudentLayout() {
         </aside>
 
         <div className="min-w-0 flex-1 space-y-4">
-          <div className="navyan-panel sticky top-3 z-40 bg-[#0f1318]/86 px-4 py-3 text-[#f5f7fa] md:px-5">
+          <div className="navyan-panel sticky top-3 z-40 bg-[color:var(--sidebar)] px-4 py-3 text-[color:var(--text)] md:px-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="lg:hidden">
@@ -118,10 +118,10 @@ export function StudentLayout() {
                   />
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-[#f5f7fa] md:text-xl">
+                  <p className="font-display text-lg font-semibold text-[color:var(--text)] md:text-xl">
                     Student portal
                   </p>
-                  <p className="text-xs text-[#7e8794]">
+                  <p className="text-xs text-[color:var(--text-muted)]">
                     Track your internship lifecycle, documents, and achievements.
                   </p>
                 </div>

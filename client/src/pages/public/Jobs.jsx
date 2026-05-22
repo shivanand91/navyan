@@ -203,7 +203,7 @@ export default function Jobs() {
                               {job.companyName}
                             </CardDescription>
                           </div>
-                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/8 bg-white/5 text-primary">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-primary/10 text-primary">
                             {job.isInternal ? (
                               <ShieldCheck className="h-4 w-4" />
                             ) : (
@@ -218,7 +218,7 @@ export default function Jobs() {
                             .map((tag) => (
                               <span
                                 key={`${job._id}-${tag}`}
-                                className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-700 dark:text-[#c7cfdb]"
+                                className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
                               >
                                 {tag}
                               </span>
@@ -312,7 +312,7 @@ function FilterSelect({ value, onChange, options }) {
 
 function TagPill({ icon: Icon, label }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-[#d9e0ea]">
+    <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
       <Icon className="h-3.5 w-3.5 text-primary" />
       {label}
     </span>

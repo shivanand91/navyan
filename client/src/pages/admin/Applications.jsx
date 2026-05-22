@@ -578,8 +578,8 @@ function ApplicationDetailModal({
         </div>
 
         <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold text-[#f5f7fa]">Student profile</p>
+          <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+            <p className="text-sm font-semibold text-[color:var(--text)]">Student profile</p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <ModalTile label="Email" value={application.user?.email} />
               <ModalTile label="Phone" value={profile.phone} />
@@ -604,8 +604,8 @@ function ApplicationDetailModal({
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm font-semibold text-[#f5f7fa]">Quick actions</p>
+            <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+              <p className="text-sm font-semibold text-[color:var(--text)]">Quick actions</p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
                 <ModalAction href={application.user?.email ? `mailto:${application.user.email}` : ""}>
                   Email
@@ -622,9 +622,9 @@ function ApplicationDetailModal({
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm font-semibold text-[#f5f7fa]">Payment</p>
-              <div className="mt-3 space-y-2 text-sm text-[#b7c0cc]">
+            <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+              <p className="text-sm font-semibold text-[color:var(--text)]">Payment</p>
+              <div className="mt-3 space-y-2 text-sm text-[color:var(--text-secondary)]">
                 <p>Status: {application.payment?.status || "Not Required"}</p>
                 {application.payment?.amount ? <p>Amount: Rs {application.payment.amount}</p> : null}
                 {application.payment?.utrNumber ? <p>UTR: {application.payment.utrNumber}</p> : null}
@@ -653,8 +653,8 @@ function ApplicationDetailModal({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-          <p className="text-sm font-semibold text-[#f5f7fa]">Application details</p>
+        <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+          <p className="text-sm font-semibold text-[color:var(--text)]">Application details</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <ModalTile label="Applied on" value={formatDate(application.createdAt)} />
             <ModalTile label="Status" value={application.status} />
@@ -664,7 +664,7 @@ function ApplicationDetailModal({
           </div>
 
           <div className="mt-4 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8c95a3]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
               Internal notes
             </p>
             <Textarea
@@ -676,8 +676,8 @@ function ApplicationDetailModal({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-          <p className="text-sm font-semibold text-[#f5f7fa]">Workflow actions</p>
+        <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+          <p className="text-sm font-semibold text-[color:var(--text)]">Workflow actions</p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <Button
               size="sm"
@@ -728,11 +728,11 @@ function ApplicationDetailModal({
 
 function ModalTile({ label, value, wide = false }) {
   return (
-    <div className={`rounded-2xl border border-white/10 bg-[#111418] px-3 py-3 ${wide ? "md:col-span-2" : ""}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8c95a3]">
+    <div className={`rounded-2xl border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3 ${wide ? "md:col-span-2" : ""}`}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
         {label}
       </p>
-      <p className="mt-1 break-words text-sm text-[#f5f7fa]">{value || "Not added"}</p>
+      <p className="mt-1 break-words text-sm text-[color:var(--text)]">{value || "Not added"}</p>
     </div>
   );
 }

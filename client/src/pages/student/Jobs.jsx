@@ -146,15 +146,15 @@ export default function StudentJobs() {
               <CardTitle className="text-sm">Snapshot</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 text-xs">
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <p className="text-slate-500 dark:text-[#7e8794]">Live jobs</p>
-                <p className="mt-2 font-display text-2xl font-semibold text-slate-900 dark:text-[#f5f7fa]">
+              <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3">
+                <p className="text-[color:var(--text-muted)]">Live jobs</p>
+                <p className="mt-2 font-display text-2xl font-semibold text-[color:var(--text)]">
                   {jobs.length}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <p className="text-slate-500 dark:text-[#7e8794]">Applied jobs</p>
-                <p className="mt-2 font-display text-2xl font-semibold text-slate-900 dark:text-[#f5f7fa]">
+              <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3">
+                <p className="text-[color:var(--text-muted)]">Applied jobs</p>
+                <p className="mt-2 font-display text-2xl font-semibold text-[color:var(--text)]">
                   {applications.length}
                 </p>
               </div>
@@ -233,7 +233,7 @@ export default function StudentJobs() {
                                 {job.companyName}
                               </p>
                             </div>
-                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/8 bg-white/5 text-primary">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-primary/10 text-primary">
                               {job.isInternal ? (
                                 <ShieldCheck className="h-4 w-4" />
                               ) : (
@@ -248,7 +248,7 @@ export default function StudentJobs() {
                               .map((tag) => (
                                 <span
                                   key={`${job._id}-${tag}`}
-                                  className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-700 dark:text-[#c7cfdb]"
+                                  className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
                                 >
                                   {tag}
                                 </span>

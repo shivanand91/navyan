@@ -131,7 +131,7 @@ export default function AdminReferrals() {
                       <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
                         {code.code}
                       </span>
-                      <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-[#d7deea]">
+                      <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
                         {code.isActive ? "Active" : "Deleted"}
                       </span>
                     </div>

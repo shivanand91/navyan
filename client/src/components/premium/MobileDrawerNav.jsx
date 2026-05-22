@@ -26,13 +26,13 @@ export function MobileDrawerNav({
         </Button>
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-[80] bg-[#06080b]/70 backdrop-blur-sm" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto max-w-2xl rounded-t-[28px] border border-white/10 bg-[#0f1318]/98 p-4 text-[#f5f7fa] shadow-[0_-20px_60px_rgba(0,0,0,0.45)]">
-          <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-white/10" />
+        <Drawer.Overlay className="fixed inset-0 z-[80] bg-slate-950/45 backdrop-blur-sm dark:bg-[#06080b]/70" />
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto max-w-2xl rounded-t-[28px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 text-[color:var(--text)] shadow-[0_-20px_60px_rgba(15,23,42,0.2)] dark:shadow-[0_-20px_60px_rgba(0,0,0,0.45)]">
+          <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[color:var(--border)]" />
           <div className="mb-4">
             <Drawer.Title className="font-display text-xl font-semibold">{title}</Drawer.Title>
             {subtitle ? (
-              <Drawer.Description className="mt-1 text-sm text-[#7e8794]">
+              <Drawer.Description className="mt-1 text-sm text-[color:var(--text-muted)]">
                 {subtitle}
               </Drawer.Description>
             ) : null}
@@ -43,13 +43,13 @@ export function MobileDrawerNav({
                 <Link
                   to={link.to}
                   className={cn(
-                    "flex items-center justify-between rounded-2xl border border-white/8 px-4 py-3 text-sm font-medium text-[#b7c0cc] transition hover:border-primary/25 hover:bg-primary/10 hover:text-[#f5f7fa]",
+                    "flex items-center justify-between rounded-2xl border border-[color:var(--border)] px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-primary/25 hover:bg-primary/10 hover:text-[color:var(--text)]",
                     pathname === link.to && "border-primary/28 bg-primary/10 text-primary"
                   )}
                 >
                   <span>{link.label}</span>
                   {link.caption ? (
-                    <span className="text-[11px] uppercase tracking-[0.16em] text-[#7e8794]">
+                    <span className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                       {link.caption}
                     </span>
                   ) : null}

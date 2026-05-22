@@ -22,21 +22,21 @@ export function MetricCard({
         <div className="flex items-center justify-between gap-3">
           <div
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-2xl border border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+              "flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--border)]",
               toneMap[tone] || toneMap.gold
             )}
           >
             {Icon ? <Icon className="h-4 w-4" /> : null}
           </div>
           {hint ? (
-            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
               {hint}
             </span>
           ) : null}
         </div>
       </CardHeader>
       <CardContent className="space-y-1">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
           {label}
         </p>
         <CardTitle className="text-3xl md:text-[2rem]">{value}</CardTitle>
