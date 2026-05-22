@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, FileCheck2, TrendingUp, Users, Zap } from "lucide-react";
+import { BarChart3, FileCheck2, TrendingUp, Users } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -123,13 +123,6 @@ export default function AdminDashboard() {
               <h1 className="text-2xl sm:text-3xl font-bold text-white">Admin Dashboard</h1>
               <p className="text-slate-400 text-sm mt-1">Manage internships, applications, and submissions</p>
             </div>
-            <Link to="/admin/applications">
-              <Button size="lg" className="gap-2">
-                <Zap className="h-4 w-4" />
-                Go to Applications
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

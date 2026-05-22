@@ -126,7 +126,7 @@ export default function Internships() {
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,168,95,0.16),transparent_56%),linear-gradient(180deg,#111418_0%,#171b21_100%)] px-6 text-center text-sm text-[#b7c0cc]">
-                            Navyan internship cohort
+                            Navyan internship Live
                           </div>
                         )}
                         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-primary/18 bg-[#0f1318]/82 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
@@ -218,7 +218,7 @@ export default function Internships() {
                             </Button>
                             <Link to={`/internships/${internship.slug}`}>
                               <Button>
-                                Full page
+                                Apply now
                                 <ArrowRight className="ml-2 h-4 w-4" />
                               </Button>
                             </Link>

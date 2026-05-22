@@ -1,31 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "@/lib/axios";
-import { getApiErrorMessage } from "@/lib/axios";
+import api, { getApiErrorMessage } from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ModalShell } from "@/components/premium/ModalShell";
 import { toast } from "sonner";
 
-const statusOrder = [
-  "Applied",
-  "Under Review",
-  "Shortlisted",
-  "Selected",
-  "In Progress",
-  "Submission Pending",
-  "Submitted",
-  "Revision Requested",
-  "Completed",
-  "Rejected"
-];
-
 const WORKFLOW_TABS = [
-  { key: "new", label: "New", description: "Fresh applications awaiting the first pass." },
-  { key: "review", label: "Review", description: "Needs admin review or revision follow-up." },
-  { key: "inprogress", label: "In Progress", description: "Selected candidates in active execution." },
-  { key: "completed", label: "Completed", description: "Closed workflows and finished internships." }
+  { key: "new", label: "New", description: "Fresh applications awaiting first review." },
+  { key: "review", label: "Review", description: "Submissions, revisions, or payment review." },
+  { key: "inprogress", label: "In Progress", description: "Selected candidates currently working." },
+  { key: "completed", label: "Completed", description: "Completed or rejected workflows." }
 ];
 
 const TASK_BRIEF_VISIBLE_STATUSES = new Set([
@@ -65,16 +53,6 @@ const getWorkflowBucket = (application) => {
   return "new";
 };
 
-const summarizeStatuses = (applications) =>
-  applications.reduce((counts, application) => {
-    counts[application.status] = (counts[application.status] || 0) + 1;
-    return counts;
-  }, {});
-
-const metaTextClass = "text-[11px] text-slate-500 dark:text-slate-400";
-const detailCardClass =
-  "rounded-2xl border border-slate-200 bg-white/80 px-3 py-3 dark:border-white/8 dark:bg-white/5";
-
 const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : "Not added");
 
 const formatList = (value) => {
@@ -94,9 +72,23 @@ const formatBoolean = (value) => {
   return value ? "Yes" : "No";
 };
 
+const getRoleLabel = (application) =>
+  application?.domainLabel ||
+  application?.internship?.role ||
+  application?.internship?.title ||
+  "General Internship";
+
+const getRoleKey = (application) => getRoleLabel(application).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
 const getDurationLabel = (application) =>
-  application.internship?.durations?.find((item) => item.key === application.durationKey)?.label ||
-  application.durationKey;
+  application?.internship?.durations?.find((item) => item.key === application.durationKey)?.label ||
+  application?.durationKey ||
+  "Not added";
+
+const getApplicantName = (application) =>
+  application?.user?.profile?.fullName || application?.user?.fullName || "Candidate";
+
+const getApplicantProfile = (application) => application?.user?.profile || {};
 
 const normalizePhoneLink = (value) => {
   const digits = String(value || "").replace(/[^\d+]/g, "");
@@ -108,47 +100,8 @@ const normalizeWhatsappLink = (value) => {
   return digits ? `https://wa.me/${digits}` : "";
 };
 
-const getApplicantName = (application) =>
-  application?.user?.profile?.fullName || application?.user?.fullName || "Candidate";
-
-const getApplicantProfile = (application) => application?.user?.profile || {};
-
-const buildContactActions = (application) => {
-  const profile = getApplicantProfile(application);
-  const email = application?.user?.email || "";
-  const phone = profile.phone || "";
-  const whatsapp = profile.whatsapp || "";
-
-  return [
-    { href: email ? `mailto:${email}` : "", label: "Email" },
-    { href: phone ? `tel:${normalizePhoneLink(phone)}` : "", label: "Call" },
-    { href: normalizeWhatsappLink(whatsapp), label: "WhatsApp" },
-    { href: profile.resumeUrl, label: "Resume" },
-    { href: profile.githubUrl, label: "GitHub" },
-    { href: profile.linkedinUrl, label: "LinkedIn" },
-    { href: profile.portfolioUrl, label: "Portfolio" },
-    {
-      href:
-        TASK_BRIEF_VISIBLE_STATUSES.has(application?.status) && application?.internshipMeta?.taskPdfUrl
-          ? application.internshipMeta.taskPdfUrl
-          : "",
-      label: "Task brief"
-    }
-  ].filter((item) => item.href);
-};
-
-const getDaysLabel = (value) => {
-  if (value === 1) {
-    return "1 day";
-  }
-
-  return `${value} days`;
-};
-
-const getEndDateMeta = (value) => {
-  if (!value) {
-    return { isUrgent: false, hint: "End date not added" };
-  }
+const getEndDateHint = (value) => {
+  if (!value) return "End date not added";
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -158,203 +111,49 @@ const getEndDateMeta = (value) => {
 
   const diffDays = Math.round((endDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
 
-  if (diffDays < 0) {
-    return {
-      isUrgent: true,
-      hint: `Ended ${getDaysLabel(Math.abs(diffDays))} ago`
-    };
-  }
-
-  if (diffDays === 0) {
-    return {
-      isUrgent: true,
-      hint: "Ends today"
-    };
-  }
-
-  if (diffDays <= 5) {
-    return {
-      isUrgent: true,
-      hint: `${getDaysLabel(diffDays)} left`
-    };
-  }
-
-  return {
-    isUrgent: false,
-    hint: `${getDaysLabel(diffDays)} left`
-  };
+  if (diffDays < 0) return `Ended ${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? "" : "s"} ago`;
+  if (diffDays === 0) return "Ends today";
+  return `${diffDays} day${diffDays === 1 ? "" : "s"} left`;
 };
 
-function DetailTile({ label, value }) {
-  return (
-    <div className={detailCardClass}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
-        {label}
-      </p>
-      <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{value || "Not added"}</p>
-    </div>
-  );
-}
-
-function TimelineTile({ label, value, hint, isUrgent = false }) {
-  return (
-    <div
-      className={`${detailCardClass} ${
-        isUrgent
-          ? "border-rose-200 bg-rose-50/80 dark:border-rose-500/20 dark:bg-rose-500/10"
-          : ""
-      }`}
-    >
-      <p
-        className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${
-          isUrgent ? "text-rose-500 dark:text-rose-200/80" : "text-slate-400 dark:text-slate-500"
-        }`}
-      >
-        {label}
-      </p>
-      <p
-        className={`mt-1 text-sm font-medium ${
-          isUrgent ? "text-rose-700 dark:text-rose-100" : "text-slate-700 dark:text-slate-200"
-        }`}
-      >
-        {value || "Not added"}
-      </p>
-      {hint ? (
-        <p
-          className={`mt-1 text-[11px] ${
-            isUrgent ? "text-rose-600 dark:text-rose-200" : "text-slate-500 dark:text-slate-400"
-          }`}
-        >
-          {hint}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function ActionLink({ href, children }) {
-  if (!href) {
-    return null;
-  }
-
-  const opensInNewTab = /^https?:\/\//i.test(href);
-
-  return (
-    <a
-      href={href}
-      target={opensInNewTab ? "_blank" : undefined}
-      rel={opensInNewTab ? "noreferrer" : undefined}
-      className="text-primary"
-    >
-      {children}
-    </a>
-  );
-}
+const getExternalLinkProps = (href) =>
+  /^https?:\/\//i.test(href || "") ? { target: "_blank", rel: "noreferrer" } : {};
 
 export default function AdminApplications() {
   const [applications, setApplications] = useState([]);
-  const [groups, setGroups] = useState([]);
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const [reminderId, setReminderId] = useState(null);
   const [notesById, setNotesById] = useState({});
   const [activeWorkflowKey, setActiveWorkflowKey] = useState("new");
-  const [selectedApplicationId, setSelectedApplicationId] = useState(null);
+  const [activeRoleKey, setActiveRoleKey] = useState("all");
+  const [detailApplicationId, setDetailApplicationId] = useState(null);
 
   const load = async () => {
     try {
       const { data } = await api.get("/applications/admin", {
         params: search ? { search } : {}
       });
-      setApplications(data.applications || []);
-      setGroups(data.groups || []);
+      const nextApplications = data.applications || [];
+
+      setApplications(nextApplications);
       setNotesById(
         Object.fromEntries(
-          (data.applications || []).map((app) => [app._id, app.internalNotes || ""])
+          nextApplications.map((application) => [
+            application._id,
+            application.internalNotes || ""
+          ])
         )
       );
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
+      toast.error(getApiErrorMessage(error, "Could not load applications."));
     }
   };
 
   useEffect(() => {
     load();
   }, []);
-
-  const handlePaymentDecision = async (id, paymentDecision) => {
-    setUpdatingId(`${id}:payment:${paymentDecision}`);
-    try {
-      await api.post(`/applications/admin/${id}/action`, {
-        paymentDecision,
-        internalNotes: notesById[id]
-      });
-      toast.success(
-        paymentDecision === "Verified" ? "Payment marked as verified." : "Payment rejected."
-      );
-      load();
-    } catch (error) {
-      console.error(error);
-      toast.error(getApiErrorMessage(error, "Could not review payment."));
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const handleStatusChange = async (id, status) => {
-    setUpdatingId(`${id}:status:${status}`);
-    try {
-      const { data } = await api.post(`/applications/admin/${id}/action`, {
-        status,
-        internalNotes: notesById[id]
-      });
-      if (Array.isArray(data?.warnings) && data.warnings.length > 0) {
-        toast.success(`Status updated to ${status}`);
-        toast.warning(data.warnings[0]);
-      } else {
-        toast.success(`Status updated to ${status}`);
-      }
-      load();
-    } catch (e) {
-      console.error(e);
-      toast.error(getApiErrorMessage(e, "Could not update status."));
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const groupedApplications = useMemo(() => {
-    if (groups.length > 0) {
-      return groups;
-    }
-
-    const grouped = applications.reduce((accumulator, application) => {
-      const categoryLabel =
-        application.domainLabel ||
-        application.internship?.role ||
-        application.internship?.title ||
-        "General Internship";
-      const categoryKey = categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-      if (!accumulator[categoryKey]) {
-        accumulator[categoryKey] = {
-          categoryKey,
-          categoryLabel,
-          applicationCount: 0,
-          statusCounts: {},
-          applications: []
-        };
-      }
-
-      accumulator[categoryKey].applications.push(application);
-      accumulator[categoryKey].applicationCount += 1;
-      accumulator[categoryKey].statusCounts[application.status] =
-        (accumulator[categoryKey].statusCounts[application.status] || 0) + 1;
-
-      return accumulator;
-    }, {});
-
-    return Object.values(grouped);
-  }, [applications, groups]);
 
   const workflowTabs = useMemo(
     () =>
@@ -365,107 +164,143 @@ export default function AdminApplications() {
     [applications]
   );
 
-  const visibleGroups = useMemo(
-    () =>
-      groupedApplications
-        .map((group) => {
-          const filteredApplications = group.applications.filter(
-            (application) => getWorkflowBucket(application) === activeWorkflowKey
-          );
-
-          return {
-            ...group,
-            applications: filteredApplications,
-            applicationCount: filteredApplications.length,
-            statusCounts: summarizeStatuses(filteredApplications)
-          };
-        })
-        .filter((group) => group.applicationCount > 0),
-    [activeWorkflowKey, groupedApplications]
+  const workflowApplications = useMemo(
+    () => applications.filter((application) => getWorkflowBucket(application) === activeWorkflowKey),
+    [activeWorkflowKey, applications]
   );
 
-  const visibleApplications = useMemo(
-    () => visibleGroups.flatMap((group) => group.applications),
-    [visibleGroups]
-  );
+  const roleOptions = useMemo(() => {
+    const roles = workflowApplications.reduce((accumulator, application) => {
+      const key = getRoleKey(application);
 
-  useEffect(() => {
-    setSelectedApplicationId((current) => {
-      if (visibleApplications.length === 0) {
-        return null;
+      if (!accumulator[key]) {
+        accumulator[key] = {
+          key,
+          label: getRoleLabel(application),
+          count: 0
+        };
       }
 
-      return visibleApplications.some((application) => application._id === current)
-        ? current
-        : visibleApplications[0]._id;
-    });
-  }, [visibleApplications]);
+      accumulator[key].count += 1;
+      return accumulator;
+    }, {});
 
-  const selectedApplication = useMemo(
+    return Object.values(roles).sort((left, right) => left.label.localeCompare(right.label));
+  }, [workflowApplications]);
+
+  useEffect(() => {
+    if (activeRoleKey === "all") return;
+
+    const roleStillExists = roleOptions.some((role) => role.key === activeRoleKey);
+    if (!roleStillExists) {
+      setActiveRoleKey("all");
+    }
+  }, [activeRoleKey, roleOptions]);
+
+  const visibleApplications = useMemo(
     () =>
-      visibleApplications.find((application) => application._id === selectedApplicationId) || null,
-    [selectedApplicationId, visibleApplications]
+      activeRoleKey === "all"
+        ? workflowApplications
+        : workflowApplications.filter((application) => getRoleKey(application) === activeRoleKey),
+    [activeRoleKey, workflowApplications]
   );
 
-  const renderApplicationCard = (app) => {
-    const fullName = getApplicantName(app);
-    const paymentStatus = app.payment?.status;
-    const requiresPaymentReview = paymentStatus && paymentStatus !== "Not Required";
-    const paymentCleared = ["Verified", "Linked"].includes(paymentStatus);
+  const detailApplication = useMemo(
+    () => applications.find((application) => application._id === detailApplicationId) || null,
+    [applications, detailApplicationId]
+  );
 
-    return (
-      <div
-        key={app._id}
-        className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 transition-all hover:border-primary/30"
-      >
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1 flex-1">
-            <p className="font-medium text-slate-800 dark:text-slate-100">
-              {fullName}
-            </p>
-            <p className={metaTextClass}>
-              {app.internship?.title ?? "Internship"} • Applied on{" "}
-              {new Date(app.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <StatusBadge status={app.status} />
-            <Button
-              size="sm"
-              variant="subtle"
-              onClick={() => setSelectedApplicationId(app._id)}
-            >
-              View Details
-            </Button>
-          </div>
-        </div>
+  const handleStatusChange = async (application, status) => {
+    const id = application._id;
+    setUpdatingId(`${id}:status:${status}`);
 
-        {requiresPaymentReview && paymentStatus === "Pending" ? (
-          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
-            <p className="font-medium">Payment awaiting verification · Rs {app.payment.amount}</p>
-          </div>
-        ) : null}
-      </div>
-    );
+    try {
+      const { data } = await api.post(`/applications/admin/${id}/action`, {
+        status,
+        internalNotes: notesById[id]
+      });
+
+      toast.success(`Status updated to ${status}`);
+      if (Array.isArray(data?.warnings) && data.warnings.length > 0) {
+        toast.warning(data.warnings[0]);
+      }
+
+      await load();
+    } catch (error) {
+      console.error(error);
+      toast.error(getApiErrorMessage(error, "Could not update status."));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handlePaymentDecision = async (application, paymentDecision) => {
+    const id = application._id;
+    setUpdatingId(`${id}:payment:${paymentDecision}`);
+
+    try {
+      await api.post(`/applications/admin/${id}/action`, {
+        paymentDecision,
+        internalNotes: notesById[id]
+      });
+
+      toast.success(
+        paymentDecision === "Verified" ? "Payment marked as verified." : "Payment rejected."
+      );
+      await load();
+    } catch (error) {
+      console.error(error);
+      toast.error(getApiErrorMessage(error, "Could not review payment."));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const sendReminder = async (application) => {
+    setReminderId(application._id);
+
+    try {
+      await api.post(`/applications/admin/${application._id}/send-reminder`);
+      toast.success("Task submission reminder email sent.");
+    } catch (error) {
+      console.error(error);
+      toast.error(getApiErrorMessage(error, "Failed to send reminder email."));
+    } finally {
+      setReminderId(null);
+    }
+  };
+
+  const updateNotes = (applicationId, value) => {
+    setNotesById((current) => ({
+      ...current,
+      [applicationId]: value
+    }));
   };
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Applications by workflow
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            Admin workflow
+          </p>
+          <h1 className="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">
+            Applications
           </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            Review candidates through focused workflow buckets instead of one long mixed queue.
+          <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+            Filter by workflow, then by role. Cards stay compact; full candidate information opens in a modal.
           </p>
         </div>
+
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Input
             placeholder="Search name, email, phone, notes..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-9 w-full max-w-[14rem] text-xs md:w-52"
+            onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") load();
+            }}
+            className="h-10 w-full text-xs sm:w-72"
           />
           <Button size="sm" variant="outline" onClick={load}>
             Search
@@ -473,323 +308,460 @@ export default function AdminApplications() {
         </div>
       </div>
 
-      {groupedApplications.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Applications</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-slate-500 dark:text-slate-400">No applications yet.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div className="overflow-x-auto pb-1">
-            <div className="inline-flex min-w-full gap-2 rounded-[24px] border border-slate-200 bg-white/70 p-2 dark:border-white/8 dark:bg-white/5">
-              {workflowTabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setActiveWorkflowKey(tab.key)}
-                  className={`rounded-2xl px-4 py-2 text-left transition ${
-                    activeWorkflowKey === tab.key
-                      ? "bg-[#d4a85f] text-[#111418] shadow-[0_10px_30px_rgba(212,168,95,0.22)]"
-                      : "bg-transparent text-slate-600 hover:bg-slate-100 dark:text-[#b7c0cc] dark:hover:bg-white/6"
-                  }`}
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-75">
-                    {tab.label}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold">
-                    {tab.count} application
-                    {tab.count === 1 ? "" : "s"}
-                  </p>
-                  <p className="mt-1 max-w-[16rem] text-[11px] opacity-75">{tab.description}</p>
-                </button>
+      <div className="overflow-x-auto pb-1">
+        <div className="inline-grid min-w-full grid-cols-4 gap-2 rounded-[24px] border border-slate-200 bg-white/80 p-2 dark:border-white/8 dark:bg-white/5 max-lg:min-w-[760px]">
+          {workflowTabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => {
+                setActiveWorkflowKey(tab.key);
+                setActiveRoleKey("all");
+              }}
+              className={`rounded-2xl px-4 py-3 text-left transition ${
+                activeWorkflowKey === tab.key
+                  ? "bg-[#d4a85f] text-[#111418] shadow-[0_12px_34px_rgba(212,168,95,0.2)]"
+                  : "text-slate-600 hover:bg-slate-100 dark:text-[#b7c0cc] dark:hover:bg-white/6"
+              }`}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-75">
+                {tab.label}
+              </p>
+              <p className="mt-1 text-lg font-semibold">{tab.count}</p>
+              <p className="mt-1 text-[11px] opacity-75">{tab.description}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader className="space-y-3">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Role filter
+              </p>
+              <CardTitle className="mt-1 text-base">
+                {workflowApplications.length} application{workflowApplications.length === 1 ? "" : "s"} in{" "}
+                {WORKFLOW_TABS.find((tab) => tab.key === activeWorkflowKey)?.label}
+              </CardTitle>
+            </div>
+            {activeRoleKey !== "all" ? (
+              <Button size="sm" variant="ghost" onClick={() => setActiveRoleKey("all")}>
+                Clear role filter
+              </Button>
+            ) : null}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {roleOptions.length === 0 ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Is workflow bucket me abhi koi role/application nahi hai.
+            </p>
+          ) : (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <RoleFilterButton
+                active={activeRoleKey === "all"}
+                label="All roles"
+                count={workflowApplications.length}
+                onClick={() => setActiveRoleKey("all")}
+              />
+              {roleOptions.map((role) => (
+                <RoleFilterButton
+                  key={role.key}
+                  active={activeRoleKey === role.key}
+                  label={role.label}
+                  count={role.count}
+                  onClick={() => setActiveRoleKey(role.key)}
+                />
               ))}
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-3">
+        {visibleApplications.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+              No applications found for the selected workflow and role.
+            </CardContent>
+          </Card>
+        ) : (
+          visibleApplications.map((application) => (
+            <ApplicationRow
+              key={application._id}
+              application={application}
+              reminderBusy={reminderId === application._id}
+              onReminder={() => sendReminder(application)}
+              onDetails={() => setDetailApplicationId(application._id)}
+            />
+          ))
+        )}
+      </div>
+
+      <ApplicationDetailModal
+        application={detailApplication}
+        notes={detailApplication ? notesById[detailApplication._id] || "" : ""}
+        updatingId={updatingId}
+        reminderBusy={detailApplication ? reminderId === detailApplication._id : false}
+        onClose={() => setDetailApplicationId(null)}
+        onNotesChange={updateNotes}
+        onStatusChange={handleStatusChange}
+        onPaymentDecision={handlePaymentDecision}
+        onReminder={sendReminder}
+      />
+    </div>
+  );
+}
+
+function RoleFilterButton({ active, label, count, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`shrink-0 rounded-full border px-4 py-2 text-left text-sm transition ${
+        active
+          ? "border-[#d4a85f] bg-[#d4a85f]/15 text-slate-950 dark:text-[#f5f7fa]"
+          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-primary/40 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
+      }`}
+    >
+      <span className="font-semibold">{label}</span>
+      <span className="ml-2 text-xs opacity-70">{count}</span>
+    </button>
+  );
+}
+
+function ApplicationRow({ application, reminderBusy, onReminder, onDetails }) {
+  const profile = getApplicantProfile(application);
+  const phoneLink = normalizePhoneLink(profile.phone);
+  const offerLetterUrl = application.offerLetter?.accessToken
+    ? `/documents/offer-letter/${application.offerLetter.accessToken}`
+    : application.offerLetter?.url;
+  const canShowOfferLetter =
+    OFFER_LETTER_VISIBLE_STATUSES.has(application.status) && Boolean(offerLetterUrl);
+
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="p-4">
+        <div className="grid gap-4 xl:grid-cols-[minmax(220px,1.2fr)_minmax(0,2fr)_auto] xl:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                {getApplicantName(application)}
+              </p>
+              <StatusBadge status={application.status} />
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Applied {formatDate(application.createdAt)} | {getDurationLabel(application)}
+            </p>
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[290px_minmax(0,1fr)]">
-            <Card className="xl:sticky xl:top-5 xl:self-start">
-              <CardHeader className="space-y-2">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Applicant menu
-                  </p>
-                  <CardTitle className="mt-1 text-base">
-                    {visibleApplications.length} applicant{visibleApplications.length === 1 ? "" : "s"}
-                  </CardTitle>
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  {workflowTabs.find((tab) => tab.key === activeWorkflowKey)?.label} queue ke applicants.
-                </p>
-              </CardHeader>
-              <CardContent className="max-h-[70vh] space-y-2 overflow-y-auto pr-1">
-                {visibleApplications.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Is workflow bucket me abhi koi applicant nahi hai.
-                  </p>
-                ) : (
-                  visibleApplications.map((application) => {
-                    const isSelected = application._id === selectedApplicationId;
-                    return (
-                      <div
-                        key={`menu-${application._id}`}
-                        className={`rounded-2xl border px-3 py-3 ${
-                          isSelected
-                            ? "border-primary/25 bg-primary/10"
-                            : "border-slate-200 bg-slate-50/70 dark:border-white/8 dark:bg-white/5"
-                        }`}
-                      >
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                          {getApplicantName(application)}
-                        </p>
-                        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                          {application.internship?.title || "Internship"}
-                        </p>
-                        <div className="mt-3 flex items-center justify-between gap-2">
-                          <StatusBadge status={application.status} />
-                          <Button
-                            size="sm"
-                            variant={isSelected ? "subtle" : "outline"}
-                            onClick={() => setSelectedApplicationId(application._id)}
-                          >
-                            Details
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </CardContent>
-            </Card>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <SummaryCell label="Role" value={getRoleLabel(application)} />
+            <SummaryCell label="Start date" value={formatDate(application.internshipMeta?.startDate)} />
+            <SummaryCell
+              label="End date"
+              value={formatDate(application.internshipMeta?.endDate)}
+              hint={getEndDateHint(application.internshipMeta?.endDate)}
+            />
+          </div>
 
-            <div className="space-y-5">
-              {selectedApplication ? (
-                <Card>
-                  <CardHeader className="space-y-3">
-                    <div className="flex flex-col gap-4">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                          Student Details
-                        </p>
-                        <CardTitle className="mt-2 text-2xl">
-                          {getApplicantName(selectedApplication)}
-                        </CardTitle>
-                      </div>
+          <div className="flex flex-wrap gap-2 xl:justify-end">
+            <a
+              href={phoneLink ? `tel:${phoneLink}` : undefined}
+              aria-disabled={!phoneLink}
+              className={!phoneLink ? "pointer-events-none opacity-50" : ""}
+            >
+              <Button size="sm" variant="outline" type="button">
+                Call
+              </Button>
+            </a>
 
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
-                          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
-                            Field Applied
-                          </p>
-                          <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-                            {selectedApplication.internship?.title || "Internship"}
-                          </p>
-                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                            {selectedApplication.durationKey} • {selectedApplication.status}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
-                          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
-                            End Date
-                          </p>
-                          <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-                            {formatDate(selectedApplication.internshipMeta?.endDate)}
-                          </p>
-                          <p
-                            className={`mt-1 text-sm ${
-                              getEndDateMeta(selectedApplication.internshipMeta?.endDate).isUrgent
-                                ? "text-rose-600 dark:text-rose-400"
-                                : "text-slate-600 dark:text-slate-300"
-                            }`}
-                          >
-                            {getEndDateMeta(selectedApplication.internshipMeta?.endDate).hint}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
-                        <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">
-                          Quick Links
-                        </p>
-                        <div className="flex flex-wrap gap-2 break-words">
-                          {OFFER_LETTER_VISIBLE_STATUSES.has(selectedApplication.status) &&
-                          selectedApplication.offerLetter?.accessToken ? (
-                            <Link to={`/documents/offer-letter/${selectedApplication.offerLetter.accessToken}`}>
-                              <Button size="sm" variant="outline">
-                                📄 Offer Letter
-                              </Button>
-                            </Link>
-                          ) : OFFER_LETTER_VISIBLE_STATUSES.has(selectedApplication.status) &&
-                            selectedApplication.offerLetter?.url ? (
-                            <a href={selectedApplication.offerLetter.url} target="_blank" rel="noreferrer">
-                              <Button size="sm" variant="outline">
-                                📄 Offer Letter
-                              </Button>
-                            </a>
-                          ) : null}
-                          {selectedApplication.status === "Completed" && selectedApplication.certificate?.certificateId ? (
-                            <Link to={`/documents/certificate/${selectedApplication.certificate.certificateId}`}>
-                              <Button size="sm" variant="outline">
-                                🎓 View Certificate
-                              </Button>
-                            </Link>
-                          ) : null}
-                          {getApplicantProfile(selectedApplication).phone ? (
-                            <a href={`tel:${normalizePhoneLink(getApplicantProfile(selectedApplication).phone)}`}>
-                              <Button size="sm" variant="outline">
-                                📞 Call
-                              </Button>
-                            </a>
-                          ) : null}
-                          {getApplicantProfile(selectedApplication).whatsapp ? (
-                            <a href={normalizeWhatsappLink(getApplicantProfile(selectedApplication).whatsapp)} target="_blank" rel="noreferrer">
-                              <Button size="sm" variant="outline">
-                                💬 WhatsApp
-                              </Button>
-                            </a>
-                          ) : null}
-                          {getApplicantProfile(selectedApplication).githubUrl ? (
-                            <a href={getApplicantProfile(selectedApplication).githubUrl} target="_blank" rel="noreferrer">
-                              <Button size="sm" variant="outline">
-                                🔗 GitHub
-                              </Button>
-                            </a>
-                          ) : null}
-                          {getApplicantProfile(selectedApplication).linkedinUrl ? (
-                            <a href={getApplicantProfile(selectedApplication).linkedinUrl} target="_blank" rel="noreferrer">
-                              <Button size="sm" variant="outline">
-                                💼 LinkedIn
-                              </Button>
-                            </a>
-                          ) : null}
-                          {getApplicantProfile(selectedApplication).portfolioUrl ? (
-                            <a href={getApplicantProfile(selectedApplication).portfolioUrl} target="_blank" rel="noreferrer">
-                              <Button size="sm" variant="outline">
-                                🌐 Portfolio
-                              </Button>
-                            </a>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/8 dark:bg-white/5">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-3">
-                          Admin actions
-                        </p>
-                        <div className="grid gap-2 sm:grid-cols-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              selectedApplication.status === "Selected" ||
-                              updatingId === `${selectedApplication._id}:status:Selected`
-                            }
-                            onClick={() => handleStatusChange(selectedApplication._id, "Selected")}
-                          >
-                            🎯 Select
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              selectedApplication.status === "Rejected" ||
-                              updatingId === `${selectedApplication._id}:status:Rejected`
-                            }
-                            onClick={() => handleStatusChange(selectedApplication._id, "Rejected")}
-                          >
-                            ✋ Reject
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              selectedApplication.status === "Completed" ||
-                              updatingId === `${selectedApplication._id}:status:Completed`
-                            }
-                            onClick={() => handleStatusChange(selectedApplication._id, "Completed")}
-                          >
-                            ✅ Complete
-                          </Button>
-                        </div>
-                        <p className="mt-3 text-[12px] text-slate-500 dark:text-slate-400">
-                          Selecting a candidate generates the offer letter and sends the email automatically.
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
-                        <Button
-                          className="w-full"
-                          size="sm"
-                          onClick={async () => {
-                            try {
-                              await api.post(`/applications/admin/${selectedApplication._id}/send-reminder`);
-                              toast.success("Reminder email sent to student!");
-                            } catch (error) {
-                              toast.error(getApiErrorMessage(error, "Failed to send reminder email"));
-                            }
-                          }}
-                        >
-                          ⏰ Send Task Submission Reminder
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ) : null}
-
-              {visibleGroups.length === 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">No applications in this bucket</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-500 dark:text-slate-400">
-                      No candidates are currently in the {workflowTabs.find((tab) => tab.key === activeWorkflowKey)?.label?.toLowerCase()} queue.
-                    </p>
-                  </CardContent>
-                </Card>
+            {canShowOfferLetter ? (
+              application.offerLetter?.accessToken ? (
+                <Link to={offerLetterUrl}>
+                  <Button size="sm" variant="outline" type="button">
+                    Offer letter
+                  </Button>
+                </Link>
               ) : (
-                visibleGroups.map((group) => (
-                  <Card key={group.categoryKey}>
-                    <CardHeader className="space-y-3">
-                      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                        <div>
-                          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                            Role
-                          </p>
-                          <CardTitle className="mt-1 text-base">{group.categoryLabel}</CardTitle>
-                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                            {group.applicationCount} application{group.applicationCount === 1 ? "" : "s"}
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {statusOrder
-                            .filter((status) => group.statusCounts?.[status])
-                            .map((status) => (
-                              <span
-                                key={status}
-                                className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
-                              >
-                                {status}: {group.statusCounts[status]}
-                              </span>
-                            ))}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3 text-xs">
-                      {group.applications.map(renderApplicationCard)}
-                    </CardContent>
-                  </Card>
-                ))
-              )}
+                <a href={offerLetterUrl} {...getExternalLinkProps(offerLetterUrl)}>
+                  <Button size="sm" variant="outline" type="button">
+                    Offer letter
+                  </Button>
+                </a>
+              )
+            ) : null}
+
+            <Button
+              size="sm"
+              variant="outline"
+              type="button"
+              disabled={reminderBusy}
+              onClick={onReminder}
+            >
+              {reminderBusy ? "Sending..." : "Reminder"}
+            </Button>
+
+            <Button size="sm" type="button" onClick={onDetails}>
+              Details
+            </Button>
+          </div>
+        </div>
+
+        {application.payment?.status === "Pending" ? (
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+            Payment verification pending | Amount: Rs {application.payment.amount} | UTR:{" "}
+            {application.payment.utrNumber || "Not added"}
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SummaryCell({ label, value, hint }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-white/8 dark:bg-white/5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-sm font-medium text-slate-800 dark:text-slate-100">
+        {value || "Not added"}
+      </p>
+      {hint ? <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{hint}</p> : null}
+    </div>
+  );
+}
+
+function ApplicationDetailModal({
+  application,
+  notes,
+  updatingId,
+  reminderBusy,
+  onClose,
+  onNotesChange,
+  onStatusChange,
+  onPaymentDecision,
+  onReminder
+}) {
+  if (!application) return null;
+
+  const profile = getApplicantProfile(application);
+  const phoneLink = normalizePhoneLink(profile.phone);
+  const whatsappLink = normalizeWhatsappLink(profile.whatsapp);
+  const offerLetterUrl = application.offerLetter?.accessToken
+    ? `/documents/offer-letter/${application.offerLetter.accessToken}`
+    : application.offerLetter?.url;
+  const taskBriefUrl = TASK_BRIEF_VISIBLE_STATUSES.has(application.status)
+    ? application.internshipMeta?.taskPdfUrl
+    : "";
+  const certificateUrl = application.certificate?.certificateId
+    ? `/documents/certificate/${application.certificate.certificateId}`
+    : "";
+
+  return (
+    <ModalShell
+      open={Boolean(application)}
+      onClose={onClose}
+      title={getApplicantName(application)}
+      description={`${getRoleLabel(application)} | ${application.status} | ${getDurationLabel(application)}`}
+      className="max-w-6xl"
+    >
+      <div className="space-y-5">
+        <div className="grid gap-3 md:grid-cols-4">
+          <ModalTile label="Role" value={getRoleLabel(application)} />
+          <ModalTile label="Duration" value={getDurationLabel(application)} />
+          <ModalTile label="Start date" value={formatDate(application.internshipMeta?.startDate)} />
+          <ModalTile label="End date" value={formatDate(application.internshipMeta?.endDate)} />
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+            <p className="text-sm font-semibold text-[#f5f7fa]">Student profile</p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <ModalTile label="Email" value={application.user?.email} />
+              <ModalTile label="Phone" value={profile.phone} />
+              <ModalTile label="WhatsApp" value={profile.whatsapp} />
+              <ModalTile label="City / State" value={[profile.city, profile.state].filter(Boolean).join(", ")} />
+              <ModalTile label="College" value={profile.college} />
+              <ModalTile label="Degree / Course" value={profile.degree} />
+              <ModalTile label="Branch" value={profile.branch} />
+              <ModalTile label="Current year" value={profile.currentYear} />
+              <ModalTile label="Graduation year" value={profile.graduationYear} />
+              <ModalTile label="Daily hours" value={profile.dailyHours} />
+              <ModalTile label="Laptop" value={formatBoolean(profile.hasLaptop)} />
+              <ModalTile label="English level" value={profile.englishLevel} />
+              <ModalTile label="Skills" value={formatList(profile.skills)} wide />
+              <ModalTile label="Preferred roles" value={formatList(profile.preferredRoles)} wide />
+              <ModalTile
+                label="Previous experience"
+                value={profile.prevInternshipExperience || "Not added"}
+                wide
+              />
             </div>
           </div>
-        </>
-      )}
+
+          <div className="space-y-4">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <p className="text-sm font-semibold text-[#f5f7fa]">Quick actions</p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                <ModalAction href={application.user?.email ? `mailto:${application.user.email}` : ""}>
+                  Email
+                </ModalAction>
+                <ModalAction href={phoneLink ? `tel:${phoneLink}` : ""}>Call</ModalAction>
+                <ModalAction href={whatsappLink}>WhatsApp</ModalAction>
+                <ModalAction href={profile.linkedinUrl}>LinkedIn</ModalAction>
+                <ModalAction href={profile.githubUrl}>GitHub</ModalAction>
+                <ModalAction href={profile.portfolioUrl}>Portfolio</ModalAction>
+                <ModalAction href={profile.resumeUrl}>Resume</ModalAction>
+                <ModalAction href={taskBriefUrl}>Task brief</ModalAction>
+                <ModalAction href={offerLetterUrl}>Offer letter</ModalAction>
+                <ModalAction href={certificateUrl}>Certificate</ModalAction>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <p className="text-sm font-semibold text-[#f5f7fa]">Payment</p>
+              <div className="mt-3 space-y-2 text-sm text-[#b7c0cc]">
+                <p>Status: {application.payment?.status || "Not Required"}</p>
+                {application.payment?.amount ? <p>Amount: Rs {application.payment.amount}</p> : null}
+                {application.payment?.utrNumber ? <p>UTR: {application.payment.utrNumber}</p> : null}
+              </div>
+              {application.payment?.status === "Pending" ? (
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <Button
+                    size="sm"
+                    variant="success"
+                    disabled={updatingId === `${application._id}:payment:Verified`}
+                    onClick={() => onPaymentDecision(application, "Verified")}
+                  >
+                    Verify payment
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    disabled={updatingId === `${application._id}:payment:Rejected`}
+                    onClick={() => onPaymentDecision(application, "Rejected")}
+                  >
+                    Reject payment
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+          <p className="text-sm font-semibold text-[#f5f7fa]">Application details</p>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <ModalTile label="Applied on" value={formatDate(application.createdAt)} />
+            <ModalTile label="Status" value={application.status} />
+            <ModalTile label="Referral code" value={application.referral?.code} />
+            <ModalTile label="Referral owner" value={application.referral?.ownerName} />
+            <ModalTile label="Motivation" value={application.motivation || "Not added"} wide />
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8c95a3]">
+              Internal notes
+            </p>
+            <Textarea
+              rows={4}
+              value={notes}
+              onChange={(event) => onNotesChange(application._id, event.target.value)}
+              placeholder="Add private admin notes before changing status..."
+            />
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+          <p className="text-sm font-semibold text-[#f5f7fa]">Workflow actions</p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <Button
+              size="sm"
+              disabled={
+                application.status === "Selected" ||
+                updatingId === `${application._id}:status:Selected`
+              }
+              onClick={() => onStatusChange(application, "Selected")}
+            >
+              Select
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              disabled={
+                application.status === "Rejected" ||
+                updatingId === `${application._id}:status:Rejected`
+              }
+              onClick={() => onStatusChange(application, "Rejected")}
+            >
+              Reject
+            </Button>
+            <Button
+              size="sm"
+              variant="success"
+              disabled={
+                application.status === "Completed" ||
+                updatingId === `${application._id}:status:Completed`
+              }
+              onClick={() => onStatusChange(application, "Completed")}
+            >
+              Complete
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={reminderBusy}
+              onClick={() => onReminder(application)}
+            >
+              {reminderBusy ? "Sending..." : "Task reminder"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function ModalTile({ label, value, wide = false }) {
+  return (
+    <div className={`rounded-2xl border border-white/10 bg-[#111418] px-3 py-3 ${wide ? "md:col-span-2" : ""}`}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8c95a3]">
+        {label}
+      </p>
+      <p className="mt-1 break-words text-sm text-[#f5f7fa]">{value || "Not added"}</p>
     </div>
+  );
+}
+
+function ModalAction({ href, children }) {
+  if (!href) {
+    return (
+      <Button size="sm" variant="outline" disabled>
+        {children}
+      </Button>
+    );
+  }
+
+  const isInternalDocument = href.startsWith("/documents/");
+  if (isInternalDocument) {
+    return (
+      <Link to={href}>
+        <Button size="sm" variant="outline" className="w-full">
+          {children}
+        </Button>
+      </Link>
+    );
+  }
+
+  return (
+    <a href={href} {...getExternalLinkProps(href)}>
+      <Button size="sm" variant="outline" className="w-full">
+        {children}
+      </Button>
+    </a>
   );
 }
