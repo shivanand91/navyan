@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, index: true },
     passwordHash: { type: String, required: true },
     refreshTokenHash: String,
+    passwordResetTokenHash: String,
+    passwordResetExpiresAt: Date,
     profile: profileSchema
   },
   { timestamps: true }

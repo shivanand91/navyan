@@ -380,6 +380,37 @@ export const sendApplicationReceivedEmail = async ({ user, internship, durationK
   });
 };
 
+export const sendPasswordResetEmail = async ({ user, resetUrl, expiresInMinutes = 30 }) => {
+  const recipient = getRecipientEmail(user);
+  const studentName = getStudentName(user);
+
+  if (!recipient || !resetUrl) {
+    return false;
+  }
+
+  return sendEmail({
+    to: recipient,
+    subject: "Navyan: Reset your password",
+    text: `Hello ${studentName}, use this link to reset your Navyan password within ${expiresInMinutes} minutes: ${resetUrl}. If you did not request this, you can ignore this email.`,
+    html: buildEmailLayout({
+      eyebrow: "Password reset",
+      title: "Reset your Navyan password",
+      intro: `Hello ${studentName}, we received a request to reset the password for your Navyan account. This secure link expires in ${expiresInMinutes} minutes.`,
+      summaryRows: [
+        { label: "Account", value: recipient },
+        { label: "Expires in", value: `${expiresInMinutes} minutes` },
+        { label: "Security", value: "One-time reset link" }
+      ],
+      nextStep:
+        "Click the button below and create a new password. If this was not you, ignore this email and your password will remain unchanged.",
+      primaryAction: {
+        href: resetUrl,
+        label: "Reset password"
+      }
+    })
+  });
+};
+
 export const sendApplicationStatusEmail = async ({
   user,
   internship,

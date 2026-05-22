@@ -18,6 +18,8 @@ const OfferLetterPreview = lazy(() => import("@/pages/documents/OfferLetterPrevi
 const CertificatePreview = lazy(() => import("@/pages/documents/CertificatePreview"));
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
+const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/auth/ResetPassword"));
 const StudentDashboard = lazy(() => import("@/pages/student/Dashboard"));
 const ProfileOverview = lazy(() => import("@/pages/student/ProfileOverview"));
 const Profile = lazy(() => import("@/pages/student/Profile"));
@@ -94,6 +96,8 @@ export default function App() {
           <Route path="/verify-certificate/:certificateId" element={<LazyPage><VerifyCertificate /></LazyPage>} />
           <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
           <Route path="/signup" element={<LazyPage><Signup /></LazyPage>} />
+          <Route path="/forgot-password" element={<LazyPage><ForgotPassword /></LazyPage>} />
+          <Route path="/reset-password/:token" element={<LazyPage><ResetPassword /></LazyPage>} />
         </Route>
 
         <Route

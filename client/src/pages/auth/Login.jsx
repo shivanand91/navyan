@@ -100,9 +100,14 @@ export default function Login() {
                 ) : null}
               </div>
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-[#7e8794]">
-                  Password
-                </label>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-[#7e8794]">
+                    Password
+                  </label>
+                  <Link to="/forgot-password" className="text-xs font-semibold text-primary">
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input type="password" placeholder="Enter your password" {...register("password")} />
                 {errors.password ? (
                   <p className="mt-2 text-xs text-danger">{errors.password.message}</p>

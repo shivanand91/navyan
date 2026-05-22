@@ -2,6 +2,8 @@ import express from "express";
 import {
   registerStudent,
   login,
+  requestPasswordReset,
+  resetPassword,
   me,
   seedAdminDev,
   refreshSession,
@@ -13,6 +15,8 @@ const router = express.Router();
 
 router.post("/register", registerStudent);
 router.post("/login", login);
+router.post("/forgot-password", requestPasswordReset);
+router.post("/reset-password", resetPassword);
 router.post("/refresh", refreshSession);
 router.post("/logout", logout);
 router.get("/me", protect, me);
