@@ -5,6 +5,7 @@ import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { Certificate } from "../models/Certificate.js";
 import { buildCertificateVerifyUrl } from "../services/certificateService.js";
 import { createCertificateHtml, renderCertificatePdf } from "../services/pdfService.js";
+import { resolveInternshipRoleLabel } from "../services/taskAssignmentService.js";
 import { buildServerUrl } from "../utils/origin.js";
 
 const router = express.Router();
@@ -14,13 +15,21 @@ const durationLabels = {
   "6-months": "6 months"
 };
 
+const getCertificateRoleLabel = (certificate) =>
+  certificate?.internship
+    ? resolveInternshipRoleLabel(certificate.internship)
+    : certificate?.role || "Intern";
+
 // Phase 2 compatibility: allow student UI to load (returns empty until Phase 4 issues certs)
 router.get("/me", protect, async (req, res, next) => {
   try {
-    const certificates = await Certificate.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const certificates = await Certificate.find({ user: req.user._id })
+      .populate("internship")
+      .sort({ createdAt: -1 });
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
+        role: getCertificateRoleLabel(certificate),
         pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
         verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }))
@@ -39,6 +48,7 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
     res.json({
       certificates: certificates.map((certificate) => ({
         ...certificate.toObject(),
+        role: getCertificateRoleLabel(certificate),
         pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
         verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }))
@@ -60,11 +70,12 @@ router.get("/download/:certificateId", async (req, res, next) => {
 
     const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
     const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
+    const roleLabel = getCertificateRoleLabel(certificate);
     const html = await createCertificateHtml({
       certificateId: certificate.certificateId,
       studentName: certificate.fullName,
-      internshipTitle: certificate.internship?.title || certificate.role || "Internship",
-      role: certificate.role || certificate.internship?.role || "Intern",
+      internshipTitle: certificate.internship?.title || roleLabel || "Internship",
+      role: roleLabel,
       durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
       completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
       issueDateStr: format(certificate.issueDate || certificate.createdAt, "dd MMM yyyy"),
@@ -97,13 +108,14 @@ router.get("/preview/:certificateId", async (req, res, next) => {
 
     const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
     const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
+    const roleLabel = getCertificateRoleLabel(certificate);
 
     res.json({
       certificate: {
         certificateId: certificate.certificateId,
         studentName: certificate.fullName,
-        internshipTitle: certificate.internship?.title || certificate.role || "Internship",
-        role: certificate.role || certificate.internship?.role || "Intern",
+        internshipTitle: certificate.internship?.title || roleLabel || "Internship",
+        role: roleLabel,
         durationKey: certificate.durationKey,
         durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
         completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
@@ -124,13 +136,16 @@ router.get("/verify/:certificateId", async (req, res, next) => {
   try {
     const { certificateId } = req.params;
     const certificate = await Certificate.findOne({ certificateId }).select(
-      "fullName role durationKey completionDate issueDate certificateId verifyUrl pdfUrl verificationStatus"
-    );
+      "fullName role durationKey completionDate issueDate certificateId verifyUrl pdfUrl verificationStatus internship"
+    ).populate("internship");
     if (!certificate) return res.status(404).json({ valid: false });
+    const certificateObject = certificate.toObject();
     res.json({
       valid: certificate.verificationStatus !== "Revoked",
       certificate: {
-        ...certificate.toObject(),
+        ...certificateObject,
+        internship: undefined,
+        role: getCertificateRoleLabel(certificate),
         pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
         verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }

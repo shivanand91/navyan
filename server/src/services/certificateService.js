@@ -5,6 +5,7 @@ import {
   normalizeAbsoluteUrl,
   normalizeClientDocumentUrl
 } from "../utils/origin.js";
+import { resolveInternshipRoleLabel } from "./taskAssignmentService.js";
 
 export const buildCertificateVerifyUrl = (req, certificateId, existingVerifyUrl = "") => {
   const encodedCertificateId = encodeURIComponent(certificateId);
@@ -19,11 +20,25 @@ export const buildCertificateVerifyUrl = (req, certificateId, existingVerifyUrl 
   return normalizeClientDocumentUrl(existingVerifyUrl, req, fallbackPath) || buildClientUrl(req, fallbackPath);
 };
 
+const syncCertificateRole = async (certificate, application) => {
+  if (!certificate || !application?.internship) {
+    return certificate;
+  }
+
+  const roleLabel = resolveInternshipRoleLabel(application.internship);
+  if (certificate.role !== roleLabel) {
+    certificate.role = roleLabel;
+    await certificate.save();
+  }
+
+  return certificate;
+};
+
 export const ensureCertificateForApplication = async (application, options = {}) => {
   if (application.certificate) {
     const existing = await Certificate.findById(application.certificate);
     if (existing) {
-      return existing;
+      return await syncCertificateRole(existing, application);
     }
   }
 
@@ -31,7 +46,7 @@ export const ensureCertificateForApplication = async (application, options = {})
   if (existingCertificate) {
     application.certificate = existingCertificate._id;
     await application.save();
-    return existingCertificate;
+    return await syncCertificateRole(existingCertificate, application);
   }
 
   const certificateId = `NAV-CERT-${new Date().getFullYear()}-${String(application._id)
@@ -45,7 +60,7 @@ export const ensureCertificateForApplication = async (application, options = {})
     user: application.user._id,
     internship: application.internship._id,
     fullName: application.user?.profile?.fullName || application.user?.fullName || "Navyan Student",
-    role: application.internship?.role || application.internship?.title || "Intern",
+    role: resolveInternshipRoleLabel(application.internship),
     durationKey: application.durationKey,
     completionDate,
     issueDate: completionDate,

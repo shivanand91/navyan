@@ -31,6 +31,7 @@ import { buildUpiPaymentPayload, getDurationPricing } from "../services/paymentS
 import {
   resolveAssignedTaskPdfUrl,
   resolveInternshipDomainLabel,
+  resolveInternshipRoleLabel,
   shouldExposeAssignedTask
 } from "../services/taskAssignmentService.js";
 import { buildClientUrl, buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
@@ -121,6 +122,7 @@ const getOfferLetterDocumentPayload = (application) => {
         ? addMonths(startDate, 3)
         : addMonths(startDate, 6);
   const durationOption = internship?.durations?.find((d) => d.key === application.durationKey);
+  const roleLabel = resolveInternshipRoleLabel(internship);
   const offerId =
     application.offerLetter?.id ||
     `NAV-OFFER-${new Date().getFullYear()}-${String(application._id).slice(-6).toUpperCase()}`;
@@ -134,7 +136,7 @@ const getOfferLetterDocumentPayload = (application) => {
       offerId,
       studentName: user?.profile?.fullName || user?.fullName || "Student",
       internshipTitle: internship?.title || "Internship",
-      role: internship?.role,
+      role: roleLabel,
       durationLabel: getDurationLabel(application),
       mode: internship?.mode || "remote",
       startDateStr: format(startDate, "dd MMM yyyy"),
@@ -327,7 +329,7 @@ const loadSubmissionHistory = async (applicationIds) => {
   }, {});
 };
 
-const serializeCertificateForResponse = (certificate, req) => {
+const serializeCertificateForResponse = (certificate, req, internship) => {
   if (!certificate) {
     return certificate;
   }
@@ -335,6 +337,7 @@ const serializeCertificateForResponse = (certificate, req) => {
   return {
     ...certificate.toObject?.(),
     ...(!certificate.toObject ? certificate : {}),
+    role: internship ? resolveInternshipRoleLabel(internship) : certificate?.role,
     verifyUrl: buildCertificateVerifyUrl(req, certificate?.certificateId, certificate?.verifyUrl),
     pdfUrl: normalizeServerDocumentUrl(
       certificate?.pdfUrl,
@@ -351,7 +354,7 @@ const serializeApplicationForResponse = (application, req, options = {}) => {
   return {
     ...applicationObject,
     offerLetter: serializeOfferLetterForResponse(application, req),
-    certificate: serializeCertificateForResponse(application.certificate, req),
+    certificate: serializeCertificateForResponse(application.certificate, req, application.internship),
     domainLabel: resolveInternshipDomainLabel(application.internship),
     ...(includeTimeline ? { timeline: getTimelineState(application) } : {}),
     ...(includeSubmissions

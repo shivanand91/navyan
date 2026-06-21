@@ -174,6 +174,19 @@ export const resolveInternshipDomainLabel = (internship) => {
   return fallback ? toTitleCase(fallback) : "General Internship";
 };
 
+export const resolveInternshipRoleLabel = (internship) => {
+  const domainLabel = resolveInternshipDomainLabel(internship);
+
+  if (domainLabel && domainLabel !== "General Internship") {
+    return `${domainLabel} Intern`;
+  }
+
+  const fallback =
+    cleanupFallbackDomain(internship?.title) || cleanupFallbackDomain(internship?.role);
+
+  return fallback ? `${toTitleCase(fallback)} Intern` : "Intern";
+};
+
 const resolveDomainMapping = (internship) => {
   const haystack = buildInternshipSearchText(internship);
 
