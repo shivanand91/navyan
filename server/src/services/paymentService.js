@@ -1,7 +1,7 @@
 import QRCode from "qrcode";
 
 const DEFAULT_PRICING = {
-  "4-weeks": 0,
+  "4-weeks": 9,
   "3-months": 1499,
   "6-months": 2499
 };

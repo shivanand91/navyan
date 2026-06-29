@@ -16,6 +16,7 @@ import { SectionHeading } from "@/components/premium/SectionHeading";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { InternshipPreviewPanel } from "@/components/internships/InternshipPreviewPanel";
 import { useAuth } from "@/context/AuthContext";
+import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
 
 const durationFallbackLabels = {
   "4-weeks": "4 weeks",
@@ -171,9 +172,9 @@ export default function Internships() {
                                 </span>
                               </div>
                               <p className="mt-3 text-sm font-semibold text-[#825f25] dark:text-primary">
-                                {(internship.durations || []).some((item) => item.isPaid || item.price > 0)
-                                  ? "Free + paid tracks available"
-                                  : "Free internship track"}
+                                {(internship.durations || []).some(isPaidDuration)
+                                  ? "Paid tracks available"
+                                  : "Free tracks available"}
                               </p>
                             </div>
                           </div>
@@ -199,8 +200,8 @@ export default function Internships() {
                                   {getDurationLabel(duration)}
                                 </p>
                                 <p className="mt-1 text-[11px] text-[color:var(--text-muted)]">
-                                  {duration.isPaid || duration.price > 0
-                                    ? `Paid${duration.price ? ` • Rs ${duration.price}` : ""}`
+                                  {isPaidDuration(duration)
+                                    ? `Paid • ${getDurationPriceLabel(duration)}`
                                     : "Free"}
                                 </p>
                               </div>

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { InternshipPreviewPanel } from "@/components/internships/InternshipPreviewPanel";
+import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
 import { toast } from "sonner";
 
 const durationFallbackLabels = {
@@ -35,11 +36,7 @@ const blockingStatuses = new Set([
 const getDurationLabel = (duration) => duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
 
 const getPriceLabel = (duration) => {
-  if (!duration) return "Flexible";
-  if (duration.isPaid || duration.price > 0) {
-    return duration.price ? `Rs ${duration.price}` : "Paid";
-  }
-  return "Free";
+  return getDurationPriceLabel(duration);
 };
 
 const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").slice(0, 12);
@@ -101,7 +98,7 @@ export default function StudentInternships() {
     () => ({
       total: internships.length,
       paidTracks: internships.filter((internship) =>
-        (internship.durations || []).some((duration) => duration.isPaid || duration.price > 0)
+        (internship.durations || []).some(isPaidDuration)
       ).length,
       remoteTracks: internships.filter((internship) => internship.mode === "remote").length
     }),
@@ -475,8 +472,8 @@ export default function StudentInternships() {
                               {getDurationLabel(duration)}
                             </p>
                             <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                              {duration.isPaid || duration.price > 0
-                                ? `Paid cohort${duration.price ? ` • Rs ${duration.price}` : ""}`
+                              {isPaidDuration(duration)
+                                ? `Paid cohort • ${getPriceLabel(duration)}`
                                 : "Free track"}
                             </p>
                           </div>
@@ -523,7 +520,7 @@ export default function StudentInternships() {
                   </p>
                 </div>
 
-                {currentDuration.isPaid || currentDuration.price > 0 ? (
+                {isPaidDuration(currentDuration) ? (
                   <div className="rounded-[28px] border border-primary/18 bg-primary/10 p-5">
                     <div className="flex items-start gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/18 bg-[color:var(--card)] text-primary">

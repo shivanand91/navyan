@@ -8,6 +8,10 @@ import {
   Users2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  getDurationPriceLabel,
+  isPaidDuration
+} from "@/utils/internshipPricing";
 
 const durationFallbackLabels = {
   "4-weeks": "4 weeks",
@@ -182,20 +186,20 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
                   <div>
                     <p className="text-sm font-semibold text-[color:var(--text)]">{getDurationLabel(duration)}</p>
                     <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                      {duration.isPaid || duration.price > 0
-                        ? `Paid cohort${duration.price ? ` • Rs ${duration.price}` : ""}`
+                      {isPaidDuration(duration)
+                        ? `Paid cohort • ${getDurationPriceLabel(duration)}`
                         : "Free internship track"}
                     </p>
                   </div>
                   <span
                     className={cn(
                       "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]",
-                      duration.isPaid || duration.price > 0
+                      isPaidDuration(duration)
                         ? "border border-primary/20 bg-primary/10 text-primary"
                         : "border border-success/20 bg-success/12 text-success"
                     )}
                   >
-                    {duration.isPaid || duration.price > 0 ? "Paid" : "Free"}
+                    {isPaidDuration(duration) ? "Paid" : "Free"}
                   </span>
                 </div>
                 {duration.benefits?.length ? (

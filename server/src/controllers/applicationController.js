@@ -121,7 +121,7 @@ const getOfferLetterDocumentPayload = (application) => {
       : application.durationKey === "3-months"
         ? addMonths(startDate, 3)
         : addMonths(startDate, 6);
-  const durationOption = internship?.durations?.find((d) => d.key === application.durationKey);
+  const pricing = getDurationPricing(internship, application.durationKey);
   const roleLabel = resolveInternshipRoleLabel(internship);
   const offerId =
     application.offerLetter?.id ||
@@ -142,7 +142,7 @@ const getOfferLetterDocumentPayload = (application) => {
       startDateStr: format(startDate, "dd MMM yyyy"),
       endDateStr: format(endDate, "dd MMM yyyy"),
       issueDateStr: format(new Date(), "dd MMM yyyy"),
-      internshipType: durationOption?.isPaid ? "Paid internship" : "Merit-based internship",
+      internshipType: pricing.isPaid ? "Paid internship" : "Merit-based internship",
       organizationName: "Navyan"
     }
   };

@@ -58,7 +58,7 @@ export default function AdminInternships() {
           shortDescription: form.shortDescription,
           isPublished: true,
           durations: [
-            { key: "4-weeks", label: "4 weeks", isPaid: false },
+            { key: "4-weeks", label: "4 weeks", isPaid: true, price: 9 },
             { key: "3-months", label: "3 months", isPaid: true },
             { key: "6-months", label: "6 months", isPaid: true }
           ]

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { BadgeCheck, Calendar, Laptop, MapPin, Sparkles } from "lucide-react";
@@ -129,7 +130,7 @@ export default function InternshipDetail() {
                         {d.label || d.key}
                       </span>
                       <span className="text-[11px]">
-                        {d.isPaid ? "Paid" : "Free"}{" "}
+                        {isPaidDuration(d) ? `Paid • ${getDurationPriceLabel(d)}` : "Free"}{" "}
                       </span>
                     </div>
                   ))}
