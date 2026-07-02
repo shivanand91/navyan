@@ -3,6 +3,16 @@ import { useParams } from "react-router-dom";
 import api from "@/lib/axios";
 import halfLogo from "@/assests/half_logo.png";
 
+const formatCertificateDate = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+};
+
 export default function CertificatePreview() {
   const { certificateId } = useParams();
   const [certificate, setCertificate] = useState(null);
@@ -26,6 +36,9 @@ export default function CertificatePreview() {
   }, [certificateId]);
 
   if (!certificate) return <div className="text-white text-center mt-20">Loading...</div>;
+
+  const startDate = certificate.startDateStr || formatCertificateDate(certificate.startDate);
+  const endDate = certificate.endDateStr || formatCertificateDate(certificate.endDate);
 
   return (
     <div className="min-h-screen bg-[#07111f] py-10 px-4 print:p-0 print:bg-white flex flex-col items-center">
@@ -89,7 +102,7 @@ export default function CertificatePreview() {
             <div className="max-w-[900px] mx-auto mt-2 text-center">
               <p className="text-[20px] leading-[1.6] text-slate-700 font-medium px-4">
                 For successfully completing the <span className="font-bold text-[#061a35]">{certificate.role}</span> internship program at <span className="font-bold text-[#061a35]">Navyan</span>. 
-                The internship was conducted from <span className="font-bold text-[#061a35]">{certificate.startDate}</span> to <span className="font-bold text-[#061a35]">{certificate.endDate}</span>.
+                The internship was conducted from <span className="font-bold text-[#061a35]">{startDate}</span> to <span className="font-bold text-[#061a35]">{endDate}</span>.
                 During this period, the individual has shown dedication, consistency, and a strong willingness to learn and contribute. 
               </p>
             </div>

@@ -54,6 +54,8 @@ router.get("/me", protect, async (req, res, next) => {
           role: getCertificateRoleLabel(certificate),
           startDate: timeline.startDate,
           endDate: timeline.endDate,
+          startDateStr: timeline.startDateStr,
+          endDateStr: timeline.endDateStr,
           pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
           verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
         };
@@ -80,6 +82,8 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
           role: getCertificateRoleLabel(certificate),
           startDate: timeline.startDate,
           endDate: timeline.endDate,
+          startDateStr: timeline.startDateStr,
+          endDateStr: timeline.endDateStr,
           pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
           verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
         };
@@ -156,8 +160,8 @@ router.get("/preview/:certificateId", async (req, res, next) => {
         role: roleLabel,
         durationKey: certificate.durationKey,
         durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
-        startDate: timeline.startDate,
-        endDate: timeline.endDate,
+        startDate: timeline.startDateStr,
+        endDate: timeline.endDateStr,
         startDateStr: timeline.startDateStr,
         endDateStr: timeline.endDateStr,
         completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
@@ -192,8 +196,8 @@ router.get("/verify/:certificateId", async (req, res, next) => {
         application: undefined,
         internship: undefined,
         role: getCertificateRoleLabel(certificate),
-        startDate: timeline.startDate,
-        endDate: timeline.endDate,
+        startDate: timeline.startDateStr,
+        endDate: timeline.endDateStr,
         startDateStr: timeline.startDateStr,
         endDateStr: timeline.endDateStr,
         pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
