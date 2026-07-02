@@ -3,6 +3,7 @@ import axios from "axios";
 const ACCESS_TOKEN_STORAGE_KEY = "navyan_access_token";
 const PRODUCTION_API_BASE_URL = "https://navyan.vercel.app/api";
 const LOCAL_API_URL_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?/i;
+const DEFAULT_GET_CACHE_TTL = 5 * 60 * 1000;
 
 const resolveApiBaseUrl = () => {
   const configuredUrl = import.meta.env.VITE_API_URL?.trim();
@@ -29,14 +30,91 @@ const readStoredAccessToken = () => {
 let accessToken = readStoredAccessToken();
 let refreshRequest = null;
 let unauthorizedHandler = null;
+const getCache = new Map();
+const pendingGetRequests = new Map();
 
 const api = axios.create({
   baseURL: resolveApiBaseUrl(),
   withCredentials: true
 });
 
+const stableSerialize = (value) => {
+  if (!value || typeof value !== "object") {
+    return String(value ?? "");
+  }
+
+  if (Array.isArray(value)) {
+    return `[${value.map(stableSerialize).join(",")}]`;
+  }
+
+  return `{${Object.keys(value)
+    .sort()
+    .map((key) => `${key}:${stableSerialize(value[key])}`)
+    .join(",")}}`;
+};
+
+const buildGetCacheKey = (url, config = {}) =>
+  [
+    accessToken ? "auth" : "public",
+    api.defaults.baseURL,
+    url,
+    stableSerialize(config.params)
+  ].join("|");
+
+export const clearApiCache = () => {
+  getCache.clear();
+  pendingGetRequests.clear();
+};
+
+const rawGet = api.get.bind(api);
+
+api.get = (url, config = {}) => {
+  const shouldSkipCache =
+    config.cache === false ||
+    config.responseType ||
+    config.signal ||
+    config.headers?.Range;
+
+  if (shouldSkipCache) {
+    return rawGet(url, config);
+  }
+
+  const cacheKey = buildGetCacheKey(url, config);
+  const ttl = Number.isFinite(config.cacheTtl) ? config.cacheTtl : DEFAULT_GET_CACHE_TTL;
+  const cached = getCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.createdAt < ttl) {
+    return Promise.resolve(cached.response);
+  }
+
+  const pendingRequest = pendingGetRequests.get(cacheKey);
+  if (pendingRequest) {
+    return pendingRequest;
+  }
+
+  const request = rawGet(url, config)
+    .then((response) => {
+      getCache.set(cacheKey, {
+        createdAt: Date.now(),
+        response
+      });
+      return response;
+    })
+    .finally(() => {
+      pendingGetRequests.delete(cacheKey);
+    });
+
+  pendingGetRequests.set(cacheKey, request);
+  return request;
+};
+
 export const setAccessToken = (token) => {
+  const previousToken = accessToken;
   accessToken = token || null;
+
+  if (previousToken !== accessToken) {
+    clearApiCache();
+  }
 
   if (typeof window !== "undefined") {
     if (accessToken) {
@@ -61,7 +139,13 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.config?.method && response.config.method.toLowerCase() !== "get") {
+      clearApiCache();
+    }
+
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const isUnauthorized = error?.response?.status === 401;
