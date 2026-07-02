@@ -1,15 +1,21 @@
 import axios from "axios";
 
 const ACCESS_TOKEN_STORAGE_KEY = "navyan_access_token";
+const PRODUCTION_API_BASE_URL = "https://navyan.vercel.app/api";
+const LOCAL_API_URL_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?/i;
 
 const resolveApiBaseUrl = () => {
   const configuredUrl = import.meta.env.VITE_API_URL?.trim();
   if (configuredUrl) {
+    if (!import.meta.env.DEV && LOCAL_API_URL_PATTERN.test(configuredUrl)) {
+      return PRODUCTION_API_BASE_URL;
+    }
+
     return configuredUrl.replace(/\/$/, "");
   }
 
   if (!import.meta.env.DEV && typeof window !== "undefined") {
-    return `${window.location.origin.replace(/\/$/, "")}/api`;
+    return PRODUCTION_API_BASE_URL;
   }
 
   return "http://localhost:5000/api";

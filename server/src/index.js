@@ -22,6 +22,7 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import referralRoutes from "./routes/referralRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
 const app = express();
@@ -142,6 +143,8 @@ const HOST = process.env.HOST || (isProduction ? "0.0.0.0" : "127.0.0.1");
 
 connectDB()
   .then(async () => {
+    await runDatabaseMaintenance();
+
     app.listen(PORT, HOST, () => {
       console.log(`Navyan API running on http://${HOST}:${PORT}`);
     });

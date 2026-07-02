@@ -11,6 +11,7 @@ import {
   ensureCertificateForApplication
 } from "../services/certificateService.js";
 import {
+  APPLICATION_BLOCKING_STATUSES,
   buildBlockingWorkflowResponse,
   findBlockingWorkflow
 } from "../services/applicationAccessService.js";
@@ -375,6 +376,15 @@ export const createPaymentIntent = async (req, res, next) => {
       return res.status(400).json({ message: "Internship and duration are required" });
     }
 
+    const completion = getProfileCompletion(req.user.profile);
+    if (!completion.isEligibleToApply) {
+      return res.status(400).json({
+        message: "Complete your profile before generating a payment QR",
+        completion,
+        action: "COMPLETE_PROFILE"
+      });
+    }
+
     const internship = await Internship.findById(internshipId);
     if (!internship || !internship.isPublished || internship.isDeleted) {
       return res.status(404).json({ message: "Internship not found" });
@@ -383,7 +393,8 @@ export const createPaymentIntent = async (req, res, next) => {
     const existingApplication = await Application.findOne({
       user: userId,
       internship: internshipId,
-      durationKey
+      durationKey,
+      status: { $in: APPLICATION_BLOCKING_STATUSES }
     });
     if (existingApplication) {
       return res.status(400).json({
@@ -502,7 +513,8 @@ export const applyToInternship = async (req, res, next) => {
     const existing = await Application.findOne({
       user: userId,
       internship: internshipId,
-      durationKey
+      durationKey,
+      status: { $in: APPLICATION_BLOCKING_STATUSES }
     });
     if (existing) {
       return res

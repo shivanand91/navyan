@@ -592,6 +592,8 @@ export const createCertificateHtml = async ({
   internshipTitle,
   role,
   durationLabel,
+  startDateStr,
+  endDateStr,
   completionDateStr,
   issueDateStr,
   organizationName,
@@ -601,6 +603,10 @@ export const createCertificateHtml = async ({
   const fullLogoDataUri = await getFullLogoDataUri();
   const halfLogoDataUri = await getHalfLogoDataUri();
   const resolvedRole = role || internshipTitle || "Internship";
+  const periodText =
+    startDateStr && endDateStr
+      ? `The internship was conducted from <strong>${escapeHtml(startDateStr)}</strong> to <strong>${escapeHtml(endDateStr)}</strong>.`
+      : `The internship duration was <strong>${escapeHtml(durationLabel || "successfully completed")}</strong>.`;
 
   return `<!doctype html>
   <html>
@@ -873,7 +879,7 @@ export const createCertificateHtml = async ({
 
         <div class="certificate-copy">
           For successfully completing the <strong>${escapeHtml(resolvedRole)}</strong> internship
-          program at ${escapeHtml(organizationName)}. During this internship, the individual has
+          program at ${escapeHtml(organizationName)}. ${periodText} During this internship, the individual has
           shown dedication, consistency, and a strong willingness to learn and contribute.
           We appreciate their efforts and wish them success in their future endeavors.
         </div>

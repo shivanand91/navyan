@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowUpRight,
   CircleDollarSign,
@@ -53,6 +53,7 @@ export default function StudentInternships() {
   const [selectedDurations, setSelectedDurations] = useState({});
   const [activeInternship, setActiveInternship] = useState(null);
   const [ticker, setTicker] = useState(Date.now());
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const applyId = searchParams.get("apply");
 
@@ -147,7 +148,17 @@ export default function StudentInternships() {
       toast.success("New UPI QR generated. Pay first, then enter the UTR.");
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data?.message || "Could not generate payment QR.");
+      const response = error?.response?.data;
+      if (response?.action === "COMPLETE_PROFILE") {
+        toast.error(response.message || "Complete your profile before payment.", {
+          action: {
+            label: "Complete profile",
+            onClick: () => navigate("/student/profile/edit")
+          }
+        });
+      } else {
+        toast.error(response?.message || "Could not generate payment QR.");
+      }
     } finally {
       setPaymentLoadingId(null);
     }

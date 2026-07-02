@@ -20,19 +20,44 @@ const getCertificateRoleLabel = (certificate) =>
     ? resolveInternshipRoleLabel(certificate.internship)
     : certificate?.role || "Intern";
 
+const formatCertificateDate = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : format(date, "dd MMM yyyy");
+};
+
+const getCertificateTimeline = (certificate) => {
+  const startDate = certificate?.application?.internshipMeta?.startDate;
+  const endDate = certificate?.application?.internshipMeta?.endDate;
+
+  return {
+    startDate,
+    endDate,
+    startDateStr: formatCertificateDate(startDate),
+    endDateStr: formatCertificateDate(endDate)
+  };
+};
+
 // Phase 2 compatibility: allow student UI to load (returns empty until Phase 4 issues certs)
 router.get("/me", protect, async (req, res, next) => {
   try {
     const certificates = await Certificate.find({ user: req.user._id })
+      .populate("application")
       .populate("internship")
       .sort({ createdAt: -1 });
     res.json({
-      certificates: certificates.map((certificate) => ({
-        ...certificate.toObject(),
-        role: getCertificateRoleLabel(certificate),
-        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
-        verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
-      }))
+      certificates: certificates.map((certificate) => {
+        const timeline = getCertificateTimeline(certificate);
+
+        return {
+          ...certificate.toObject(),
+          role: getCertificateRoleLabel(certificate),
+          startDate: timeline.startDate,
+          endDate: timeline.endDate,
+          pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+          verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
+        };
+      })
     });
   } catch (err) {
     next(err);
@@ -42,16 +67,23 @@ router.get("/me", protect, async (req, res, next) => {
 router.get("/admin", protect, requireAdmin, async (req, res, next) => {
   try {
     const certificates = await Certificate.find()
+      .populate("application")
       .populate("user")
       .populate("internship")
       .sort({ createdAt: -1 });
     res.json({
-      certificates: certificates.map((certificate) => ({
-        ...certificate.toObject(),
-        role: getCertificateRoleLabel(certificate),
-        pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
-        verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
-      }))
+      certificates: certificates.map((certificate) => {
+        const timeline = getCertificateTimeline(certificate);
+
+        return {
+          ...certificate.toObject(),
+          role: getCertificateRoleLabel(certificate),
+          startDate: timeline.startDate,
+          endDate: timeline.endDate,
+          pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+          verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
+        };
+      })
     });
   } catch (err) {
     next(err);
@@ -61,6 +93,7 @@ router.get("/admin", protect, requireAdmin, async (req, res, next) => {
 router.get("/download/:certificateId", async (req, res, next) => {
   try {
     const certificate = await Certificate.findOne({ certificateId: req.params.certificateId })
+      .populate("application")
       .populate("internship")
       .populate("user");
 
@@ -71,12 +104,15 @@ router.get("/download/:certificateId", async (req, res, next) => {
     const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
     const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
     const roleLabel = getCertificateRoleLabel(certificate);
+    const timeline = getCertificateTimeline(certificate);
     const html = await createCertificateHtml({
       certificateId: certificate.certificateId,
       studentName: certificate.fullName,
       internshipTitle: certificate.internship?.title || roleLabel || "Internship",
       role: roleLabel,
       durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
+      startDateStr: timeline.startDateStr,
+      endDateStr: timeline.endDateStr,
       completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
       issueDateStr: format(certificate.issueDate || certificate.createdAt, "dd MMM yyyy"),
       organizationName: "Navyan",
@@ -99,6 +135,7 @@ router.get("/download/:certificateId", async (req, res, next) => {
 router.get("/preview/:certificateId", async (req, res, next) => {
   try {
     const certificate = await Certificate.findOne({ certificateId: req.params.certificateId })
+      .populate("application")
       .populate("internship")
       .populate("user");
 
@@ -109,6 +146,7 @@ router.get("/preview/:certificateId", async (req, res, next) => {
     const verifyUrl = buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl);
     const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
     const roleLabel = getCertificateRoleLabel(certificate);
+    const timeline = getCertificateTimeline(certificate);
 
     res.json({
       certificate: {
@@ -118,6 +156,10 @@ router.get("/preview/:certificateId", async (req, res, next) => {
         role: roleLabel,
         durationKey: certificate.durationKey,
         durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
+        startDate: timeline.startDate,
+        endDate: timeline.endDate,
+        startDateStr: timeline.startDateStr,
+        endDateStr: timeline.endDateStr,
         completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
         issueDateStr: format(certificate.issueDate || certificate.createdAt, "dd MMM yyyy"),
         organizationName: "Navyan",
@@ -136,16 +178,24 @@ router.get("/verify/:certificateId", async (req, res, next) => {
   try {
     const { certificateId } = req.params;
     const certificate = await Certificate.findOne({ certificateId }).select(
-      "fullName role durationKey completionDate issueDate certificateId verifyUrl pdfUrl verificationStatus internship"
-    ).populate("internship");
+      "fullName role durationKey completionDate issueDate certificateId verifyUrl pdfUrl verificationStatus internship application"
+    )
+      .populate("application")
+      .populate("internship");
     if (!certificate) return res.status(404).json({ valid: false });
     const certificateObject = certificate.toObject();
+    const timeline = getCertificateTimeline(certificate);
     res.json({
       valid: certificate.verificationStatus !== "Revoked",
       certificate: {
         ...certificateObject,
+        application: undefined,
         internship: undefined,
         role: getCertificateRoleLabel(certificate),
+        startDate: timeline.startDate,
+        endDate: timeline.endDate,
+        startDateStr: timeline.startDateStr,
+        endDateStr: timeline.endDateStr,
         pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
         verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
       }

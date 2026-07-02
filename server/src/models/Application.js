@@ -91,7 +91,7 @@ const applicationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-applicationSchema.index({ user: 1, internship: 1, durationKey: 1 }, { unique: true });
+applicationSchema.index({ user: 1, internship: 1, durationKey: 1 });
 applicationSchema.index({ createdAt: -1 });
 applicationSchema.index({ status: 1, createdAt: -1 });
 applicationSchema.index(
