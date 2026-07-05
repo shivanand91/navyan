@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Layers3,
   PenTool,
+  BellRing,
   Search,
   Share2,
   ShieldCheck,
@@ -31,7 +32,8 @@ const links = [
   { to: "/admin/applications", label: "Applications", icon: Users2, caption: "Candidates" },
   { to: "/admin/submissions", label: "Submissions", icon: FileSearch, caption: "Reviews" },
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },
-  { to: "/admin/service-inquiries", label: "Service Leads", icon: Layers3, caption: "Pipeline" }
+  { to: "/admin/service-inquiries", label: "Service Leads", icon: Layers3, caption: "Pipeline" },
+  { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" }
 ];
 
 export function AdminLayout() {

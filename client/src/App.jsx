@@ -37,6 +37,7 @@ const AdminApplications = lazy(() => import("@/pages/admin/Applications"));
 const AdminSubmissions = lazy(() => import("@/pages/admin/Submissions"));
 const AdminCertificates = lazy(() => import("@/pages/admin/Certificates"));
 const ServiceInquiries = lazy(() => import("@/pages/admin/ServiceInquiries"));
+const AdminAlerts = lazy(() => import("@/pages/admin/Alerts"));
 
 function PageLoader() {
   return (
@@ -136,6 +137,7 @@ export default function App() {
           <Route path="submissions" element={<LazyPage><AdminSubmissions /></LazyPage>} />
           <Route path="certificates" element={<LazyPage><AdminCertificates /></LazyPage>} />
           <Route path="service-inquiries" element={<LazyPage><ServiceInquiries /></LazyPage>} />
+          <Route path="alerts" element={<LazyPage><AdminAlerts /></LazyPage>} />
         </Route>
       </Routes>
     </>

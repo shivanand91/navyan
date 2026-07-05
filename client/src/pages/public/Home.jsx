@@ -527,7 +527,6 @@ export default function Home() {
           <SectionHeading
             eyebrow="Live Internships"
             title="Explore currently open internships."
-            description="Every live internship now includes a feature image, key role details, and a direct path into the application flow."
           />
 
           {loading ? (
@@ -634,8 +633,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
             eyebrow="Featured Services"
-            title="A few services we currently provide."
-            description="We keep the home page focused by showing only a curated preview. Open the full services page to explore everything."
+            title="Services ."
           />
 
           {servicesLoading ? (
@@ -731,7 +729,6 @@ export default function Home() {
           <SectionHeading
             eyebrow="Why Choose Navyan"
             title="Why students choose NAVYAN."
-            description="The experience is designed to stay clear, professional, and easy to trust."
           />
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">

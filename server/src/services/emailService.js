@@ -86,6 +86,48 @@ const parseBoolean = (value, fallback) => {
 const stripTrailingSlash = (value) =>
   typeof value === "string" ? value.trim().replace(/\/$/, "") : "";
 
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const escapeAttribute = (value) => escapeHtml(value).replace(/`/g, "&#96;");
+
+const normalizeActionHref = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  if (/^(https?:\/\/|mailto:|tel:|\/)/i.test(raw)) {
+    return raw;
+  }
+
+  return "";
+};
+
+const renderParagraphs = (value) => {
+  const text = String(value || "").trim();
+
+  if (!text) return "";
+
+  return text
+    .split(/\n\s*\n/g)
+    .map((paragraph) => {
+      const escaped = escapeHtml(paragraph).replace(/\n/g, "<br>");
+      const linked = escaped.replace(
+        /((?:https?:\/\/|www\.)[^\s<]+)(?![^<]*>)/gi,
+        (match) => {
+          const href = match.toLowerCase().startsWith("www.") ? `https://${match}` : match;
+          return `<a href="${escapeAttribute(href)}" style="color:#d4a85f;text-decoration:underline;text-underline-offset:3px;">${match}</a>`;
+        }
+      );
+      return `<p style="margin:0 0 14px;font-size:15px;line-height:1.8;color:#b7c0cc;">${linked}</p>`;
+    })
+    .join("");
+};
+
 const getDashboardBaseUrl = () =>
   normalizeAbsoluteUrl(process.env.CLIENT_URL) || "https://navyan.online";
 
@@ -317,6 +359,46 @@ const buildEmailLayout = ({
     </div>
   </body>
 </html>`;
+
+const buildBroadcastEmailLayout = ({ subject, message, actionLabel, actionHref }) => {
+  const safeTitle = escapeHtml(subject || "Navyan update");
+  const safeHref = normalizeActionHref(actionHref);
+  const safeActionLabel = escapeHtml(actionLabel || "Open link");
+  const messageHtml = renderParagraphs(message);
+
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#0b0d10;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f5f7fa;">
+    <div style="max-width:680px;margin:0 auto;padding:32px 18px;">
+      <div style="border:1px solid rgba(255,255,255,0.08);background:#14181d;border-radius:28px;overflow:hidden;">
+        <div style="padding:28px 28px 18px;background:radial-gradient(circle at top right, rgba(212,168,95,0.16), transparent 34%), #111418;">
+          <div style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(212,168,95,0.12);border:1px solid rgba(212,168,95,0.24);color:#d4a85f;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;">
+            Navyan alert
+          </div>
+          <h1 style="margin:18px 0 0;font-size:30px;line-height:1.1;font-weight:700;color:#f5f7fa;">${safeTitle}</h1>
+        </div>
+        <div style="padding:0 28px 28px;">
+          <div style="margin-top:22px;border:1px solid rgba(255,255,255,0.08);background:#1a2027;border-radius:22px;padding:22px;">
+            ${messageHtml}
+          </div>
+          ${
+            safeHref
+              ? `<div style="margin-top:18px;">
+              <a href="${escapeAttribute(safeHref)}" style="display:inline-block;padding:13px 20px;border-radius:16px;background:#d4a85f;color:#111418;font-size:14px;font-weight:700;text-decoration:none;">
+                ${safeActionLabel}
+              </a>
+            </div>`
+              : ""
+          }
+          <p style="margin:24px 0 0;font-size:12px;line-height:1.8;color:#7e8794;">
+            This is a broadcast update from Navyan. Open your dashboard for account-specific actions and status.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>`;
+};
 
 const sendEmail = async ({ to, subject, html, text }) => {
   const transporter = getTransporter();
@@ -565,6 +647,31 @@ export const sendTaskSubmissionReminderEmail = async ({ user, application, inter
         href: dashboardUrl,
         label: "Open dashboard to submit"
       }
+    })
+  });
+};
+
+export const sendBroadcastAlertEmail = async ({ user, subject, message, actionLabel, actionHref }) => {
+  const recipient = getRecipientEmail(user);
+  if (!recipient || !subject || !message) {
+    return false;
+  }
+
+  const studentName = getStudentName(user);
+  const safeSubject = String(subject).trim();
+  const safeMessage = String(message).trim();
+  const safeActionHref = normalizeActionHref(actionHref);
+  const safeActionLabel = String(actionLabel || "Open link").trim() || "Open link";
+
+  return sendEmail({
+    to: recipient,
+    subject: `Navyan: ${safeSubject}`,
+    text: `Hello ${studentName},\n\n${safeSubject}\n\n${safeMessage}${safeActionHref ? `\n\nAction link: ${safeActionHref}` : ""}\n\nYou can also check your Navyan dashboard for updates.`,
+    html: buildBroadcastEmailLayout({
+      subject: safeSubject,
+      message: `Hello ${studentName},\n\n${safeMessage}`,
+      actionLabel: safeActionLabel,
+      actionHref: safeActionHref
     })
   });
 };
