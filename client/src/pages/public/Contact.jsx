@@ -72,7 +72,22 @@ export default function Contact() {
 
   const onSubmit = async (values) => {
     try {
-      await api.post("/service-inquiries", values);
+      const payload = {
+        name: values.name.trim(),
+        email: values.email.trim(),
+        service: values.service.trim(),
+        inquiryType: values.inquiryType,
+        description: values.description.trim()
+      };
+
+      if (values.phone?.trim()) payload.phone = values.phone.trim();
+      if (values.company?.trim()) payload.company = values.company.trim();
+      if (values.serviceId?.trim()) payload.serviceId = values.serviceId.trim();
+      if (values.budgetRange?.trim()) payload.budgetRange = values.budgetRange.trim();
+      if (values.timeline?.trim()) payload.timeline = values.timeline.trim();
+      if (values.scheduledCallAt?.trim()) payload.scheduledCallAt = values.scheduledCallAt.trim();
+
+      await api.post("/service-inquiries", payload);
       toast.success(
         values.inquiryType === "call"
           ? "Your call request has been booked. Our team will reach out around the selected time."
@@ -81,7 +96,7 @@ export default function Contact() {
       reset();
     } catch (e) {
       console.error(e);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(e?.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
 

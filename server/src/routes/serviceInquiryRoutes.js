@@ -1,8 +1,15 @@
 import express from "express";
+import mongoose from "mongoose";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { ServiceInquiry } from "../models/ServiceInquiry.js";
 
 const router = express.Router();
+
+const optionalString = (value) => {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+};
 
 // Public: create service inquiry
 router.post("/", async (req, res, next) => {
@@ -22,18 +29,29 @@ router.post("/", async (req, res, next) => {
       referenceLinks
     } = req.body;
 
+    const normalizedServiceId = optionalString(serviceId);
+    const normalizedScheduledCallAt = optionalString(scheduledCallAt);
+
+    if (normalizedServiceId && !mongoose.Types.ObjectId.isValid(normalizedServiceId)) {
+      return res.status(400).json({ message: "Invalid service reference." });
+    }
+
+    if (inquiryType === "call" && !normalizedScheduledCallAt) {
+      return res.status(400).json({ message: "Select a valid date and time for the call." });
+    }
+
     const inquiry = await ServiceInquiry.create({
-      name,
-      email,
-      phone,
-      company,
-      serviceId,
-      service,
+      name: optionalString(name),
+      email: optionalString(email),
+      phone: optionalString(phone),
+      company: optionalString(company),
+      serviceId: normalizedServiceId,
+      service: optionalString(service),
       inquiryType: inquiryType === "call" ? "call" : "inquiry",
-      budgetRange,
-      description,
-      timeline,
-      scheduledCallAt,
+      budgetRange: optionalString(budgetRange),
+      description: optionalString(description),
+      timeline: optionalString(timeline),
+      scheduledCallAt: normalizedScheduledCallAt ? new Date(normalizedScheduledCallAt) : undefined,
       referenceLinks
     });
 
