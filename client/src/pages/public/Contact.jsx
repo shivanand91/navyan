@@ -98,33 +98,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
-          {[
-            {
-              icon: ShieldCheck,
-              t: "Premium execution",
-              d: "Clean design system, scalable code, and a launch-ready finish."
-            },
-            {
-              icon: Clock3,
-              t: "Clear timelines",
-              d: "Milestone-based delivery with updates you can trust."
-            },
-            {
-              icon: MessageSquareText,
-              t: "Fast response",
-              d: "We reply with scope guidance and realistic next steps."
-            }
-          ].map((x) => (
-            <div key={x.t} className="navyan-card p-5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#f8efdd] text-[#6b5424] dark:bg-[#2b2417] dark:text-[#e9cc97]">
-                <x.icon className="h-4 w-4" />
-              </div>
-              <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-white">{x.t}</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{x.d}</p>
-            </div>
-          ))}
-        </div>
+       
 
         <form onSubmit={handleSubmit(onSubmit)} className="navyan-card space-y-4 p-5">
           <input type="hidden" {...register("serviceId")} />

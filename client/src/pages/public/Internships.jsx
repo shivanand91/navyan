@@ -52,42 +52,10 @@ export default function Internships() {
       <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
-            eyebrow="Live cohorts"
+            eyebrow="Live Internships"
             title="Open internships organised like a serious product pipeline, not a random jobs board."
             description="Every role below is presented as a structured track. Browse the live list, open a modal for the full breakdown, and move into application from a cleaner workflow."
           />
-
-          <div className="grid gap-4 xl:grid-cols-3">
-            {[
-              {
-                icon: BadgeCheck,
-                title: "Structured review flow",
-                description: "Every application moves through clear states instead of disappearing after submission."
-              },
-              {
-                icon: FileText,
-                title: "Offer letters and tasks",
-                description: "Selected students receive role-linked documents directly inside their dashboard."
-              },
-              {
-                icon: ShieldCheck,
-                title: "Public verification layer",
-                description: "Completion certificates remain verifiable and professional for hiring use."
-              }
-            ].map((item, index) => (
-              <RevealInView key={item.title} delay={index * 0.05}>
-                <Card>
-                  <CardHeader>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/18 bg-primary/10 text-primary">
-                      <item.icon className="h-4 w-4" />
-                    </div>
-                    <CardTitle className="mt-5">{item.title}</CardTitle>
-                    <CardDescription>{item.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              </RevealInView>
-            ))}
-          </div>
 
           {loading ? (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
