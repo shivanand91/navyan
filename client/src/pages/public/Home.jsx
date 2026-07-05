@@ -655,71 +655,91 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {featuredServices.map((service) => (
-                <Card
-                  key={service._id}
-                  className="flex h-full min-h-[460px] flex-col overflow-hidden p-0"
-                >
-                  <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
-                    {service.featureImageUrl ? (
-                      <img
-                        src={service.featureImageUrl}
-                        alt={service.title}
-                        className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[color:var(--text-secondary)]">
-                        Navyan service preview
-                      </div>
-                    )}
-                    <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
-                      {service.category || "Service"}
-                    </div>
-                  </div>
-
-                  <CardHeader className="pb-2">
-                    <CardTitle>{service.title}</CardTitle>
-                    <CardDescription>{service.shortDescription}</CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="flex flex-1 flex-col justify-between">
-                    <div className="space-y-3">
-                      {(service.highlights || []).slice(0, 3).map((item) => (
-                        <div key={item} className="flex items-start gap-3">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
-                          <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                            {item}
-                          </p>
+            <>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {featuredServices.map((service) => (
+                  <Card
+                    key={service._id}
+                    className="flex h-full min-h-[460px] flex-col overflow-hidden p-0"
+                  >
+                    <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
+                      {service.featureImageUrl ? (
+                        <img
+                          src={service.featureImageUrl}
+                          alt={service.title}
+                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[color:var(--text-secondary)]">
+                          Navyan service preview
                         </div>
-                      ))}
-                      {service.description ? (
-                        <p
-                          className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]"
-                          style={{
-                            display: "-webkit-box",
-                            WebkitBoxOrient: "vertical",
-                            WebkitLineClamp: 3,
-                            overflow: "hidden"
-                          }}
-                        >
-                          {service.description}
-                        </p>
-                      ) : null}
+                      )}
+                      <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
+                        {service.category || "Service"}
+                      </div>
                     </div>
 
-                    <div className="mt-auto border-t border-[color:var(--border)] pt-4">
-                      <Link to="/services">
-                        <Button variant="outline" className="w-full">
-                          View all services
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <CardHeader className="pb-2">
+                      <CardTitle>{service.title}</CardTitle>
+                      <CardDescription>{service.shortDescription}</CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-1 flex-col justify-between">
+                      <div className="space-y-3">
+                        {(service.highlights || []).slice(0, 3).map((item) => (
+                          <div key={item} className="flex items-start gap-3">
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                            <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                              {item}
+                            </p>
+                          </div>
+                        ))}
+                        {service.description ? (
+                          <p
+                            className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 3,
+                              overflow: "hidden"
+                            }}
+                          >
+                            {service.description}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4 sm:flex-row">
+                        <Link
+                          to={`/contact?mode=inquiry&service=${encodeURIComponent(service.title)}&serviceId=${service._id}`}
+                          className="sm:flex-1"
+                        >
+                          <Button className="w-full">
+                            Start a Project
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Link to="/services" className="sm:flex-1">
+                          <Button variant="outline" className="w-full">
+                            View all services
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="flex justify-center pt-2">
+                <Link to="/services">
+                  <Button variant="outline" size="lg">
+                    View all services
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>
