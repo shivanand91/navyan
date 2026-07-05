@@ -7,6 +7,7 @@ import {
   FileSearch,
   GraduationCap,
   Layers3,
+  PenTool,
   Search,
   Share2,
   ShieldCheck,
@@ -23,6 +24,7 @@ import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 const links = [
   { to: "/admin", label: "Overview", icon: BarChart3, caption: "Analytics" },
   { to: "/admin/internships", label: "Internships", icon: BriefcaseBusiness, caption: "Programs" },
+  { to: "/admin/services", label: "Services", icon: PenTool, caption: "Studio" },
   { to: "/admin/jobs", label: "Jobs", icon: Briefcase, caption: "Hiring" },
   { to: "/admin/courses", label: "Courses", icon: GraduationCap, caption: "Learning" },
   { to: "/admin/referrals", label: "Referrals", icon: Share2, caption: "Codes" },

@@ -12,10 +12,13 @@ router.post("/", async (req, res, next) => {
       email,
       phone,
       company,
+      serviceId,
       service,
+      inquiryType,
       budgetRange,
       description,
       timeline,
+      scheduledCallAt,
       referenceLinks
     } = req.body;
 
@@ -24,10 +27,13 @@ router.post("/", async (req, res, next) => {
       email,
       phone,
       company,
+      serviceId,
       service,
+      inquiryType: inquiryType === "call" ? "call" : "inquiry",
       budgetRange,
       description,
       timeline,
+      scheduledCallAt,
       referenceLinks
     });
 
@@ -40,7 +46,9 @@ router.post("/", async (req, res, next) => {
 // Admin: list + update status
 router.get("/admin", protect, requireAdmin, async (req, res, next) => {
   try {
-    const inquiries = await ServiceInquiry.find().sort({ createdAt: -1 });
+    const inquiries = await ServiceInquiry.find()
+      .populate("serviceId", "title slug")
+      .sort({ createdAt: -1 });
     res.json({ inquiries });
   } catch (err) {
     next(err);
@@ -66,4 +74,3 @@ router.patch("/admin/:id", protect, requireAdmin, async (req, res, next) => {
 });
 
 export default router;
-

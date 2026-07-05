@@ -15,10 +15,21 @@ const serviceInquirySchema = new mongoose.Schema(
     email: { type: String, required: true },
     phone: String,
     company: String,
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service"
+    },
     service: { type: String, required: true },
+    inquiryType: {
+      type: String,
+      enum: ["inquiry", "call"],
+      default: "inquiry",
+      index: true
+    },
     budgetRange: String,
     description: String,
     timeline: String,
+    scheduledCallAt: Date,
     referenceLinks: [String],
     status: { type: String, enum: STATUS, default: "New", index: true }
   },
@@ -26,4 +37,3 @@ const serviceInquirySchema = new mongoose.Schema(
 );
 
 export const ServiceInquiry = mongoose.model("ServiceInquiry", serviceInquirySchema);
-

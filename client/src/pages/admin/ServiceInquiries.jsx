@@ -74,6 +74,18 @@ export default function ServiceInquiries() {
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {inq.service} · {inq.email} · {inq.phone}
                   </p>
+                  <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                    {inq.inquiryType === "call" ? "Booked call" : "Service inquiry"}
+                    {inq.scheduledCallAt
+                      ? ` · ${new Date(inq.scheduledCallAt).toLocaleString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}`
+                      : ""}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
