@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, PhoneCall, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Eye, PhoneCall, Sparkles } from "lucide-react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ModalShell } from "@/components/premium/ModalShell";
 import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 
@@ -17,6 +18,7 @@ const deliveryModel = [
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeService, setActiveService] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -114,7 +116,7 @@ export default function Services() {
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {services.map((service, index) => (
                 <RevealInView key={service._id} delay={index * 0.04}>
-                  <Card className="flex h-full flex-col overflow-hidden p-0">
+                  <Card className="flex h-full min-h-[520px] flex-col overflow-hidden p-0">
                     <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
                       {service.featureImageUrl ? (
                         <img
@@ -133,12 +135,12 @@ export default function Services() {
                       </div>
                     </div>
 
-                    <CardHeader>
+                    <CardHeader className="pb-2">
                       <CardTitle>{service.title}</CardTitle>
                       <CardDescription>{service.shortDescription}</CardDescription>
                     </CardHeader>
 
-                    <CardContent className="flex flex-1 flex-col">
+                    <CardContent className="flex flex-1 flex-col justify-between">
                       <div className="space-y-3">
                         {(service.highlights || []).slice(0, 4).map((item) => (
                           <div key={item} className="flex items-start gap-3">
@@ -147,7 +149,7 @@ export default function Services() {
                           </div>
                         ))}
                         {service.description ? (
-                          <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                          <p className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
                             {service.description}
                           </p>
                         ) : null}
@@ -172,6 +174,14 @@ export default function Services() {
                             <PhoneCall className="ml-2 h-4 w-4" />
                           </Button>
                         </Link>
+                        <Button
+                          variant="ghost"
+                          className="sm:flex-1"
+                          onClick={() => setActiveService(service)}
+                        >
+                          More details
+                          <Eye className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -206,6 +216,70 @@ export default function Services() {
           </div>
         </div>
       </section>
+
+      <ModalShell
+        open={Boolean(activeService)}
+        onClose={() => setActiveService(null)}
+        title={activeService?.title}
+        description={activeService?.shortDescription}
+        className="max-w-4xl"
+      >
+        {activeService ? (
+          <div className="space-y-6">
+            <div className="overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
+              {activeService.featureImageUrl ? (
+                <img
+                  src={activeService.featureImageUrl}
+                  alt={activeService.title}
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-video items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)]">
+                  Navyan service capability
+                </div>
+              )}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 md:col-span-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  Full description
+                </p>
+                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[color:var(--text-secondary)]">
+                  {activeService.description || "No extended description added yet."}
+                </p>
+              </div>
+
+              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  Category
+                </p>
+                <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
+                  {activeService.category || "General"}
+                </p>
+                <div className="mt-5 flex flex-col gap-2">
+                  <Link
+                    to={`/contact?mode=inquiry&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
+                  >
+                    <Button className="w-full">
+                      Apply
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link
+                    to={`/contact?mode=call&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
+                  >
+                    <Button variant="outline" className="w-full">
+                      Book call
+                      <PhoneCall className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </ModalShell>
     </div>
   );
 }
