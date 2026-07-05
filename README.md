@@ -33,4 +33,4 @@ This codebase is structured in **phases**:
 - Phase 1: Auth, student profile, internships, apply flow, admin internship/applicant management
 - Phase 2: Selection → Offer letters, project PDFs, internship timeline
 - Phase 3: Submission window, submission form, admin review
-- Phase 4: Certificates, verification, UX polish and premium SaaS theming
+- Phase 4: Certificates, verification, UX polish and premium SaaS theming.
