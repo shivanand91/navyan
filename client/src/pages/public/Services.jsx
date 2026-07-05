@@ -149,7 +149,15 @@ export default function Services() {
                           </div>
                         ))}
                         {service.description ? (
-                          <p className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                          <p
+                            className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 4,
+                              overflow: "hidden"
+                            }}
+                          >
                             {service.description}
                           </p>
                         ) : null}
@@ -240,14 +248,35 @@ export default function Services() {
               )}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 md:col-span-2">
+            <div className="space-y-4">
+              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                   Full description
                 </p>
                 <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[color:var(--text-secondary)]">
                   {activeService.description || "No extended description added yet."}
                 </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to={`/contact?mode=inquiry&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
+                  className="sm:flex-1"
+                >
+                  <Button className="w-full">
+                    Apply
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link
+                  to={`/contact?mode=call&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
+                  className="sm:flex-1"
+                >
+                  <Button variant="outline" className="w-full">
+                    Book call
+                    <PhoneCall className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
 
               <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
@@ -257,24 +286,6 @@ export default function Services() {
                 <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
                   {activeService.category || "General"}
                 </p>
-                <div className="mt-5 flex flex-col gap-2">
-                  <Link
-                    to={`/contact?mode=inquiry&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
-                  >
-                    <Button className="w-full">
-                      Apply
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Link
-                    to={`/contact?mode=call&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
-                  >
-                    <Button variant="outline" className="w-full">
-                      Book call
-                      <PhoneCall className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
