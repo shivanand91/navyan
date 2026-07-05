@@ -51,6 +51,7 @@ const buildWhatsAppLink = (phone) => {
 export default function ServiceInquiries() {
   const [inquiries, setInquiries] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [activeInquiry, setActiveInquiry] = useState(null);
 
   const summary = useMemo(
@@ -111,6 +112,32 @@ export default function ServiceInquiries() {
     }
 
     window.open(link, "_blank", "noopener,noreferrer");
+  };
+
+  const handleDelete = async (inquiry) => {
+    if (inquiry.status !== "Closed Lost") {
+      toast.error("Only Closed Lost leads can be deleted.");
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      `Delete the lead for "${inquiry.name}" permanently from the backend?`
+    );
+
+    if (!shouldDelete) return;
+
+    setDeletingId(inquiry._id);
+    try {
+      const { data } = await api.delete(`/service-inquiries/admin/${inquiry._id}`);
+      toast.success(data.message || "Lead deleted.");
+      setInquiries((current) => current.filter((item) => item._id !== inquiry._id));
+      setActiveInquiry((current) => (current?._id === inquiry._id ? null : current));
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Could not delete lead.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -200,6 +227,16 @@ export default function ServiceInquiries() {
                     >
                       Closed Lost
                     </Button>
+                    {inquiry.status === "Closed Lost" ? (
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={deletingId === inquiry._id}
+                        onClick={() => handleDelete(inquiry)}
+                      >
+                        {deletingId === inquiry._id ? "Deleting..." : "Delete"}
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -305,6 +342,15 @@ export default function ServiceInquiries() {
                       <XCircle className="mr-2 h-4 w-4" />
                       Mark Closed Lost
                     </Button>
+                    {activeInquiry.status === "Closed Lost" ? (
+                      <Button
+                        variant="danger"
+                        disabled={deletingId === activeInquiry._id}
+                        onClick={() => handleDelete(activeInquiry)}
+                      >
+                        {deletingId === activeInquiry._id ? "Deleting..." : "Delete lead"}
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
               </div>

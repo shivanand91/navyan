@@ -85,7 +85,12 @@ export default function Contact() {
       if (values.serviceId?.trim()) payload.serviceId = values.serviceId.trim();
       if (values.budgetRange?.trim()) payload.budgetRange = values.budgetRange.trim();
       if (values.timeline?.trim()) payload.timeline = values.timeline.trim();
-      if (values.scheduledCallAt?.trim()) payload.scheduledCallAt = values.scheduledCallAt.trim();
+      if (values.scheduledCallAt?.trim()) {
+        const parsedScheduledCallAt = new Date(values.scheduledCallAt);
+        payload.scheduledCallAt = Number.isNaN(parsedScheduledCallAt.getTime())
+          ? values.scheduledCallAt.trim()
+          : parsedScheduledCallAt.toISOString();
+      }
 
       await api.post("/service-inquiries", payload);
       toast.success(

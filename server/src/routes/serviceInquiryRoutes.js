@@ -91,4 +91,27 @@ router.patch("/admin/:id", protect, requireAdmin, async (req, res, next) => {
   }
 });
 
+router.delete("/admin/:id", protect, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const inquiry = await ServiceInquiry.findById(id);
+    if (!inquiry) {
+      return res.status(404).json({ message: "Inquiry not found" });
+    }
+
+    if (inquiry.status !== "Closed Lost") {
+      return res.status(400).json({
+        message: "Only leads marked as Closed Lost can be deleted."
+      });
+    }
+
+    await ServiceInquiry.findByIdAndDelete(id);
+
+    res.json({ message: "Lead deleted successfully." });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
