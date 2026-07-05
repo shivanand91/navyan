@@ -117,7 +117,7 @@ export default function Internships() {
               {internships.map((internship, index) => (
                 <RevealInView key={internship._id} delay={index * 0.03}>
                   <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
-                    <div className="relative h-56 overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
+                    <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
                       {internship.coverImageUrl ? (
                         <img
                           src={internship.coverImageUrl}

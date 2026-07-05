@@ -544,7 +544,7 @@ export default function Home() {
               {internships.slice(0, 3).map((internship, index) => (
                 <RevealInView key={internship._id} delay={index * 0.05}>
                   <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
-                    <div className="relative h-56 overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
+                    <div className="relative aspect-video overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
                       {internship.coverImageUrl ? (
                         <img
                           src={internship.coverImageUrl}

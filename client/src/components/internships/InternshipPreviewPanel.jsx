@@ -38,15 +38,15 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
   return (
     <div className={cn("grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", className)}>
       <div className="space-y-5">
-        <div className="overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
+        <div className="aspect-video overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
           {internship.coverImageUrl ? (
             <img
               src={internship.coverImageUrl}
               alt={internship.title}
-              className="h-[240px] w-full object-cover md:h-[300px]"
+              className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-[240px] items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)] md:h-[300px]">
+            <div className="flex h-full items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)]">
               Navyan internship preview
             </div>
           )}

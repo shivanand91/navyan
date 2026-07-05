@@ -67,7 +67,7 @@ export default function InternshipDetail() {
         <Card>
           <CardHeader>
             {internship.coverImageUrl && (
-              <div className="mb-4 h-56 w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-900/40">
+              <div className="mb-4 aspect-video w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-900/40">
                 <img
                   src={internship.coverImageUrl}
                   alt={internship.title}

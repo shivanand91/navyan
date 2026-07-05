@@ -375,7 +375,7 @@ export default function StudentInternships() {
                       applyId === internship._id ? "ring-2 ring-primary/30" : ""
                     }`}
                   >
-                    <div className="relative h-56 overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
+                    <div className="relative aspect-video overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
                       {internship.coverImageUrl ? (
                         <img
                           src={internship.coverImageUrl}
