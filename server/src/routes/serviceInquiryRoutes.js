@@ -40,6 +40,10 @@ router.post("/", async (req, res, next) => {
       return res.status(400).json({ message: "Select a valid date and time for the call." });
     }
 
+    if (normalizedScheduledCallAt && Number.isNaN(new Date(normalizedScheduledCallAt).getTime())) {
+      return res.status(400).json({ message: "Select a valid date and time for the call." });
+    }
+
     const inquiry = await ServiceInquiry.create({
       name: optionalString(name),
       email: optionalString(email),
@@ -51,7 +55,7 @@ router.post("/", async (req, res, next) => {
       budgetRange: optionalString(budgetRange),
       description: optionalString(description),
       timeline: optionalString(timeline),
-      scheduledCallAt: normalizedScheduledCallAt ? new Date(normalizedScheduledCallAt) : undefined,
+      scheduledCallAt: normalizedScheduledCallAt,
       referenceLinks
     });
 

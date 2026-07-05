@@ -31,7 +31,26 @@ const statusStyles = {
 
 const formatDateTime = (value) => {
   if (!value) return "Not scheduled";
-  const parsed = new Date(value);
+  const raw = typeof value === "string" ? value : "";
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+
+  if (match) {
+    const [, year, month, day, hour24, minute] = match;
+    const dateLabel = new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+    const hour = Number(hour24);
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = ((hour + 11) % 12) + 1;
+    return `${dateLabel}, ${String(hour12).padStart(2, "0")}:${minute} ${period}`;
+  }
+
+  const parsed = new Date(raw);
   if (Number.isNaN(parsed.getTime())) return "Not scheduled";
 
   return parsed.toLocaleString("en-IN", {

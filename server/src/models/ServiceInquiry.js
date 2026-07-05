@@ -29,7 +29,7 @@ const serviceInquirySchema = new mongoose.Schema(
     budgetRange: String,
     description: String,
     timeline: String,
-    scheduledCallAt: Date,
+    scheduledCallAt: String,
     referenceLinks: [String],
     status: { type: String, enum: STATUS, default: "New", index: true }
   },
