@@ -342,19 +342,21 @@ export default function StudentInternships() {
               Internship list
             </p>
             <p className="mt-1 text-sm text-slate-600 dark:text-[#b7c0cc]">
-              All open internships are shown as a clean list. Open any item for the full
+              All open internships are shown as image-first cards. Open any one for the full
               application workflow.
             </p>
           </div>
 
-          <div className="divide-y divide-black/8 dark:divide-white/8">
+          <div className="p-5 md:p-6">
             {loading ? (
-              Array.from({ length: 4 }).map((_, index) => (
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-[152px] animate-pulse bg-black/[0.03] dark:bg-white/[0.03]"
+                  className="h-[430px] rounded-[28px] bg-black/[0.03] animate-pulse dark:bg-white/[0.03]"
                 />
-              ))
+                ))}
+              </div>
             ) : internships.length === 0 ? (
               <div className="px-6 py-12 text-center">
                 <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
@@ -365,66 +367,87 @@ export default function StudentInternships() {
                 </p>
               </div>
             ) : (
-              internships.map((internship) => (
-                <div
-                  key={internship._id}
-                  className={`grid gap-4 px-5 py-5 transition md:px-6 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-center ${
-                    applyId === internship._id ? "bg-primary/6" : "hover:bg-black/[0.025] dark:hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-primary/18 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {internships.map((internship) => (
+                  <div
+                    key={internship._id}
+                    className={`navyan-card flex h-full flex-col overflow-hidden p-0 ${
+                      applyId === internship._id ? "ring-2 ring-primary/30" : ""
+                    }`}
+                  >
+                    <div className="relative h-56 overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
+                      {internship.coverImageUrl ? (
+                        <img
+                          src={internship.coverImageUrl}
+                          alt={internship.title}
+                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-[#7e8794]">
+                          Navyan internship preview
+                        </div>
+                      )}
+                      <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
                         {internship.mode?.toUpperCase() || "REMOTE"}
-                      </span>
-                      <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
-                        {internship.role || "Internship track"}
-                      </span>
+                      </div>
                     </div>
 
-                    <div>
-                      <h2 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
-                        {internship.title}
-                      </h2>
-                      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                        {internship.shortDescription}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {(internship.skillsRequired || []).slice(0, 6).map((skill) => (
-                        <span
-                          key={skill}
-                          className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
-                        >
-                          {skill}
+                    <div className="flex flex-1 flex-col px-5 py-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
+                          {internship.role || "Internship track"}
                         </span>
-                      ))}
-                    </div>
+                      </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {(internship.durations || []).map((duration) => (
-                        <span
-                          key={duration.key}
-                          className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-700 dark:border-white/8 dark:bg-[#101419]/94 dark:text-[#dce2e9]"
-                        >
-                          {getDurationLabel(duration)} • {getPriceLabel(duration)}
-                        </span>
-                      ))}
+                      <div className="mt-4">
+                        <h2 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+                          {internship.title}
+                        </h2>
+                        <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                          {internship.shortDescription}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
+                          <span
+                            key={skill}
+                            className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="mt-4 grid gap-2">
+                        {(internship.durations || []).map((duration) => (
+                          <div
+                            key={duration.key}
+                            className="rounded-[18px] border border-black/8 bg-black/[0.03] px-4 py-3 dark:border-white/8 dark:bg-[#101419]/94"
+                          >
+                            <p className="text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
+                              {getDurationLabel(duration)}
+                            </p>
+                            <p className="mt-1 text-[11px] text-slate-500 dark:text-[#7e8794]">
+                              {getPriceLabel(duration)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-auto border-t border-black/8 pt-4 dark:border-white/8">
+                        <p className="text-xs text-slate-500 dark:text-[#7e8794]">
+                          Preview the internship, choose a duration, and submit from the modal.
+                        </p>
+                        <Button className="mt-3 w-full" onClick={() => openInternshipModal(internship)}>
+                          Apply Now
+                          <ArrowUpRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="flex flex-col gap-3 lg:items-end">
-                    <Button onClick={() => openInternshipModal(internship)}>
-                      Apply Now
-                      <ArrowUpRight className="ml-2 h-4 w-4" />
-                    </Button>
-                    <p className="max-w-[220px] text-xs text-slate-500 dark:text-[#7e8794] lg:text-right">
-                      Preview the internship, choose a duration, and submit from the modal.
-                    </p>
-                  </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>

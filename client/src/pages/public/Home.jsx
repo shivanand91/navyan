@@ -27,6 +27,11 @@ import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 
 const VISITOR_STORAGE_KEY = "navyan_visitor_id";
+const durationFallbackLabels = {
+  "4-weeks": "4 weeks",
+  "3-months": "3 months",
+  "6-months": "6 months"
+};
 
 const workflowSteps = [
   {
@@ -161,6 +166,9 @@ const referralSignals = [
   "Applications linked to a referral are tracked automatically in the backend.",
   "Rewards can be aligned to actual application volume and performance outcomes."
 ];
+
+const getDurationLabel = (duration) =>
+  duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
 
 export default function Home() {
   const [internships, setInternships] = useState([]);
@@ -502,6 +510,114 @@ export default function Home() {
               </RevealInView>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="navyan-section px-4 md:px-6">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <SectionHeading
+            eyebrow="Live Internships"
+            title="Explore currently open internships."
+            description="Every live internship now includes a feature image, key role details, and a direct path into the application flow."
+          />
+
+          {loading ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="navyan-card h-[430px] animate-pulse bg-white/40 dark:bg-white/5"
+                />
+              ))}
+            </div>
+          ) : internships.length === 0 ? (
+            <div className="navyan-card px-6 py-12 text-center">
+              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                No live internships at the moment.
+              </p>
+              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
+                New cohorts will appear here as soon as the admin publishes them.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {internships.slice(0, 3).map((internship, index) => (
+                <RevealInView key={internship._id} delay={index * 0.05}>
+                  <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
+                    <div className="relative h-56 overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
+                      {internship.coverImageUrl ? (
+                        <img
+                          src={internship.coverImageUrl}
+                          alt={internship.title}
+                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-[#7e8794]">
+                          Navyan internship live
+                        </div>
+                      )}
+                      <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
+                        {internship.mode?.toUpperCase() || "REMOTE"}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col px-5 py-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
+                          {internship.role || "Internship track"}
+                        </span>
+                      </div>
+
+                      <div className="mt-4">
+                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+                          {internship.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                          {internship.shortDescription}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 grid gap-2">
+                        {(internship.durations || []).slice(0, 3).map((duration) => (
+                          <div
+                            key={duration.key}
+                            className="rounded-[18px] border border-black/8 bg-black/[0.03] px-4 py-3 dark:border-white/8 dark:bg-white/5"
+                          >
+                            <p className="text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
+                              {getDurationLabel(duration)}
+                            </p>
+                            <p className="mt-1 text-[11px] text-slate-500 dark:text-[#7e8794]">
+                              {duration.isPaid ? "Paid track" : "Free track"}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-auto border-t border-black/8 pt-4 dark:border-white/8">
+                        <Link to={`/internships/${internship.slug}`}>
+                          <Button className="w-full">
+                            Apply Now
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </RevealInView>
+              ))}
+            </div>
+          )}
+
+          {internships.length > 3 ? (
+            <div className="flex justify-center">
+              <Link to="/internships">
+                <Button variant="outline" size="lg">
+                  View all internships
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          ) : null}
         </div>
       </section>
 

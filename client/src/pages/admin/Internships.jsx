@@ -19,6 +19,8 @@ export default function AdminInternships() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [coverImageFile, setCoverImageFile] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState("");
 
   const load = async () => {
     try {
@@ -40,6 +42,24 @@ export default function AdminInternships() {
   const resetForm = () => {
     setForm(createEmptyForm());
     setEditingId(null);
+    setCoverImageFile(null);
+    setCoverImagePreview("");
+  };
+
+  const buildPayload = () => {
+    const payload = new FormData();
+
+    payload.append("title", form.title);
+    payload.append("slug", form.slug);
+    payload.append("shortDescription", form.shortDescription);
+    payload.append("role", form.role);
+    payload.append("mode", form.mode);
+
+    if (coverImageFile) {
+      payload.append("coverImage", coverImageFile);
+    }
+
+    return payload;
   };
 
   const handleSubmit = async (e) => {
@@ -47,21 +67,24 @@ export default function AdminInternships() {
     setSaving(true);
     try {
       if (editingId) {
-        await api.put(`/internships/admin/${editingId}`, {
-          ...form,
-          shortDescription: form.shortDescription
+        await api.put(`/internships/admin/${editingId}`, buildPayload(), {
+          headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success("Internship updated.");
       } else {
-        await api.post("/internships/admin", {
-          ...form,
-          shortDescription: form.shortDescription,
-          isPublished: true,
-          durations: [
+        const payload = buildPayload();
+        payload.append("isPublished", "true");
+        payload.append(
+          "durations",
+          JSON.stringify([
             { key: "4-weeks", label: "4 weeks", isPaid: true, price: 9 },
             { key: "3-months", label: "3 months", isPaid: true },
             { key: "6-months", label: "6 months", isPaid: true }
-          ]
+          ])
+        );
+
+        await api.post("/internships/admin", payload, {
+          headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success("Internship created.");
       }
@@ -84,9 +107,17 @@ export default function AdminInternships() {
       role: internship.role || "",
       mode: internship.mode || "remote"
     });
+    setCoverImageFile(null);
+    setCoverImagePreview(internship.coverImageUrl || "");
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setCoverImageFile(file);
+    setCoverImagePreview(file ? URL.createObjectURL(file) : "");
   };
 
   const handleDelete = async (internship) => {
@@ -125,7 +156,7 @@ export default function AdminInternships() {
 
       <form
         onSubmit={handleSubmit}
-        className="navyan-card grid gap-4 p-5 md:grid-cols-4 text-xs"
+        className="navyan-card grid gap-4 p-5 text-xs md:grid-cols-4"
       >
         <Field label="Title">
           <Input name="title" value={form.title} onChange={handleChange} />
@@ -148,6 +179,33 @@ export default function AdminInternships() {
             />
           </Field>
         </div>
+        <div className="md:col-span-1">
+          <Field label="Feature image">
+            <Input type="file" accept="image/*" onChange={handleImageChange} />
+          </Field>
+        </div>
+        {(coverImagePreview || editingId) ? (
+          <div className="md:col-span-3">
+            <div className="space-y-2">
+              <p className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                Image preview
+              </p>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-[#2a2a36] dark:bg-[#16161f]">
+                {coverImagePreview ? (
+                  <img
+                    src={coverImagePreview}
+                    alt="Internship cover preview"
+                    className="h-44 w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-44 items-center justify-center text-xs text-slate-500 dark:text-slate-400">
+                    No feature image uploaded yet.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
         <div className="md:col-span-1 flex items-end">
           <div className="flex w-full gap-2">
             <Button type="submit" disabled={saving} className="w-full">
@@ -179,13 +237,28 @@ export default function AdminInternships() {
             internships.map((i) => (
               <div
                 key={i._id}
-                className="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between"
+                className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between"
               >
-                <div>
-                  <p className="font-medium text-slate-800 dark:text-slate-100">{i.title}</p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {i.role} · {i.mode?.toUpperCase()} · Slug: {i.slug}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="h-16 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-[#2a2a36] dark:bg-[#16161f]">
+                    {i.coverImageUrl ? (
+                      <img
+                        src={i.coverImageUrl}
+                        alt={i.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[10px] text-slate-500 dark:text-slate-400">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-800 dark:text-slate-100">{i.title}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {i.role} · {i.mode?.toUpperCase()} · Slug: {i.slug}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-700">
