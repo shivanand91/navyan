@@ -147,6 +147,9 @@ export function PublicLayout() {
               <Link to="/about" className="block text-sm text-textSecondary hover:text-primary dark:text-white/70 dark:hover:text-accent transition">
                 About Us
               </Link>
+              <Link to="/jobs" className="block text-sm text-textSecondary hover:text-primary dark:text-white/70 dark:hover:text-accent transition">
+                Career
+              </Link>
               <Link to="/contact" className="block text-sm text-textSecondary hover:text-primary dark:text-white/70 dark:hover:text-accent transition">
                 Contact
               </Link>
