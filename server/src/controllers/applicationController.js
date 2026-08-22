@@ -38,7 +38,7 @@ import {
 import { buildClientUrl, buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
-const PAYMENT_INTENT_TTL_MINUTES = 30;
+const PAYMENT_INTENT_TTL_MINUTES = 5;
 const UPI_UTR_REGEX = /^\d{12}$/;
 
 const createPaymentReference = (internshipId, durationKey) =>
@@ -233,6 +233,7 @@ const INTERNSHIP_SELECT = [
   "durations.key",
   "durations.label",
   "durations.isPaid",
+  "durations.price",
   "durations.taskPdfUrl"
 ].join(" ");
 
@@ -462,8 +463,12 @@ export const createPaymentIntent = async (req, res, next) => {
       qrCodeDataUrl,
       minimumConfirmationSeconds: PAYMENT_CONFIRMATION_WINDOW_SECONDS,
       issuedAt: paymentAttempt.createdAt,
+      expiresAt: new Date(
+        new Date(paymentAttempt.createdAt).getTime() + PAYMENT_INTENT_TTL_MINUTES * 60 * 1000
+      ),
+      expiresInSeconds: PAYMENT_INTENT_TTL_MINUTES * 60,
       expiresNote:
-        "Complete payment, wait briefly for the payment app to generate the UTR, then submit the 12-digit reference number."
+        "QR code is valid for 5 minutes. If payment fails or the QR expires, generate a fresh QR and try again with the new payment reference."
     });
   } catch (err) {
     if (err?.code === 11000) {

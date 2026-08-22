@@ -77,9 +77,9 @@ export default function AdminInternships() {
         payload.append(
           "durations",
           JSON.stringify([
-            { key: "4-weeks", label: "4 weeks", isPaid: true, price: 9 },
-            { key: "3-months", label: "3 months", isPaid: true },
-            { key: "6-months", label: "6 months", isPaid: true }
+            { key: "4-weeks", label: "4 weeks", isPaid: true, price: 49 },
+            { key: "3-months", label: "3 months", isPaid: true, price: 2499 },
+            { key: "6-months", label: "6 months", isPaid: true, price: 4499 }
           ])
         );
 

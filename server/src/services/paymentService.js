@@ -1,9 +1,9 @@
 import QRCode from "qrcode";
 
 const DEFAULT_PRICING = {
-  "4-weeks": 9,
-  "3-months": 1499,
-  "6-months": 2499
+  "4-weeks": 49,
+  "3-months": 2499,
+  "6-months": 4499
 };
 
 export const getDurationPricing = (internship, durationKey) => {
@@ -12,10 +12,7 @@ export const getDurationPricing = (internship, durationKey) => {
     return { duration: null, amount: 0, isPaid: false };
   }
 
-  const amount =
-    typeof duration.price === "number" && duration.price > 0
-      ? duration.price
-      : DEFAULT_PRICING[durationKey] || 0;
+  const amount = DEFAULT_PRICING[durationKey] || 0;
 
   return {
     duration,

@@ -1,17 +1,25 @@
-export const MINIMUM_FOUR_WEEK_PRICE = 0;
+export const MINIMUM_FOUR_WEEK_PRICE = 49;
 
 const DEFAULT_DURATION_PRICING = {
-  "4-weeks": 0,
-  "3-months": 0,
-  "6-months": 0
+  "4-weeks": 49,
+  "3-months": 2499,
+  "6-months": 4499
 };
 
 export const getEffectiveDurationPrice = (duration) => {
-  return 0;
+  if (!duration) return 0;
+  return DEFAULT_DURATION_PRICING[duration.key] || 0;
 };
 
-export const isPaidDuration = (duration) => false;
+export const isPaidDuration = (duration) => {
+  if (!duration) return false;
+  return Boolean(duration.isPaid) || getEffectiveDurationPrice(duration) > 0;
+};
 
 export const getDurationPriceLabel = (duration) => {
-  return "Free";
+  if (!isPaidDuration(duration)) {
+    return "Free";
+  }
+
+  return `Rs ${getEffectiveDurationPrice(duration).toLocaleString("en-IN")}`;
 };

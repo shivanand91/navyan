@@ -5,6 +5,7 @@ import {
   CircleDollarSign,
   Compass,
   CreditCard,
+  RefreshCw,
   ShieldCheck,
   Sparkles
 } from "lucide-react";
@@ -41,6 +42,7 @@ const getPriceLabel = (duration) => {
 
 const normalizeUtr = (value) => String(value || "").replace(/\D/g, "").slice(0, 12);
 const isValidUpiUtr = (value) => /^\d{12}$/.test(normalizeUtr(value));
+const formatCurrency = (amount) => `Rs ${Number(amount || 0).toLocaleString("en-IN")}`;
 
 export default function StudentInternships() {
   const [internships, setInternships] = useState([]);
@@ -145,7 +147,8 @@ export default function StudentInternships() {
         durationKey
       });
       setPaymentSessions((prev) => ({ ...prev, [key]: data }));
-      toast.success("New UPI QR generated. Pay first, then enter the UTR.");
+      updateForm(key, "utrNumber", "");
+      toast.success("New UPI QR generated for 5 minutes. Complete payment and then submit the UTR.");
     } catch (error) {
       console.error(error);
       const response = error?.response?.data;
@@ -259,6 +262,8 @@ export default function StudentInternships() {
 
   const currentPaymentSession = currentKey ? paymentSessions[currentKey] : null;
   const remainingWaitSeconds = getRemainingWaitSeconds(currentPaymentSession);
+  const qrRemainingSeconds = getQrRemainingSeconds(currentPaymentSession);
+  const paymentSessionExpired = isPaymentSessionExpired(currentPaymentSession);
 
   return (
     <>
@@ -471,8 +476,9 @@ export default function StudentInternships() {
                     </p>
                   </div>
                   <p className="mt-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    Select a duration first. Paid tracks require UPI payment and manual payment
-                    verification before the application can move forward.
+                    Start by selecting the internship duration. For paid tracks, the application
+                    follows a professional 3-step flow: choose duration, generate a 5-minute QR,
+                    complete payment, then enter the UTR and submit.
                   </p>
 
                   {applicationsLocked ? (
@@ -544,9 +550,45 @@ export default function StudentInternships() {
                           Paid application for {getDurationLabel(currentDuration)}
                         </p>
                         <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
-                          UPI payment is required. Only a 12-digit UPI reference number is
-                          accepted, and every paid application moves into admin verification before
-                          review.
+                          UPI payment is required for this duration. UTR is mandatory, the QR stays
+                          valid for only 5 minutes, and if a payment attempt fails you can safely
+                          generate a fresh QR and retry.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 md:grid-cols-3">
+                      <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                          Step 1
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-[color:var(--text)]">
+                          Select internship type
+                        </p>
+                        <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
+                          Duration selected: {getDurationLabel(currentDuration)}
+                        </p>
+                      </div>
+                      <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                          Step 2
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-[color:var(--text)]">
+                          Generate QR and pay
+                        </p>
+                        <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
+                          Amount: {getPriceLabel(currentDuration)}
+                        </p>
+                      </div>
+                      <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                          Step 3
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-[color:var(--text)]">
+                          Enter UTR and submit
+                        </p>
+                        <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
+                          Application will not submit without a valid 12-digit UTR.
                         </p>
                       </div>
                     </div>
@@ -558,8 +600,8 @@ export default function StudentInternships() {
                             Amount to pay: {getPriceLabel(currentDuration)}
                           </p>
                           <p className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                            Generate a fresh QR code, complete payment from your UPI app, then
-                            enter the UTR number here.
+                            A unique QR will be generated for this payment attempt. It remains
+                            valid for 5 minutes only.
                           </p>
                         </div>
                         <Button
@@ -583,16 +625,34 @@ export default function StudentInternships() {
                             />
                             <div className="space-y-1 text-center">
                               <p className="text-sm font-semibold text-[color:var(--text)]">
-                                Pay Rs {currentPaymentSession.amount}
+                                Pay {formatCurrency(currentPaymentSession.amount)}
                               </p>
                               <p className="text-[11px] text-[color:var(--text-secondary)]">
                                 Payment reference: {currentPaymentSession.paymentReference}
+                              </p>
+                              <p className="text-[11px] text-[color:var(--text-secondary)]">
+                                QR validity:{" "}
+                                {paymentSessionExpired
+                                  ? "Expired"
+                                  : `${qrRemainingSeconds}s remaining`}
                               </p>
                               <p className="text-[11px] text-[color:var(--text-secondary)]">
                                 UTR accepted after {currentPaymentSession.minimumConfirmationSeconds}s from QR generation.
                               </p>
                             </div>
                           </div>
+                        </div>
+
+                        <div
+                          className={`rounded-[22px] border px-4 py-3 text-xs leading-6 ${
+                            paymentSessionExpired
+                              ? "border-danger/18 bg-danger/12 text-danger"
+                              : "border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--text-secondary)]"
+                          }`}
+                        >
+                          {paymentSessionExpired
+                            ? "This QR has expired. Generate a fresh QR code and complete payment with the new reference."
+                            : "If payment fails, you close the app, or the QR times out, just generate a fresh QR. You will not be blocked by an old initiated payment session."}
                         </div>
 
                         <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
@@ -602,6 +662,8 @@ export default function StudentInternships() {
                           <Input
                             className="mt-3"
                             placeholder="Enter 12-digit UTR"
+                            inputMode="numeric"
+                            maxLength={12}
                             value={forms[currentKey]?.utrNumber || ""}
                             onChange={(event) =>
                               updateForm(
@@ -624,7 +686,9 @@ export default function StudentInternships() {
                                 : "12 digits required"}
                             </span>
                             <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-secondary)]">
-                              {remainingWaitSeconds > 0
+                              {paymentSessionExpired
+                                ? "QR expired"
+                                : remainingWaitSeconds > 0
                                 ? `Wait ${remainingWaitSeconds}s`
                                 : "Ready to submit"}
                             </span>
@@ -638,6 +702,7 @@ export default function StudentInternships() {
                             disabled={
                               applicationsLocked ||
                               submittingId === currentKey ||
+                              paymentSessionExpired ||
                               remainingWaitSeconds > 0 ||
                               !isValidUpiUtr(forms[currentKey]?.utrNumber)
                             }
@@ -654,6 +719,7 @@ export default function StudentInternships() {
                             disabled={paymentLoadingId === currentKey || applicationsLocked}
                             onClick={() => generatePaymentQr(activeInternship._id, currentDuration.key)}
                           >
+                            <RefreshCw className="mr-2 h-4 w-4" />
                             Generate fresh QR
                           </Button>
                         </div>
@@ -707,5 +773,26 @@ export default function StudentInternships() {
 
     const elapsedSeconds = Math.floor((ticker - issuedAtMs) / 1000);
     return Math.max(0, paymentSession.minimumConfirmationSeconds - elapsedSeconds);
+  }
+
+  function getQrRemainingSeconds(paymentSession) {
+    if (!paymentSession?.expiresAt) {
+      return 0;
+    }
+
+    const expiresAtMs = new Date(paymentSession.expiresAt).getTime();
+    if (Number.isNaN(expiresAtMs)) {
+      return 0;
+    }
+
+    return Math.max(0, Math.ceil((expiresAtMs - ticker) / 1000));
+  }
+
+  function isPaymentSessionExpired(paymentSession) {
+    if (!paymentSession?.expiresAt) {
+      return false;
+    }
+
+    return getQrRemainingSeconds(paymentSession) <= 0;
   }
 }
