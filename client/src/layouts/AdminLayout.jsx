@@ -12,7 +12,8 @@ import {
   Search,
   Share2,
   ShieldCheck,
-  Users2
+  Users2,
+  Trophy
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,8 @@ const links = [
   { to: "/admin/submissions", label: "Submissions", icon: FileSearch, caption: "Reviews" },
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },
   { to: "/admin/service-inquiries", label: "Service Leads", icon: Layers3, caption: "Pipeline" },
-  { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" }
+  { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" },
+  { to: "/admin/hackathons", label: "Hackathons", icon: Trophy, caption: "Events" }
 ];
 
 export function AdminLayout() {

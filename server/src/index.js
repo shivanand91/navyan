@@ -24,6 +24,7 @@ import jobRoutes from "./routes/jobRoutes.js";
 import referralRoutes from "./routes/referralRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import alertRoutes from "./routes/alertRoutes.js";
+import hackathonRoutes from "./routes/hackathonRoutes.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
@@ -137,6 +138,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/referrals", referralRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/alerts", alertRoutes);
+app.use("/api/hackathons", hackathonRoutes);
 
 // 404 + errors
 app.use(notFound);

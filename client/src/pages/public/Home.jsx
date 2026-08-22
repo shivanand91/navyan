@@ -16,7 +16,8 @@ import {
   Sparkles,
   Stars,
   Users2,
-  WalletCards
+  WalletCards,
+  Trophy
 } from "lucide-react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
@@ -171,6 +172,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [servicesLoading, setServicesLoading] = useState(true);
   const [visitorStats, setVisitorStats] = useState(null);
+  const [hackathons, setHackathons] = useState([]);
 
   const faqItems = useMemo(
     () =>
@@ -195,16 +197,19 @@ export default function Home() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [internshipsResponse, servicesResponse] = await Promise.all([
+        const [internshipsResponse, servicesResponse, hackathonsResponse] = await Promise.all([
           api.get("/internships"),
-          api.get("/services")
+          api.get("/services"),
+          api.get("/hackathons").catch(() => ({ data: { hackathons: [] } }))
         ]);
         setInternships(internshipsResponse.data.internships || []);
         setServices(servicesResponse.data.services || []);
+        setHackathons(hackathonsResponse.data.hackathons || []);
       } catch (error) {
         console.error(error);
         setInternships([]);
         setServices([]);
+        setHackathons([]);
       } finally {
         setLoading(false);
         setServicesLoading(false);
@@ -271,6 +276,23 @@ export default function Home() {
 
   return (
     <div className="pb-10">
+      {/* Hackathon Marquee */}
+      {hackathons.length > 0 && (
+        <div className="bg-[#6D28D9] dark:bg-[#8B5CF6] text-white overflow-hidden py-2 font-display text-xs font-semibold uppercase tracking-wider relative z-20 border-b border-border dark:border-[#2a2a36]">
+          <div className="animate-marquee whitespace-nowrap flex gap-12">
+            {Array(4).fill(null).map((_, i) => (
+              <span key={i} className="inline-flex gap-12">
+                {hackathons.map((h) => (
+                  <span key={h._id} className="inline-flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                    🚀 HACKATHON LIVE: {h.title} — Team size limit: {h.minTeamSize}-{h.maxTeamSize} person{h.maxTeamSize > 1 ? "s" : ""}! Click below to register!
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       <section className="navyan-section overflow-hidden px-4 pb-8 pt-8 md:px-6 md:pt-14">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div className="space-y-8">
@@ -426,6 +448,76 @@ export default function Home() {
           </RevealInView>
         </div>
       </section>
+
+      {/* Hackathons Showcase */}
+      {hackathons.length > 0 && (
+        <section className="navyan-section px-4 md:px-6 bg-backgroundSecondary/30 dark:bg-[#16161d]/20 border-y border-border">
+          <div className="mx-auto max-w-7xl space-y-8">
+            <SectionHeading
+              eyebrow="Special Event"
+              title="Active Hackathons & Coding Challenges"
+              description="Join our team-based challenges. Showcase your skills, form teams, and win recognition."
+            />
+            <div className="grid gap-6 md:grid-cols-2">
+              {hackathons.map((hackathon, idx) => (
+                <RevealInView key={hackathon._id} delay={idx * 0.05}>
+                  <div className="navyan-card group overflow-hidden border border-border dark:border-[#2a2a36] bg-card dark:bg-[#1a1a22] flex flex-col md:flex-row h-full rounded-2xl">
+                    <div className="md:w-2/5 relative aspect-video md:aspect-auto overflow-hidden bg-slate-950">
+                      {hackathon.coverImageUrl ? (
+                        <img
+                          src={hackathon.coverImageUrl}
+                          alt={hackathon.title}
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-slate-900 text-xs text-textMuted">
+                          No cover image
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3 bg-[#6D28D9] dark:bg-[#8B5CF6] text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full tracking-wide">
+                        Registration Open
+                      </div>
+                    </div>
+                    <div className="p-6 md:w-3/5 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        <h3 className="font-display text-xl font-semibold text-textPrimary tracking-tight">
+                          {hackathon.title}
+                        </h3>
+                        <p className="text-xs font-semibold text-[#6D28D9] dark:text-[#8B5CF6] flex items-center gap-1.5">
+                          <Trophy className="h-3.5 w-3.5" />
+                          Team Size limit: {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
+                        </p>
+                        <p className="text-sm text-textSecondary leading-relaxed line-clamp-3">
+                          {hackathon.description}
+                        </p>
+                      </div>
+                      <div>
+                        {hackathon.registrationLink ? (
+                          <a
+                            href={hackathon.registrationLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex w-full"
+                          >
+                            <Button variant="accent" className="w-full justify-center">
+                              Register Now
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </a>
+                        ) : (
+                          <Button disabled variant="outline" className="w-full">
+                            Registrations Closed
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </RevealInView>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section id="how-navyan-works" className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
