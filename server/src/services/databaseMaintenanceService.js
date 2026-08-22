@@ -4,7 +4,19 @@ const LEGACY_APPLICATION_UNIQUE_INDEX = "user_1_internship_1_durationKey_1";
 
 const dropLegacyApplicationIndex = async () => {
   const collection = Application.collection;
-  const indexes = await collection.indexes();
+
+  let indexes;
+  try {
+    indexes = await collection.indexes();
+  } catch (error) {
+    if (error?.code !== 26 && error?.codeName !== "NamespaceNotFound") {
+      throw error;
+    }
+
+    await Application.createIndexes();
+    return;
+  }
+
   const legacyIndex = indexes.find(
     (index) =>
       index.name === LEGACY_APPLICATION_UNIQUE_INDEX &&

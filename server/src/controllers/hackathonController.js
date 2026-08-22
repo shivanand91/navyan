@@ -130,7 +130,7 @@ export const adminUpdateHackathon = async (req, res, next) => {
 
     hackathon.title = title;
     hackathon.slug = nextSlug;
-    hackathon.tag = String(updates.tag ?? hackathon.tag || "Hackathon").trim() || "Hackathon";
+    hackathon.tag = String(updates.tag ?? hackathon.tag ?? "Hackathon").trim() || "Hackathon";
     hackathon.description = updates.description ?? hackathon.description;
     if (updates.coverImageUrl !== undefined) {
       hackathon.coverImageUrl = updates.coverImageUrl;

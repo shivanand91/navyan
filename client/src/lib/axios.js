@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const ACCESS_TOKEN_STORAGE_KEY = "navyan_access_token";
-const PRODUCTION_API_BASE_URL = "https://navyan.vercel.app/api";
+const PRODUCTION_API_BASE_URL = "/api";
 const LOCAL_API_URL_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?/i;
 const DEFAULT_GET_CACHE_TTL = 5 * 60 * 1000;
 
