@@ -478,61 +478,59 @@ export default function Home() {
         <section className="navyan-section px-4 md:px-6 bg-backgroundSecondary/30 dark:bg-[#16161d]/20 border-y border-border">
           <div className="mx-auto max-w-7xl space-y-8">
             <SectionHeading
-              eyebrow="Special Event"
-              title="Active Hackathons & Coding Challenges"
-              description="Join our team-based challenges. Showcase your skills, form teams, and win recognition."
+              eyebrow="Hackathons"
+              title="Live Challenges"
+              description="Latest team challenges and updates."
             />
-            <div className="grid gap-8 xl:grid-cols-2">
+            <div className="grid gap-6">
               {hackathons.map((hackathon, idx) => (
                 <RevealInView key={hackathon._id} delay={idx * 0.05}>
-                  <div className="navyan-card group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-card dark:border-[#2a2a36] dark:bg-[#1a1a22]">
-                    <div className="relative aspect-[16/9] overflow-hidden bg-slate-950">
+                  <div className="navyan-card group grid overflow-hidden rounded-[30px] border border-[#f28b90]/60 bg-[#121212] p-4 dark:border-[#f28b90]/60 dark:bg-[#121212] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6 lg:p-5">
+                    <div className="relative overflow-hidden rounded-[24px] border border-[#f28b90]/70 bg-slate-950">
                       {hackathon.coverImageUrl ? (
                         <img
                           src={hackathon.coverImageUrl}
                           alt={hackathon.title}
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          className="aspect-[16/9] h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] lg:aspect-auto lg:min-h-[360px]"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-slate-900 text-xs text-textMuted">
+                        <div className="flex aspect-[16/9] h-full w-full items-center justify-center bg-slate-900 text-xs text-slate-400 lg:min-h-[360px]">
                           No cover image
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-full bg-[#6D28D9] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white dark:bg-[#8B5CF6]">
-                        Registration Open
+                      <div className="absolute left-4 top-4 rounded-full border border-[#f28b90]/80 bg-[#121212]/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8f96]">
+                        Live
                       </div>
                     </div>
-                    <div className="flex flex-1 flex-col justify-between p-6 md:p-7">
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className="inline-flex items-center gap-2 rounded-full border border-[#6D28D9]/20 bg-[#6D28D9]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6D28D9] dark:border-[#8B5CF6]/20 dark:bg-[#8B5CF6]/10 dark:text-[#c8b5ff]">
-                            <Trophy className="h-3.5 w-3.5" />
-                            Featured event
-                          </span>
-                          <span className="rounded-full border border-border bg-backgroundSecondary px-3 py-1 text-[11px] font-medium text-textSecondary">
-                            Team Size: {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
-                          </span>
-                        </div>
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary md:text-3xl">
-                          {hackathon.title}
-                        </h3>
-                        <p className="text-base leading-8 text-textSecondary">
-                          {getHackathonExcerpt(hackathon.description)}
-                        </p>
-                        <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 px-4 py-4 dark:bg-white/[0.03]">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
-                            Quick overview
+                    <div className="flex min-h-full flex-col justify-between px-1 py-2 lg:px-2">
+                      <div className="space-y-5">
+                        <div className="space-y-3">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#ff8f96]/80">
+                            Hackathon update
                           </p>
-                          <p className="mt-2 text-sm leading-7 text-textSecondary">
-                            View details in a modal and open the registration form in a new browser tab outside Navyan.
+                          <h3 className="font-display text-xl font-semibold tracking-[-0.03em] text-white md:text-2xl">
+                            {hackathon.title}
+                          </h3>
+                          <p className="text-sm leading-7 text-slate-300">
+                            {getHackathonExcerpt(hackathon.description)}
+                          </p>
+                        </div>
+
+                        <div className="rounded-[20px] border border-[#f28b90]/60 bg-[#171717] px-4 py-3">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#ff8f96]/80">
+                            Team size
+                          </p>
+                          <p className="mt-2 text-sm text-slate-200">
+                            {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+
+                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
                         <Button
                           type="button"
                           variant="outline"
-                          className="flex-1"
+                          className="h-12 rounded-[20px] border-[#f28b90]/70 bg-transparent text-white hover:bg-white/5 hover:text-white"
                           onClick={() => setActiveHackathon(hackathon)}
                         >
                           View Details
@@ -542,16 +540,22 @@ export default function Home() {
                             href={normalizeExternalUrl(hackathon.registrationLink)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1"
+                            className="block"
                           >
-                            <Button variant="accent" className="w-full justify-center">
-                              Open Registration Form
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                            <Button
+                              variant="outline"
+                              className="h-12 w-full rounded-[20px] border-[#f28b90]/70 bg-transparent text-white hover:bg-white/5 hover:text-white"
+                            >
+                              Open Form
                             </Button>
                           </a>
                         ) : (
-                          <Button disabled variant="outline" className="flex-1">
-                            Registrations Closed
+                          <Button
+                            disabled
+                            variant="outline"
+                            className="h-12 rounded-[20px] border-[#f28b90]/40 bg-transparent text-slate-400"
+                          >
+                            Closed
                           </Button>
                         )}
                       </div>
