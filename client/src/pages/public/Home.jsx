@@ -23,6 +23,7 @@ import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion } from "@/components/ui/accordion";
+import { ModalShell } from "@/components/premium/ModalShell";
 import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 
@@ -166,6 +167,28 @@ const faqData = [
 const getDurationLabel = (duration) =>
   duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
 
+const getHackathonExcerpt = (description) => {
+  const normalized = String(description || "").trim().replace(/\s+/g, " ");
+  if (normalized.length <= 160) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, 157).trimEnd()}...`;
+};
+
+const normalizeExternalUrl = (value) => {
+  const normalized = String(value || "").trim();
+  if (!normalized) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(normalized)) {
+    return normalized;
+  }
+
+  return `https://${normalized}`;
+};
+
 export default function Home() {
   const [internships, setInternships] = useState([]);
   const [services, setServices] = useState([]);
@@ -173,6 +196,7 @@ export default function Home() {
   const [servicesLoading, setServicesLoading] = useState(true);
   const [visitorStats, setVisitorStats] = useState(null);
   const [hackathons, setHackathons] = useState([]);
+  const [activeHackathon, setActiveHackathon] = useState(null);
 
   const faqItems = useMemo(
     () =>
@@ -458,54 +482,75 @@ export default function Home() {
               title="Active Hackathons & Coding Challenges"
               description="Join our team-based challenges. Showcase your skills, form teams, and win recognition."
             />
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-8 xl:grid-cols-2">
               {hackathons.map((hackathon, idx) => (
                 <RevealInView key={hackathon._id} delay={idx * 0.05}>
-                  <div className="navyan-card group overflow-hidden border border-border dark:border-[#2a2a36] bg-card dark:bg-[#1a1a22] flex flex-col md:flex-row h-full rounded-2xl">
-                    <div className="md:w-2/5 relative aspect-video md:aspect-auto overflow-hidden bg-slate-950">
+                  <div className="navyan-card group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-card dark:border-[#2a2a36] dark:bg-[#1a1a22]">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-slate-950">
                       {hackathon.coverImageUrl ? (
                         <img
                           src={hackathon.coverImageUrl}
                           alt={hackathon.title}
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-slate-900 text-xs text-textMuted">
                           No cover image
                         </div>
                       )}
-                      <div className="absolute top-3 left-3 bg-[#6D28D9] dark:bg-[#8B5CF6] text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full tracking-wide">
+                      <div className="absolute left-4 top-4 rounded-full bg-[#6D28D9] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white dark:bg-[#8B5CF6]">
                         Registration Open
                       </div>
                     </div>
-                    <div className="p-6 md:w-3/5 flex flex-col justify-between space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="font-display text-xl font-semibold text-textPrimary tracking-tight">
+                    <div className="flex flex-1 flex-col justify-between p-6 md:p-7">
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="inline-flex items-center gap-2 rounded-full border border-[#6D28D9]/20 bg-[#6D28D9]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6D28D9] dark:border-[#8B5CF6]/20 dark:bg-[#8B5CF6]/10 dark:text-[#c8b5ff]">
+                            <Trophy className="h-3.5 w-3.5" />
+                            Featured event
+                          </span>
+                          <span className="rounded-full border border-border bg-backgroundSecondary px-3 py-1 text-[11px] font-medium text-textSecondary">
+                            Team Size: {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
+                          </span>
+                        </div>
+                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary md:text-3xl">
                           {hackathon.title}
                         </h3>
-                        <p className="text-xs font-semibold text-[#6D28D9] dark:text-[#8B5CF6] flex items-center gap-1.5">
-                          <Trophy className="h-3.5 w-3.5" />
-                          Team Size limit: {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
+                        <p className="text-base leading-8 text-textSecondary">
+                          {getHackathonExcerpt(hackathon.description)}
                         </p>
-                        <p className="text-sm text-textSecondary leading-relaxed line-clamp-3">
-                          {hackathon.description}
-                        </p>
+                        <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 px-4 py-4 dark:bg-white/[0.03]">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
+                            Quick overview
+                          </p>
+                          <p className="mt-2 text-sm leading-7 text-textSecondary">
+                            View details in a modal and open the registration form in a new browser tab outside Navyan.
+                          </p>
+                        </div>
                       </div>
-                      <div>
+                      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setActiveHackathon(hackathon)}
+                        >
+                          View Details
+                        </Button>
                         {hackathon.registrationLink ? (
                           <a
-                            href={hackathon.registrationLink}
+                            href={normalizeExternalUrl(hackathon.registrationLink)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex w-full"
+                            className="flex-1"
                           >
                             <Button variant="accent" className="w-full justify-center">
-                              Register Now
+                              Open Registration Form
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                           </a>
                         ) : (
-                          <Button disabled variant="outline" className="w-full">
+                          <Button disabled variant="outline" className="flex-1">
                             Registrations Closed
                           </Button>
                         )}
@@ -518,6 +563,82 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      <ModalShell
+        open={Boolean(activeHackathon)}
+        onClose={() => setActiveHackathon(null)}
+        title={activeHackathon?.title}
+        description="Review the complete hackathon details here, then open the registration form in a new tab."
+      >
+        {activeHackathon ? (
+          <div className="space-y-6">
+            <div className="overflow-hidden rounded-[24px] border border-border bg-backgroundSecondary">
+              {activeHackathon.coverImageUrl ? (
+                <img
+                  src={activeHackathon.coverImageUrl}
+                  alt={activeHackathon.title}
+                  className="aspect-[16/8] w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-[16/8] items-center justify-center bg-slate-900 text-sm text-slate-300">
+                  No cover image
+                </div>
+              )}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
+                  Event status
+                </p>
+                <p className="mt-2 text-sm font-semibold text-textPrimary">Registration Open</p>
+              </div>
+              <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
+                  Team size
+                </p>
+                <p className="mt-2 text-sm font-semibold text-textPrimary">
+                  {activeHackathon.minTeamSize === activeHackathon.maxTeamSize
+                    ? `${activeHackathon.minTeamSize} member(s)`
+                    : `${activeHackathon.minTeamSize} to ${activeHackathon.maxTeamSize} members`}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-border bg-[color:var(--card)] p-5 md:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
+                Hackathon details
+              </p>
+              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-textSecondary">
+                {activeHackathon.description}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {activeHackathon.registrationLink ? (
+                <a
+                  href={normalizeExternalUrl(activeHackathon.registrationLink)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sm:flex-1"
+                >
+                  <Button variant="accent" className="w-full justify-center">
+                    Open Registration Form
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </a>
+              ) : (
+                <Button disabled variant="outline" className="sm:flex-1">
+                  Registrations Closed
+                </Button>
+              )}
+              <Button type="button" variant="outline" className="sm:flex-1" onClick={() => setActiveHackathon(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </ModalShell>
 
       <section id="how-navyan-works" className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
