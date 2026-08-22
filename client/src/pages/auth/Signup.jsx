@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import api, { getApiErrorMessage } from "@/lib/axios";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -83,7 +84,7 @@ export default function Signup() {
               <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
                 Password
               </label>
-              <Input type="password" placeholder="Choose a secure password" {...register("password")} />
+              <PasswordInput placeholder="Choose a secure password" {...register("password")} />
               {errors.password ? (
                 <p className="text-xs text-danger font-medium mt-1">{errors.password.message}</p>
               ) : null}

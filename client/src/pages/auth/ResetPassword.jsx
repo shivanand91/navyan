@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, KeyRound } from "lucide-react";
 import api, { getApiErrorMessage } from "@/lib/axios";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import BrandLogo from "@/components/BrandLogo";
@@ -63,7 +63,7 @@ export default function ResetPassword() {
               <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
                 New Password
               </label>
-              <Input type="password" placeholder="Enter new password" {...register("password")} />
+              <PasswordInput placeholder="Enter new password" {...register("password")} />
               {errors.password ? (
                 <p className="text-xs text-danger font-medium mt-1">{errors.password.message}</p>
               ) : null}
@@ -73,11 +73,7 @@ export default function ResetPassword() {
               <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
                 Confirm Password
               </label>
-              <Input
-                type="password"
-                placeholder="Confirm new password"
-                {...register("confirmPassword")}
-              />
+              <PasswordInput placeholder="Confirm new password" {...register("confirmPassword")} />
               {errors.confirmPassword ? (
                 <p className="text-xs text-danger font-medium mt-1">{errors.confirmPassword.message}</p>
               ) : null}
