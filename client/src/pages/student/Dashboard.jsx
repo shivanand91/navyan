@@ -28,9 +28,9 @@ const TASK_LINK_VISIBLE_STATUSES = [
 ];
 
 const panelClass =
-  "rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm";
+  "rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm";
 const panelGradientClass =
-  "rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm";
+  "rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm";
 const titleClass = "font-semibold text-[color:var(--text)]";
 const labelClass = "text-xs font-semibold uppercase tracking-widest text-[color:var(--text-muted)]";
 const mutedClass = "text-sm text-[color:var(--text-secondary)]";
@@ -89,7 +89,7 @@ export default function StudentDashboard() {
       label: "Total Applications",
       value: applications.length,
       icon: Target,
-      color: "from-blue-500 to-cyan-500"
+      color: "from-amber-500 to-yellow-600"
     },
     {
       label: "Active Tracks",
@@ -126,7 +126,7 @@ export default function StudentDashboard() {
               <p className="mt-1 text-sm text-[color:var(--text-secondary)]">Track your internships and achievements</p>
             </div>
             <div className="text-right">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[8px] bg-primary/10 border border-primary/30">
                 <Clock className="h-4 w-4 text-primary" />
                 <span className="text-sm font-semibold text-primary">
                   {nextDeadline !== null ? `${nextDeadline}d left` : "No deadline"}
@@ -146,12 +146,12 @@ export default function StudentDashboard() {
             return (
               <div
                 key={idx}
-                className="group relative overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm transition hover:border-primary/30"
+                className="group relative overflow-hidden rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 backdrop-blur-sm transition hover:border-primary/30"
               >
                 <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
 
                 <div className="relative z-10">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} text-white p-3 mb-3`}>
+                  <div className={`w-12 h-12 rounded-[10px] bg-gradient-to-br ${stat.color} text-white p-3 mb-3`}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <p className="text-sm font-medium text-[color:var(--text-muted)]">{stat.label}</p>
@@ -174,9 +174,9 @@ export default function StudentDashboard() {
               <Zap className="h-6 w-6 text-amber-400" />
             </div>
 
-            <div className="mb-4 h-3 overflow-hidden rounded-full bg-[color:var(--card-elevated)]">
+            <div className="mb-4 h-3 overflow-hidden rounded-[8px] bg-[color:var(--card-elevated)]">
               <div
-                className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-300"
+                className="h-full bg-primary transition-all duration-300"
                 style={{ width: `${completion.percentage}%` }}
               />
             </div>
@@ -220,7 +220,7 @@ export default function StudentDashboard() {
             ) : (
               <div className="space-y-3">
                 {activeApplications.slice(0, 3).map((app) => (
-                  <div key={app._id} className="flex items-center justify-between rounded-xl bg-[color:var(--card-elevated)] p-3 transition hover:bg-primary/10">
+                  <div key={app._id} className="flex items-center justify-between rounded-[10px] bg-[color:var(--card-elevated)] p-3 transition hover:bg-primary/10">
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-[color:var(--text)]">{app.internship?.title}</p>
                       <p className="mt-1 text-xs text-[color:var(--text-muted)]">{app.durationKey}</p>
@@ -241,7 +241,7 @@ export default function StudentDashboard() {
               <h2 className="mb-4 text-xl font-bold text-[color:var(--text)]">Current Internships</h2>
 
               {activeApplications.length === 0 ? (
-                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-12 text-center backdrop-blur-sm">
+                <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-12 text-center backdrop-blur-sm">
                   <Target className="h-12 w-12 mx-auto text-slate-500 mb-4 opacity-50" />
                   <p className="mb-4 text-[color:var(--text-secondary)]">Start your first internship journey</p>
                   <Link to="/student/internships">
@@ -265,7 +265,7 @@ export default function StudentDashboard() {
                   return (
                     <div
                       key={application._id}
-                      className="overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] backdrop-blur-sm transition hover:border-primary/30"
+                      className="overflow-hidden rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] backdrop-blur-sm transition hover:border-primary/30"
                     >
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -286,9 +286,9 @@ export default function StudentDashboard() {
                               {progressPercentage}%
                             </span>
                           </div>
-                          <div className="h-2 overflow-hidden rounded-full bg-[color:var(--card-elevated)]">
+                          <div className="h-2 overflow-hidden rounded-[8px] bg-[color:var(--card-elevated)]">
                             <div
-                              className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-300"
+                              className="h-full bg-primary transition-all duration-300"
                               style={{ width: `${progressPercentage}%` }}
                             />
                           </div>
@@ -296,7 +296,7 @@ export default function StudentDashboard() {
 
                         {/* Deadline Info */}
                         {leftDays !== undefined && (
-                          <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold mb-4 ${
+                          <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-[8px] text-xs font-semibold mb-4 ${
                             leftDays < 5
                               ? "border border-red-500/30 bg-red-500/15 text-red-700 dark:text-red-300"
                               : "border border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-300"

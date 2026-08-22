@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,21 +51,18 @@ export default function ProfileOverview() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-soft dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between"
+      <div
+        className="flex flex-col gap-4 rounded-[12px] border border-[color:var(--border)] bg-white/90 p-6 shadow-soft dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between"
       >
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#f8efdd] px-3 py-1 text-xs font-medium text-[#6b5424] dark:bg-[#2b2417] dark:text-[#d6b77a]">
+          <div className="inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <Sparkles className="h-3.5 w-3.5" />
             Student profile hub
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl font-semibold text-textPrimary">
             {basic?.fullName || profile?.fullName || "Your Profile"}
           </h1>
-          <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+          <p className="max-w-2xl text-sm text-textSecondary">
             Track your profile strength, internship journey, certificates, and portfolio links in one place.
           </p>
         </div>
@@ -76,7 +72,7 @@ export default function ProfileOverview() {
             <PencilLine className="ml-2 h-4 w-4" />
           </Button>
         </Link>
-      </motion.div>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         {[
@@ -85,24 +81,21 @@ export default function ProfileOverview() {
           { label: "Completed internships", value: completedInternships.length, icon: ArrowRight },
           { label: "Certificates", value: certificates.length, icon: Award }
         ].map((item, index) => (
-          <motion.div
+          <div
             key={item.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: index * 0.05 }}
           >
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f8efdd] text-[#6b5424] dark:bg-[#2b2417] dark:text-[#e9cc97]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-primary/20 bg-primary/10 text-primary">
                   <item.icon className="h-4 w-4" />
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{item.value}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{item.label}</p>
+                <p className="text-2xl font-semibold text-textPrimary">{item.value}</p>
+                <p className="text-xs text-textMuted">{item.label}</p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -145,24 +138,24 @@ export default function ProfileOverview() {
           </CardHeader>
           <CardContent className="space-y-3">
             {applications.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-textMuted">
                 No internship history yet. Once you start applying, your activity will appear here.
               </p>
             ) : (
               applications.slice(0, 6).map((application) => (
                 <div
                   key={application._id}
-                className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {application.internship?.title || "Internship"}
-                    </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {application.durationKey} · {new Date(application.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
+                  className="rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-textPrimary">
+                        {application.internship?.title || "Internship"}
+                      </p>
+                      <p className="text-[11px] text-textMuted">
+                        {application.durationKey} · {new Date(application.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                     <StatusBadge status={application.status} />
                   </div>
                 </div>
@@ -179,22 +172,22 @@ export default function ProfileOverview() {
           </CardHeader>
           <CardContent className="space-y-3">
             {runningInternships.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No running internships right now.</p>
+              <p className="text-sm text-textMuted">No running internships right now.</p>
             ) : (
               runningInternships.map((application) => (
                 <div
                   key={application._id}
-                className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {application.internship?.title}
-                    </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {application.timeline?.daysLeft ?? 0} days left · {application.durationKey}
-                    </p>
-                  </div>
+                  className="rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-textPrimary">
+                        {application.internship?.title}
+                      </p>
+                      <p className="text-[11px] text-textMuted">
+                        {application.timeline?.daysLeft ?? 0} days left · {application.durationKey}
+                      </p>
+                    </div>
                     <StatusBadge status={application.status} />
                   </div>
                 </div>
@@ -212,17 +205,17 @@ export default function ProfileOverview() {
           </CardHeader>
           <CardContent className="space-y-3">
             {certificates.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-textMuted">
                 Completed internships and certificates will appear here.
               </p>
             ) : (
               certificates.slice(0, 4).map((certificate) => (
                 <div
                   key={certificate._id}
-                className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70"
-              >
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{certificate.role}</p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  className="rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3"
+                >
+                  <p className="text-sm font-medium text-textPrimary">{certificate.role}</p>
+                  <p className="text-[11px] text-textMuted">
                     {certificate.certificateId} · {new Date(certificate.completionDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -237,14 +230,14 @@ export default function ProfileOverview() {
 
 function Detail({ label, value, isLink = false }) {
   return (
-    <div className="space-y-1 rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-3 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">{label}</p>
+    <div className="space-y-1 rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-textMuted">{label}</p>
       {isLink && value ? (
         <a href={value} target="_blank" rel="noreferrer" className="break-all text-sm text-primary">
           {value}
         </a>
       ) : (
-        <p className="text-sm text-slate-700 dark:text-slate-200">{value || "Not added yet"}</p>
+        <p className="text-sm text-textSecondary">{value || "Not added yet"}</p>
       )}
     </div>
   );

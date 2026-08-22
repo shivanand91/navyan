@@ -1,3 +1,4 @@
+// Trigger config reload for deep teal tailwind updates
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 

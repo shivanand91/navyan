@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   BadgeCheck,
@@ -161,11 +160,7 @@ const faqData = [
   }
 ];
 
-const referralSignals = [
-  "Admin can issue referral codes to selected students or partners.",
-  "Applications linked to a referral are tracked automatically in the backend.",
-  "Rewards can be aligned to actual application volume and performance outcomes."
-];
+
 
 const getDurationLabel = (duration) =>
   duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
@@ -280,17 +275,19 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div className="space-y-8">
             <RevealInView>
-              <div className="navyan-pill">NAVYAN Internship & Skill Development Platform</div>
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border border-border bg-backgroundSecondary text-textSecondary">
+                <Sparkles className="h-3 w-3 text-accent" />
+                <span>Internships &amp; IT Services Platform</span>
+              </div>
             </RevealInView>
 
             <RevealInView delay={0.04}>
               <div className="space-y-5">
-                <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa] sm:text-5xl lg:text-6xl">
-                  Start Your Internship Journey Today
+                <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-textPrimary sm:text-5xl lg:text-6xl">
+                  Outcome-Driven Learning &amp; Digital Execution
                 </h1>
-                <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-[#b7c0cc] md:text-lg">
-                  4 Weeks Free + 3 &amp; 6 Months Paid Internships. Apply, get reviewed, start
-                  your internship, and track every step clearly with NAVYAN.
+                <p className="max-w-2xl text-base leading-8 text-textSecondary md:text-lg">
+                  We run structured, task-based internships for freshers and students, and operate as a product development studio for startups and businesses.
                 </p>
               </div>
             </RevealInView>
@@ -298,16 +295,16 @@ export default function Home() {
             <RevealInView delay={0.08}>
               <div className="flex flex-wrap gap-3">
                 <Link to="/internships">
-                  <Button size="lg">
-                    Apply Now
+                  <Button variant="accent" size="lg">
+                    Explore Internships
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <a href="#how-navyan-works">
+                <Link to="/services">
                   <Button variant="outline" size="lg">
-                    Watch How It Works
+                    Start a Project
                   </Button>
-                </a>
+                </Link>
               </div>
             </RevealInView>
 
@@ -328,10 +325,10 @@ export default function Home() {
                   }
                 ].map((item) => (
                   <div key={item.label} className="navyan-card px-4 py-4">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-textMuted">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                    <p className="mt-2 text-sm font-semibold text-textPrimary">
                       {item.value}
                     </p>
                   </div>
@@ -342,18 +339,15 @@ export default function Home() {
 
           <RevealInView delay={0.06}>
             <div className="navyan-panel relative overflow-hidden p-6 md:p-7">
-              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
-              <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-secondary/12 blur-3xl" />
-
               <div className="relative space-y-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-2">
                     <div className="navyan-pill">Student + laptop workflow</div>
-                    <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] text-slate-950 dark:text-[#f5f7fa] md:text-[2rem]">
+                    <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] text-textPrimary md:text-[2rem]">
                       Clear steps, real mentorship, and visible progress.
                     </h2>
                   </div>
-                  <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-primary/15 bg-primary/10 text-primary">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                     <Code2 className="h-6 w-6" />
                   </div>
                 </div>
@@ -361,14 +355,14 @@ export default function Home() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="navyan-card px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                         <Users2 className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                        <p className="text-sm font-semibold text-textPrimary">
                           Student-ready flow
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-[#7e8794]">
+                        <p className="text-xs text-textMuted">
                           Simple apply experience
                         </p>
                       </div>
@@ -376,14 +370,14 @@ export default function Home() {
                   </div>
                   <div className="navyan-card px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10 text-secondary">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-accent/30 bg-accent/10 text-accent">
                         <WalletCards className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                        <p className="text-sm font-semibold text-textPrimary">
                           Free + paid tracks
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-[#7e8794]">
+                        <p className="text-xs text-textMuted">
                           4 weeks, 3 months, 6 months
                         </p>
                       </div>
@@ -391,13 +385,13 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="rounded-[28px] border border-black/8 bg-white/78 p-5 shadow-[0_24px_60px_rgba(37,99,235,0.08)] dark:border-white/8 dark:bg-white/5">
+                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5 shadow-[0_8px_30px_rgba(20,20,15,0.06)] dark:shadow-none">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-textMuted">
                         Live workflow preview
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                      <p className="mt-2 text-sm font-semibold text-textPrimary">
                         What students see after applying
                       </p>
                     </div>
@@ -413,21 +407,17 @@ export default function Home() {
                       "Internship started with tasks",
                       "Performance tracked and certificate unlocked"
                     ].map((item, index) => (
-                      <motion.div
+                      <div
                         key={item}
-                        initial={{ opacity: 0, x: 18 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, amount: 0.4 }}
-                        transition={{ delay: 0.05 * index, duration: 0.45 }}
-                        className="flex items-center gap-3 rounded-[20px] border border-black/8 bg-black/[0.02] px-4 py-3 dark:border-white/8 dark:bg-white/5"
+                        className="flex items-center gap-3 rounded-[12px] border border-[color:var(--border)] bg-black/[0.015] dark:bg-white/[0.02] px-4 py-3"
                       >
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/12 text-primary">
                           {index + 1}
                         </div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-[#f5f7fa]">
+                        <p className="text-sm font-medium text-textPrimary">
                           {item}
                         </p>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -451,10 +441,10 @@ export default function Home() {
                 <Card className="h-full">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                         <item.icon className="h-4 w-4" />
                       </div>
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
                         {item.step}
                       </span>
                     </div>
@@ -482,14 +472,14 @@ export default function Home() {
                 <Card className="h-full">
                   <CardHeader>
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                         <BriefcaseBusiness className="h-4 w-4" />
                       </div>
                       <span
                         className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
                           program.billing === "FREE"
                             ? "border border-success/20 bg-success/12 text-success"
-                            : "border border-secondary/20 bg-secondary/10 text-secondary"
+                            : "border border-primary/20 bg-primary/10 text-primary"
                         }`}
                       >
                         {program.billing}
@@ -503,7 +493,7 @@ export default function Home() {
                       {program.points.map((point) => (
                         <div key={point} className="flex items-start gap-3">
                           <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
-                          <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                           <p className="text-sm leading-7 text-textSecondary">
                             {point}
                           </p>
                         </div>
@@ -540,10 +530,10 @@ export default function Home() {
             </div>
           ) : internships.length === 0 ? (
             <div className="navyan-card px-6 py-12 text-center">
-              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+              <p className="font-display text-2xl font-semibold text-textPrimary">
                 No live internships at the moment.
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
+              <p className="mt-3 text-sm text-textSecondary">
                 New cohorts will appear here as soon as the admin publishes them.
               </p>
             </div>
@@ -552,7 +542,7 @@ export default function Home() {
               {internships.slice(0, 3).map((internship, index) => (
                 <RevealInView key={internship._id} delay={index * 0.05}>
                   <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
-                    <div className="relative aspect-video overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
+                    <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--bg-secondary)]">
                       {internship.coverImageUrl ? (
                         <img
                           src={internship.coverImageUrl}
@@ -560,27 +550,27 @@ export default function Home() {
                           className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-[#7e8794]">
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-textMuted">
                           Navyan internship live
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
+                      <div className="absolute left-4 top-4 rounded-[8px] border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                         {internship.mode?.toUpperCase() || "REMOTE"}
                       </div>
                     </div>
 
                     <div className="flex flex-1 flex-col px-5 py-5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
+                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] px-3 py-1 text-[11px] font-medium text-textSecondary">
                           {internship.role || "Internship track"}
                         </span>
                       </div>
 
                       <div className="mt-4">
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
                           {internship.title}
                         </h3>
-                        <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                        <p className="mt-2 text-sm leading-7 text-textSecondary">
                           {internship.shortDescription}
                         </p>
                       </div>
@@ -589,19 +579,19 @@ export default function Home() {
                         {(internship.durations || []).slice(0, 3).map((duration) => (
                           <div
                             key={duration.key}
-                            className="rounded-[18px] border border-black/8 bg-black/[0.03] px-4 py-3 dark:border-white/8 dark:bg-white/5"
+                            className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)]/50 px-4 py-3"
                           >
-                            <p className="text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
+                            <p className="text-xs font-semibold text-textPrimary">
                               {getDurationLabel(duration)}
                             </p>
-                            <p className="mt-1 text-[11px] text-slate-500 dark:text-[#7e8794]">
+                            <p className="mt-1 text-[11px] text-textMuted">
                               {duration.isPaid ? "Paid track" : "Free track"}
                             </p>
                           </div>
                         ))}
                       </div>
 
-                      <div className="mt-auto border-t border-black/8 pt-4 dark:border-white/8">
+                      <div className="mt-auto border-t border-[color:var(--border)] pt-4">
                         <Link to={`/internships/${internship.slug}`}>
                           <Button className="w-full">
                             Apply Now
@@ -633,7 +623,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
             eyebrow="Featured Services"
-            title="Services ."
+            title="Professional IT & Development Services."
           />
 
           {servicesLoading ? (
@@ -647,10 +637,10 @@ export default function Home() {
             </div>
           ) : featuredServices.length === 0 ? (
             <div className="navyan-card px-6 py-12 text-center">
-              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+              <p className="font-display text-2xl font-semibold text-textPrimary">
                 No services are live right now.
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
+              <p className="mt-3 text-sm text-textSecondary">
                 The featured services preview will appear once the admin publishes offerings.
               </p>
             </div>
@@ -670,11 +660,11 @@ export default function Home() {
                           className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[color:var(--text-secondary)]">
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-textSecondary">
                           Navyan service preview
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
+                      <div className="absolute left-4 top-4 rounded-[8px] border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                         {service.category || "Service"}
                       </div>
                     </div>
@@ -689,14 +679,14 @@ export default function Home() {
                         {(service.highlights || []).slice(0, 3).map((item) => (
                           <div key={item} className="flex items-start gap-3">
                             <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
-                            <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                            <p className="text-sm leading-7 text-textSecondary">
                               {item}
                             </p>
                           </div>
                         ))}
                         {service.description ? (
                           <p
-                            className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]"
+                            className="whitespace-pre-line text-sm leading-7 text-textSecondary"
                             style={{
                               display: "-webkit-box",
                               WebkitBoxOrient: "vertical",
@@ -756,7 +746,7 @@ export default function Home() {
               <RevealInView key={item.title} delay={index * 0.04}>
                 <Card className="h-full">
                   <CardHeader>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                       <item.icon className="h-4 w-4" />
                     </div>
                     <CardTitle className="mt-5">{item.title}</CardTitle>
@@ -769,72 +759,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="referrals" className="navyan-section px-4 md:px-6">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-6">
-          <SectionHeading
-            eyebrow="Referral System"
-            title="Referral tracking that stays transparent."
-            description="Codes are generated, shares are tracked, and real applications are counted in the backend."
-          />
 
-            <div className="space-y-3">
-              {referralSignals.map((signal) => (
-                <div key={signal} className="flex items-start gap-3 rounded-[22px] border border-black/8 bg-white/72 px-4 py-4 dark:border-white/8 dark:bg-white/5">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-secondary" />
-                  <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">{signal}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <RevealInView className="navyan-panel p-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              {[
-                {
-                  title: "Code generated",
-                  value: "NAVYAN-REF",
-                  icon: ShieldCheck
-                },
-                {
-                  title: "Applications tracked",
-                  value: "Backend count",
-                  icon: Globe2
-                },
-                {
-                  title: "Qualified referrals",
-                  value: "Real intent only",
-                  icon: Users2
-                },
-                {
-                  title: "Reward ready",
-                  value: "Performance linked",
-                  icon: WalletCards
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ delay: index * 0.05, duration: 0.45 }}
-                  className="navyan-card px-5 py-5"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
-                    <item.icon className="h-4 w-4" />
-                  </div>
-                  <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-[#7e8794]">
-                    {item.title}
-                  </p>
-                  <p className="mt-2 font-display text-xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
-                    {item.value}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </RevealInView>
-        </div>
-      </section>
 
       <section id="testimonials" className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
@@ -849,18 +774,18 @@ export default function Home() {
               <RevealInView key={item.name} delay={index * 0.05}>
                 <Card className="h-full">
                   <CardHeader>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
                       <Building2 className="h-4 w-4" />
                     </div>
-                    <CardDescription className="mt-5 text-base leading-8 text-slate-700 dark:text-[#d9dee6]">
+                    <CardDescription className="mt-5 text-base leading-8 text-textSecondary">
                       “{item.quote}”
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-display text-lg font-semibold text-slate-950 dark:text-[#f5f7fa]">
+                    <p className="font-display text-lg font-semibold text-textPrimary">
                       {item.name}
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-[#7e8794]">{item.role}</p>
+                    <p className="text-sm text-textMuted">{item.role}</p>
                   </CardContent>
                 </Card>
               </RevealInView>
@@ -886,17 +811,14 @@ export default function Home() {
       <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl">
           <div className="navyan-panel relative overflow-hidden px-6 py-8 md:px-8 md:py-10 lg:px-10">
-            <div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-primary/12 blur-3xl" />
-            <div className="absolute -right-10 bottom-0 h-40 w-40 rounded-full bg-secondary/12 blur-3xl" />
-
             <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
               <div className="space-y-5">
                 <div className="navyan-pill">Final CTA</div>
                 <div className="space-y-4">
-                  <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-slate-950 dark:text-[#f5f7fa] md:text-4xl lg:text-[2.8rem]">
+                  <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-textPrimary md:text-4xl lg:text-[2.8rem]">
                     Start with the path that fits your current stage.
                   </h2>
-                  <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-[#b7c0cc] md:text-lg">
+                  <p className="max-w-2xl text-base leading-8 text-textSecondary md:text-lg">
                     Apply for internships, build confidence with courses, and move through a platform
                     that feels structured from application to completion.
                   </p>
@@ -910,7 +832,7 @@ export default function Home() {
                   ].map((point) => (
                     <div
                       key={point}
-                      className="rounded-[22px] border border-black/8 bg-white/72 px-4 py-4 text-sm font-medium text-slate-700 dark:border-white/8 dark:bg-white/5 dark:text-[#d7deea]"
+                      className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-4 text-sm font-medium text-textSecondary"
                     >
                       {point}
                     </div>
@@ -919,13 +841,13 @@ export default function Home() {
               </div>
 
               <div className="navyan-card px-5 py-5 md:px-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-[#7e8794]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-textMuted">
                   Next step
                 </p>
-                <p className="mt-3 font-display text-2xl font-semibold tracking-[-0.03em] text-slate-950 dark:text-[#f5f7fa]">
+                <p className="mt-3 font-display text-2xl font-semibold tracking-[-0.03em] text-textPrimary">
                   Pick one action and move forward.
                 </p>
-                <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                <p className="mt-3 text-sm leading-7 text-textSecondary">
                   Browse courses if you want to build skills first, or go straight into internships
                   if you are ready to apply now.
                 </p>
@@ -949,7 +871,7 @@ export default function Home() {
                   href="https://www.navyan.online"
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-5 inline-flex items-center rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary/30 hover:text-primary dark:border-white/10 dark:text-[#b7c0cc] dark:hover:text-white"
+                  className="mt-5 inline-flex items-center rounded-full border border-[color:var(--border)] px-4 py-2 text-sm font-semibold text-textSecondary transition hover:border-primary/30 hover:text-primary"
                 >
                   navyan.online
                 </a>

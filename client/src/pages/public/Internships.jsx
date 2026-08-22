@@ -53,8 +53,8 @@ export default function Internships() {
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
             eyebrow="Live Internships"
-            title="Open internships organised like a serious product pipeline, not a random jobs board."
-            description="Every role below is presented as a structured track. Browse the live list, open a modal for the full breakdown, and move into application from a cleaner workflow."
+            title="Explore Professional Internships"
+            description="Choose from our structured 4-week, 3-month, or 6-month tracks to kickstart your tech career."
           />
 
           {loading ? (
@@ -68,10 +68,10 @@ export default function Internships() {
             </div>
           ) : internships.length === 0 ? (
             <div className="navyan-card px-6 py-12 text-center">
-              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+              <p className="font-display text-2xl font-semibold text-textPrimary">
                 No internships are live right now.
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
+              <p className="mt-3 text-sm text-textSecondary">
                 Create a profile now and check back for new cohorts.
               </p>
               <Link to="/signup">
@@ -97,7 +97,7 @@ export default function Internships() {
                           Navyan internship live
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
+                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                         <Sparkles className="h-3.5 w-3.5" />
                         Open now
                       </div>
@@ -105,31 +105,31 @@ export default function Internships() {
 
                     <div className="flex flex-1 flex-col px-5 py-5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                           {internship.role || "Internship track"}
                         </span>
-                        <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                           {internship.mode?.toUpperCase() || "REMOTE"}
                         </span>
                       </div>
 
                       <div className="mt-4">
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
                           {internship.title}
                         </h3>
-                        <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
+                        <p className="mt-2 text-sm leading-7 text-textSecondary">
                           {internship.shortDescription}
                         </p>
                       </div>
 
-                      <div className="mt-4 rounded-[22px] border border-primary/15 bg-primary/10 px-4 py-3">
+                      <div className="mt-4 rounded-[12px] border border-primary/15 bg-primary/10 px-4 py-3">
                         <div className="flex items-center gap-2 text-primary">
                           <WalletCards className="h-4 w-4" />
                           <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">
                             Duration model
                           </span>
                         </div>
-                        <p className="mt-2 text-sm font-semibold text-[#825f25] dark:text-primary">
+                        <p className="mt-2 text-sm font-semibold text-textPrimary">
                           {(internship.durations || []).some(isPaidDuration)
                             ? "Paid tracks available"
                             : "Free tracks available"}
@@ -140,7 +140,7 @@ export default function Internships() {
                         {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
                           <span
                             key={skill}
-                            className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
+                            className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
                           >
                             {skill}
                           </span>
@@ -151,7 +151,7 @@ export default function Internships() {
                         {(internship.durations || []).map((duration) => (
                           <div
                             key={duration.key}
-                            className="rounded-[18px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3"
+                            className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3"
                           >
                             <p className="text-xs font-semibold text-[color:var(--text)]">
                               {getDurationLabel(duration)}
@@ -159,7 +159,7 @@ export default function Internships() {
                             <p className="mt-1 text-[11px] text-[color:var(--text-muted)]">
                               {isPaidDuration(duration)
                                 ? `Paid • ${getDurationPriceLabel(duration)}`
-                                : "Free"}
+                               : "Free"}
                             </p>
                           </div>
                         ))}
@@ -174,7 +174,7 @@ export default function Internships() {
                             Preview role
                           </Button>
                           <Link to={`/internships/${internship.slug}`}>
-                            <Button>
+                            <Button variant="accent">
                               Apply now
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -200,7 +200,7 @@ export default function Internships() {
           internship={activeInternship}
           aside={
             activeInternship ? (
-              <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+              <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
                   Next step
                 </p>

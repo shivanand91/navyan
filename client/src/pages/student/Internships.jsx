@@ -185,9 +185,7 @@ export default function StudentInternships() {
         motivation: values.motivation
       };
 
-      if (values.referralCode?.trim()) {
-        payload.referralCode = values.referralCode.trim().toUpperCase();
-      }
+
 
       if (isPaid) {
         const paymentSession = paymentSessions[key];
@@ -533,26 +531,7 @@ export default function StudentInternships() {
                   />
                 </div>
 
-                <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-                    Referral code
-                  </p>
-                  <Input
-                    className="mt-4"
-                    placeholder="Optional referral code"
-                    value={forms[currentKey]?.referralCode || ""}
-                    onChange={(event) =>
-                      updateForm(
-                        currentKey,
-                        "referralCode",
-                        event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16)
-                      )
-                    }
-                  />
-                  <p className="mt-3 text-xs leading-6 text-[color:var(--text-secondary)]">
-                    If someone shared a Navyan referral code with you, enter it here before applying.
-                  </p>
-                </div>
+
 
                 {isPaidDuration(currentDuration) ? (
                   <div className="rounded-[28px] border border-primary/18 bg-primary/10 p-5">

@@ -26,8 +26,8 @@ export function MobileDrawerNav({
         </Button>
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-[80] bg-slate-950/45 backdrop-blur-sm dark:bg-[#06080b]/70" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto max-w-2xl rounded-t-[28px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 text-[color:var(--text)] shadow-[0_-20px_60px_rgba(15,23,42,0.2)] dark:shadow-[0_-20px_60px_rgba(0,0,0,0.45)]">
+        <Drawer.Overlay className="fixed inset-0 z-[80] bg-black/45 backdrop-blur-sm dark:bg-[#000000]/70" />
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto max-w-2xl rounded-t-[16px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 text-[color:var(--text)] shadow-[0_-20px_60px_rgba(20,20,15,0.06)] dark:shadow-none">
           <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[color:var(--border)]" />
           <div className="mb-4">
             <Drawer.Title className="font-display text-xl font-semibold">{title}</Drawer.Title>
@@ -43,7 +43,7 @@ export function MobileDrawerNav({
                 <Link
                   to={link.to}
                   className={cn(
-                    "flex items-center justify-between rounded-2xl border border-[color:var(--border)] px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-primary/25 hover:bg-primary/10 hover:text-[color:var(--text)]",
+                    "flex items-center justify-between rounded-[12px] border border-[color:var(--border)] px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-primary/25 hover:bg-primary/5 hover:text-[color:var(--text)]",
                     pathname === link.to && "border-primary/28 bg-primary/10 text-primary"
                   )}
                 >

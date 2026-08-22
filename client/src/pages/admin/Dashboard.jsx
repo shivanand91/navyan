@@ -53,7 +53,7 @@ export default function AdminDashboard() {
         label: "Total Applications",
         value: applications.length,
         icon: Users,
-        color: "from-blue-500 to-blue-600",
+        color: "from-amber-500 to-amber-600",
         trend: "+12%"
       },
       {
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium text-[color:var(--text-secondary)]">{item.status}</p>
                     <div className="w-32 h-2 bg-black/10 dark:bg-white/10 rounded-full mt-2 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-primary to-secondary"
+                        className="h-full bg-primary"
                         style={{
                           width: `${item.count * 20}%`,
                           maxWidth: "100%"
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/20 to-secondary/20 text-primary border border-primary/30">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                           {app.status}
                         </span>
                         <p className="text-xs text-[color:var(--text-muted)] mt-2">
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[color:var(--border)] bg-gradient-to-br from-primary/10 to-secondary/10 p-6">
+            <div className="rounded-2xl border border-border bg-primary/5 p-6">
               <p className="text-xs font-semibold text-primary uppercase tracking-widest">Summary</p>
               <div className="mt-4 space-y-3">
                 <div className="flex justify-between items-center">

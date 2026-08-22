@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,7 @@ export function Accordion({ items, defaultValue, className }) {
             key={value}
             className={cn(
               "navyan-card overflow-hidden transition duration-200",
-              isOpen && "border-primary/20 shadow-[0_24px_60px_rgba(37,99,235,0.12)]"
+              isOpen && "border-primary/30 shadow-[0_8px_30px_rgba(20,20,15,0.06)] dark:shadow-none"
             )}
           >
             <button
@@ -35,21 +34,21 @@ export function Accordion({ items, defaultValue, className }) {
               )}
             >
               <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-xs font-semibold text-primary">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-xs font-semibold text-primary">
                   {String(idx + 1).padStart(2, "0")}
                 </div>
                 <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white md:text-[15px]">
-                  {item.trigger}
-                </p>
-                {item.sub && (
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    {item.sub}
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white md:text-[15px]">
+                    {item.trigger}
                   </p>
-                )}
+                  {item.sub && (
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      {item.sub}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-black/8 bg-white/80 text-slate-500 dark:border-white/8 dark:bg-white/5 dark:text-slate-300">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-black/8 bg-white/80 text-slate-500 dark:border-white/8 dark:bg-white/5 dark:text-slate-300">
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 transition-transform",
@@ -59,24 +58,18 @@ export function Accordion({ items, defaultValue, className }) {
               </div>
             </button>
 
-            <AnimatePresence initial={false}>
-              {isOpen && (
-                <motion.div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
-                  className="border-t border-black/8 px-5 pb-5 dark:border-white/8"
-                >
-                  <div className="pl-14 pt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    {item.content}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {isOpen && (
+              <div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+                className="border-t border-black/8 px-5 pb-5 dark:border-white/8"
+              >
+                <div className="pl-14 pt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                  {item.content}
+                </div>
+              </div>
+            )}
           </div>
         );
       })}

@@ -211,7 +211,11 @@ export default function AdminCourses() {
                           {course.level}
                         </span>
                       ) : null}
-                      <span className="rounded-full border border-secondary/20 bg-secondary/10 px-3 py-1 text-[11px] font-semibold text-secondary">
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${
+                        course.isPublished
+                          ? "border border-success/20 bg-success/12 text-success"
+                          : "border border-border bg-backgroundSecondary text-textSecondary"
+                      }`}>
                         {course.isPublished ? "Published" : "Draft"}
                       </span>
                     </div>

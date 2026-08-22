@@ -17,42 +17,40 @@ export default {
         textSecondary: "var(--text-secondary)",
         textMuted: "var(--text-muted)",
         primary: {
-          DEFAULT: "#2563EB"
-        },
-        secondary: {
-          DEFAULT: "#F97316"
+          DEFAULT: "var(--primary)",
+          hover: "var(--primary-hover)",
+          soft: "var(--primary-soft)"
         },
         accent: {
-          DEFAULT: "#0EA5E9"
-        },
-        plum: {
-          DEFAULT: "#EA580C"
-        },
-        cyan: {
-          DEFAULT: "#67E8F9"
+          DEFAULT: "var(--accent)",
+          hover: "var(--accent-hover)",
+          soft: "var(--accent-soft)"
         },
         success: {
-          DEFAULT: "#22C55E"
+          DEFAULT: "var(--success)"
         },
         warning: {
-          DEFAULT: "#F59E0B"
+          DEFAULT: "var(--warning)"
         },
         danger: {
-          DEFAULT: "#F43F5E"
+          DEFAULT: "var(--danger)"
         }
       },
       fontFamily: {
-        sans: ["Manrope", "sans-serif"],
-        display: ["Outfit", "sans-serif"]
+        sans: ["Inter", "sans-serif"],
+        display: ["Inter", "sans-serif"]
       },
       borderRadius: {
-        xl: "1rem",
-        "2xl": "1.5rem",
-        "3xl": "1.75rem"
+        sm: "8px",
+        md: "10px",
+        lg: "12px",
+        xl: "12px",
+        "2xl": "12px",
+        "3xl": "12px"
       },
       boxShadow: {
-        soft: "0 24px 64px rgba(3,5,8,0.34)",
-        glow: "0 0 0 1px rgba(212,168,95,0.18), 0 20px 60px rgba(212,168,95,0.16)"
+        soft: "0 1px 3px rgba(0,0,0,0.04)",
+        glow: "0px 0px 0px 1px var(--border), 0px 1px 3px rgba(0,0,0,0.04)"
       }
     }
   },

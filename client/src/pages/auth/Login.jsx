@@ -2,17 +2,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import api, { getApiErrorMessage } from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import HeroScene from "@/components/premium/HeroScene";
+import BrandLogo from "@/components/BrandLogo";
 
 const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6)
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters")
 });
 
 export default function Login() {
@@ -46,85 +46,58 @@ export default function Login() {
   };
 
   return (
-    <section className="navyan-section px-4 md:px-6">
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-        <div className="relative hidden min-h-[620px] overflow-hidden rounded-[32px] border border-white/8 bg-[#0f1318]/78 p-8 shadow-soft lg:block">
-          <HeroScene className="absolute inset-0 opacity-90" />
-          <div className="navyan-grid-mask" />
-          <div className="relative z-10 flex h-full flex-col justify-between">
-            <div className="space-y-4">
-              <div className="navyan-pill">Secure access</div>
-              <h1 className="max-w-xl font-display text-5xl font-semibold tracking-[-0.06em] text-[#f5f7fa]">
-                Return to your internship and workflow command center.
+    <section className="navyan-section min-h-[75vh] flex items-center justify-center px-4 md:px-6">
+      <div className="w-full max-w-md">
+        <div className="navyan-panel p-6 md:p-10 space-y-6">
+          <div className="flex flex-col items-center text-center gap-4">
+            <BrandLogo imageClassName="h-9" surface="adaptive" />
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.04em] text-textPrimary">
+                Access your workspace
               </h1>
-              <p className="max-w-lg text-sm leading-8 text-[#b7c0cc]">
-                Students track their journey. Admins operate the platform. The interface stays
-                fast, structured, and premium in both cases.
+              <p className="text-sm text-textSecondary">
+                Log in to track your internships, courses, and projects.
               </p>
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              {[
-                { icon: ShieldCheck, title: "Secure sessions" },
-                { icon: UserRound, title: "Role-aware access" },
-                { icon: Sparkles, title: "Premium dashboards" }
-              ].map((item) => (
-                <div key={item.title} className="rounded-[22px] border border-white/8 bg-white/5 p-4">
-                  <item.icon className="h-4 w-4 text-primary" />
-                  <p className="mt-4 text-sm font-semibold text-[#f5f7fa]">{item.title}</p>
-                </div>
-              ))}
             </div>
           </div>
-        </div>
 
-        <div className="navyan-panel p-6 md:p-8">
-          <div className="mx-auto max-w-md space-y-6">
-            <div className="space-y-3">
-              <div className="navyan-pill">Login</div>
-              <h2 className="font-display text-4xl font-semibold tracking-[-0.05em] text-slate-950 dark:text-[#f5f7fa]">
-                Access your Navyan workspace
-              </h2>
-              <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                Use your student credentials to continue where you left off.
-              </p>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
+                Email Address
+              </label>
+              <Input type="email" placeholder="you@example.com" {...register("email")} />
+              {errors.email ? (
+                <p className="text-xs text-danger font-medium mt-1">{errors.email.message}</p>
+              ) : null}
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-[#7e8794]">
-                  Email
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
+                  Password
                 </label>
-                <Input type="email" placeholder="you@navyan.dev" {...register("email")} />
-                {errors.email ? (
-                  <p className="mt-2 text-xs text-danger">{errors.email.message}</p>
-                ) : null}
+                <Link to="/forgot-password" className="text-xs font-semibold text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-[#7e8794]">
-                    Password
-                  </label>
-                  <Link to="/forgot-password" className="text-xs font-semibold text-primary">
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input type="password" placeholder="Enter your password" {...register("password")} />
-                {errors.password ? (
-                  <p className="mt-2 text-xs text-danger">{errors.password.message}</p>
-                ) : null}
-              </div>
-              <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Logging in..." : "Log in"}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </form>
-
-            <div className="rounded-[22px] border border-black/8 bg-black/[0.025] p-4 text-sm text-slate-700 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
-              New to Navyan?{" "}
-              <Link to="/signup" className="font-semibold text-primary">
-                Create your account
-              </Link>
+              <Input type="password" placeholder="Enter your password" {...register("password")} />
+              {errors.password ? (
+                <p className="text-xs text-danger font-medium mt-1">{errors.password.message}</p>
+              ) : null}
             </div>
+
+            <Button variant="accent" type="submit" disabled={isSubmitting} className="w-full justify-center mt-2">
+              {isSubmitting ? "Logging in..." : "Log in to Navyan"}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </form>
+
+          <div className="rounded-[12px] border border-border bg-backgroundSecondary p-4 text-sm text-center text-textSecondary">
+            New to Navyan?{" "}
+            <Link to="/signup" className="font-semibold text-primary hover:underline">
+              Create your account
+            </Link>
           </div>
         </div>
       </div>

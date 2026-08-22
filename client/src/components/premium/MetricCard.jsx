@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 const toneMap = {
   gold: "bg-primary/12 text-primary",
   violet: "bg-accent/14 text-accent",
-  cyan: "bg-cyan/12 text-cyan",
+  amber: "bg-warning/12 text-warning",
   success: "bg-success/12 text-success"
 };
 

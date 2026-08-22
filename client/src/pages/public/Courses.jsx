@@ -30,9 +30,9 @@ export default function Courses() {
       <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
-            eyebrow="Published courses"
-            title="Clean course cards with direct video access."
-            description="Every course shown here is powered by the backend and published from the admin panel using a YouTube URL."
+            eyebrow="Our Courses"
+            title="Learn from Industry Experts"
+            description="Access our collection of video courses and resources curated to level up your technical skills."
           />
 
           {loading ? (
@@ -46,10 +46,10 @@ export default function Courses() {
             </div>
           ) : courses.length === 0 ? (
             <div className="navyan-card px-6 py-14 text-center">
-              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+              <p className="font-display text-2xl font-semibold text-textPrimary">
                 No courses are live right now.
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
+              <p className="mt-3 text-sm text-textSecondary">
                 New NAVYAN learning tracks will appear here once they are published from the admin panel.
               </p>
             </div>
@@ -71,17 +71,17 @@ export default function Courses() {
                     <CardHeader>
                       <div className="flex flex-wrap items-center gap-2">
                         {course.category ? (
-                          <span className="rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+                          <span className="rounded-[8px] border border-primary/15 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
                             {course.category}
                           </span>
                         ) : null}
                         {course.level ? (
-                          <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
+                          <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-semibold text-[color:var(--text-secondary)]">
                             {course.level}
                           </span>
                         ) : null}
                         {course.durationLabel ? (
-                          <span className="rounded-full border border-secondary/20 bg-secondary/10 px-3 py-1 text-[11px] font-semibold text-secondary">
+                          <span className="rounded-[8px] border border-border bg-backgroundSecondary px-3 py-1 text-[11px] font-semibold text-textSecondary">
                             {course.durationLabel}
                           </span>
                         ) : null}

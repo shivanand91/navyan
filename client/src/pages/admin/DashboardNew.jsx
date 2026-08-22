@@ -53,7 +53,7 @@ export default function AdminDashboard() {
         label: "Total Applications",
         value: applications.length,
         icon: Users,
-        color: "from-blue-500 to-blue-600",
+        color: "from-amber-500 to-amber-600",
         trend: "+12%"
       },
       {

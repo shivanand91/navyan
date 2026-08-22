@@ -6,7 +6,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   Search,
-  Settings2,
+  Settings,
   UserRound
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -18,13 +18,13 @@ import { CommandPalette } from "@/components/premium/CommandPalette";
 import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
 
 const links = [
-  { to: "/student", label: "Overview", icon: LayoutDashboard, caption: "Home" },
-  { to: "/student/internships", label: "Internships", icon: Compass, caption: "Apply" },
-  { to: "/student/jobs", label: "Jobs", icon: BriefcaseBusiness, caption: "Career" },
-  { to: "/student/applications", label: "My Applications", icon: FolderKanban, caption: "Track" },
-  { to: "/student/certificates", label: "Certificates", icon: FileBadge2, caption: "Proof" },
+  { to: "/student", label: "Dashboard", icon: LayoutDashboard, caption: "Overview" },
+  { to: "/student/internships", label: "My Internship", icon: Compass, caption: "Explore" },
+  { to: "/student/jobs", label: "Projects", icon: BriefcaseBusiness, caption: "Career" },
+  { to: "/student/applications", label: "Tasks & Progress", icon: FolderKanban, caption: "Track" },
+  { to: "/student/certificates", label: "Certificates", icon: FileBadge2, caption: "Registry" },
   { to: "/student/profile", label: "Profile", icon: UserRound, caption: "Identity" },
-  { to: "/student/profile/edit", label: "Edit Profile", icon: Settings2, caption: "Update" }
+  { to: "/student/profile/edit", label: "Settings", icon: Settings, caption: "Account" }
 ];
 
 export function StudentLayout() {
@@ -53,18 +53,18 @@ export function StudentLayout() {
         <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[292px] shrink-0 flex-col overflow-hidden bg-[color:var(--sidebar)] text-[color:var(--text)] lg:flex">
           <div className="border-b border-[color:var(--border)] px-5 py-5">
             <Link to={dashboardHomePath}>
-              <BrandLogo imageClassName="h-12 md:h-14" />
+              <BrandLogo imageClassName="h-10" />
             </Link>
-            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">Student Workspace</p>
+            <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-[color:var(--text-muted)] font-semibold">Student Workspace</p>
           </div>
-          <nav className="flex-1 space-y-2 px-4 py-5">
+          <nav className="flex-1 space-y-1 px-3 py-5">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/10 hover:text-[color:var(--text)]",
+                    "flex items-center gap-3 rounded-[10px] border border-transparent px-3.5 py-2.5 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/5 hover:text-[color:var(--text)]",
                     isActive && "border-primary/20 bg-primary/10 text-primary"
                   )
                 }
@@ -72,7 +72,7 @@ export function StudentLayout() {
                 <link.icon className="h-4 w-4" />
                 <div>
                   <p>{link.label}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     {link.caption}
                   </p>
                 </div>
@@ -80,17 +80,17 @@ export function StudentLayout() {
             ))}
           </nav>
           <div className="mt-auto border-t border-[color:var(--border)] p-4">
-            <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+            <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-display text-base font-semibold text-[color:var(--text)]">
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-sm font-semibold truncate text-[color:var(--text)]">
                     {user?.fullName}
                   </p>
-                  <p className="text-xs text-[color:var(--text-muted)]">{user?.email}</p>
+                  <p className="text-xs text-[color:var(--text-muted)] truncate">{user?.email}</p>
                 </div>
                 <ThemeToggle variant="ghost" />
               </div>
-              <Button variant="ghost" size="sm" className="mt-4 w-full justify-start" onClick={logout}>
+              <Button variant="ghost" size="sm" className="mt-4 w-full justify-start text-xs h-8 rounded-[8px]" onClick={logout}>
                 Logout
               </Button>
             </div>
@@ -118,7 +118,7 @@ export function StudentLayout() {
                   />
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-[color:var(--text)] md:text-xl">
+                  <p className="font-display text-base font-semibold text-[color:var(--text)]">
                     Student portal
                   </p>
                   <p className="text-xs text-[color:var(--text-muted)]">

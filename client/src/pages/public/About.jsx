@@ -1,83 +1,110 @@
-export default function About() {
-  return (
-    <div>
-      <section className="navyan-section">
-        <div className="mx-auto max-w-6xl px-4 grid gap-10 md:grid-cols-2 md:items-center">
-          <div className="space-y-3">
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white">
-              About Navyan
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Navyan is a modern Indian tech brand focused on engineering talent and digital
-              execution. We run structured internship programs for students and freshers, and we
-              operate as a product studio for founders and companies building new digital
-              experiences.
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Our north star is outcome-driven learning and delivery: internships should build
-              real skills, and products should ship with premium UX, clean architecture, and
-              trustworthy execution.
-            </p>
-          </div>
+import { Users, CheckCircle2, Play, ShieldCheck, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
-          <div className="navyan-card p-6">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              What Navyan stands for
-            </p>
-            <div className="mt-4 grid gap-3">
-              {[
-                { k: "Clarity", v: "Clear workflows from application → completion." },
-                { k: "Craft", v: "Premium UI/UX and clean engineering." },
-                { k: "Trust", v: "Verifiable documents and transparent status updates." },
-                { k: "Growth", v: "Real opportunities for students and founders." }
-              ].map((x) => (
-                <div key={x.k} className="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-4">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{x.k}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                    {x.v}
-                  </p>
-                </div>
-              ))}
+export default function About() {
+  const stats = [
+    {
+      icon: Users,
+      value: "1,000+",
+      label: "Monthly Visitors",
+      desc: "Ambitious students and businesses exploring digital execution pathways."
+    },
+    {
+      icon: CheckCircle2,
+      value: "300+",
+      label: "Completed Internships",
+      desc: "Graduates equipped with real-world engineering and product skills."
+    },
+    {
+      icon: Play,
+      value: "500+",
+      label: "Running Internships",
+      desc: "Active students currently building production-grade workflows."
+    },
+    {
+      icon: ShieldCheck,
+      value: "100%",
+      label: "Verifiable Certificates",
+      desc: "Cryptographically secured registry records accessible globally."
+    }
+  ];
+
+  return (
+    <div className="space-y-16 py-12 md:py-20">
+      {/* Hero Section */}
+      <section className="mx-auto max-w-5xl px-4 text-center space-y-6">
+        <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold border border-border bg-backgroundSecondary text-primary">
+          Our Identity & Purpose
+        </div>
+        <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-[-0.04em] text-textPrimary leading-tight max-w-3xl mx-auto">
+          Driven by talent. <br className="hidden sm:inline" />
+          Focused on execution.
+        </h1>
+        <p className="text-base md:text-lg text-textSecondary max-w-2xl mx-auto leading-relaxed">
+          Navyan bridges the gap between learning and delivery, serving as a structured internship launchpad for developers and a high-performance product studio for companies.
+        </p>
+      </section>
+
+      {/* Metrics Section */}
+      <section className="mx-auto max-w-7xl px-4 md:px-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.label} className="navyan-card p-6 flex flex-col justify-between space-y-6">
+              <div className="w-10 h-10 rounded-[10px] bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                <stat.icon className="h-5 w-5" />
+              </div>
+              <div className="space-y-2">
+                <p className="font-display text-4xl font-semibold tracking-[-0.04em] text-textPrimary">
+                  {stat.value}
+                </p>
+                <p className="text-sm font-semibold text-textPrimary">
+                  {stat.label}
+                </p>
+                <p className="text-xs leading-relaxed text-textSecondary">
+                  {stat.desc}
+                </p>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section className="navyan-section border-t border-[#e2ddd2] bg-white/75 dark:border-[#23232e] dark:bg-[#0f0f16]/70">
-        <div className="mx-auto max-w-6xl px-4 space-y-8">
-          <div className="max-w-2xl space-y-2">
-            <h2 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">
-              Built like a product, not a form.
-            </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              Navyan is a dual-purpose platform: an internship portal for students and a
-              service studio for founders. The experience is designed to be premium, structured,
-              and scalable.
-            </p>
+      {/* Core Values Section */}
+      <section className="mx-auto max-w-7xl px-4 md:px-8 grid gap-10 lg:grid-cols-12 items-center">
+        <div className="lg:col-span-5 space-y-4">
+          <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] text-textPrimary">
+            Built like a product, not a template.
+          </h2>
+          <p className="text-sm leading-relaxed text-textSecondary">
+            We believe internships should cultivate production-ready code habits, and services should be delivered with absolute design fidelity and structured architectures.
+          </p>
+          <div className="pt-2">
+            <Link to="/internships">
+              <Button variant="accent">
+                Browse Programs
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              {
-                t: "Internship workflow",
-                d: "Apply → review → selected → task → submission → verified certificate."
-              },
-              {
-                t: "Student-first UX",
-                d: "Single profile, minimal apply fields, permanent documents, status visibility."
-              },
-              {
-                t: "Founder execution",
-                d: "Design systems, MERN architecture, modern SaaS visuals, and clean delivery."
-              }
-            ].map((x) => (
-              <div key={x.t} className="navyan-card p-5">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">{x.t}</p>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {x.d}
-                </p>
-              </div>
-            ))}
-          </div>
+        </div>
+
+        <div className="lg:col-span-7 grid gap-4 sm:grid-cols-2">
+          {[
+            { k: "Clarity", v: "Transparent stages from application, tasks, execution, to final verification." },
+            { k: "Craft", v: "Clean React/Node setups with custom design systems, not boilerplate." },
+            { k: "Trust", v: "Secure verification keys for student credentials to build professional credibility." },
+            { k: "Growth", v: "Direct engineering reviews that prepare developers for high-performing roles." }
+          ].map((item) => (
+            <div key={item.k} className="navyan-card p-6 bg-card-elevated border border-border/80">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
+                {item.k}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-textSecondary">
+                {item.v}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
     </div>

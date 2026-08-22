@@ -45,7 +45,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Loading your profile...</p>
+        <p className="text-sm text-textMuted">Loading your profile...</p>
       </div>
     );
   }
@@ -53,24 +53,24 @@ export default function Profile() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Your profile</h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          You only fill this once. We use it to auto-fill your internship applications, offer
+        <h1 className="text-xl font-semibold text-textPrimary">Settings</h1>
+        <p className="mt-1 text-sm text-textSecondary">
+          Manage your account profile. This information is used to auto-fill applications, offer
           letters, and certificates.
         </p>
         {completion && (
-          <div className="mt-4 max-w-xl rounded-3xl border border-[#e4d4ad] bg-[#f8efdd]/85 p-4 shadow-soft dark:border-[#4b3f29] dark:bg-[#2b2417]/70">
+          <div className="mt-4 max-w-xl rounded-[12px] border border-primary/20 bg-primary/10 p-4 shadow-soft">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-700 dark:text-slate-200">Profile completion</span>
+              <span className="font-medium text-textSecondary">Profile completion</span>
               <span className="font-semibold text-primary">{completion.percentage}%</span>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-[#1d1d29]">
+            <div className="mt-2 h-2 overflow-hidden rounded-[8px] bg-slate-100 dark:bg-[#1d1d29]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
+                className="h-full rounded-[8px] bg-primary"
                 style={{ width: `${completion.percentage}%` }}
               />
             </div>
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-2 text-xs text-textMuted">
               Complete all required fields to unlock internship applications.
             </p>
           </div>
@@ -154,19 +154,19 @@ export default function Profile() {
         </div>
 
         <div className="md:col-span-2">
-          <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--bg-secondary)]/75 p-4 shadow-soft">
+          <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)]/75 p-4 shadow-soft">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-[color:var(--text)]">
+                <h2 className="text-sm font-semibold text-textPrimary">
                   Job email preferences
                 </h2>
-                <p className="text-sm text-slate-600 dark:text-[color:var(--text-secondary)]">
+                <p className="text-sm text-textSecondary">
                   Turn this on if you want Navyan to email you whenever new job opportunities are
                   published.
                 </p>
               </div>
 
-              <label className="inline-flex items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm dark:bg-[color:var(--bg-elevated)] dark:text-[color:var(--text)]">
+              <label className="inline-flex items-center gap-3 rounded-[10px] border border-[color:var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-textSecondary shadow-sm dark:bg-[color:var(--bg-elevated)]">
                 <input
                   type="checkbox"
                   {...register("allowJobEmails")}
@@ -191,7 +191,7 @@ export default function Profile() {
 function Field({ label, children }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs font-medium text-slate-600 dark:text-slate-300 block">{label}</label>
+      <label className="text-xs font-medium text-textSecondary block">{label}</label>
       {children}
     </div>
   );

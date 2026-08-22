@@ -33,7 +33,7 @@ export default function InternshipDetail() {
       <section className="navyan-section">
         <div className="mx-auto max-w-4xl px-4">
           <div className="navyan-card p-5 space-y-3">
-            <Skeleton height={180} borderRadius={18} />
+            <Skeleton height={180} borderRadius={12} />
             <Skeleton width="60%" />
             <Skeleton count={3} />
           </div>
@@ -47,7 +47,7 @@ export default function InternshipDetail() {
       <section className="navyan-section">
         <div className="mx-auto max-w-4xl px-4">
           <div className="navyan-card p-5 text-sm">
-            <p className="font-medium text-slate-700 dark:text-slate-200">Internship not found.</p>
+            <p className="font-medium text-textPrimary">Internship not found.</p>
             <Link to="/internships" className="mt-2 inline-block text-xs text-primary">
               Back to internships
             </Link>
@@ -60,14 +60,14 @@ export default function InternshipDetail() {
   return (
     <section className="navyan-section">
       <div className="mx-auto max-w-4xl px-4 space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#e4d4ad] bg-[#f8efdd] px-3 py-1 text-xs font-medium text-[#6b5424] dark:border-[#4b3f29] dark:bg-[#2b2417] dark:text-[#d6b77a]">
+        <div className="inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
           <Sparkles className="h-3.5 w-3.5" />
           Internship details
         </div>
         <Card>
           <CardHeader>
             {internship.coverImageUrl && (
-              <div className="mb-4 aspect-video w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-900/40">
+              <div className="mb-4 aspect-video w-full overflow-hidden rounded-[12px] bg-slate-100 dark:bg-slate-900/40">
                 <img
                   src={internship.coverImageUrl}
                   alt={internship.title}
@@ -79,36 +79,36 @@ export default function InternshipDetail() {
             <CardDescription>{internship.shortDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-3 text-xs text-slate-600 dark:text-slate-300">
-              <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-3 flex items-center gap-2">
+            <div className="grid gap-3 md:grid-cols-3 text-xs text-textSecondary">
+              <div className="rounded-[12px] bg-[color:var(--card-elevated)] p-3 flex items-center gap-2 border border-[color:var(--border)]">
                 <BadgeCheck className="h-4 w-4 text-primary" />
                 <span>Role: {internship.role}</span>
               </div>
-              <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-3 flex items-center gap-2">
+              <div className="rounded-[12px] bg-[color:var(--card-elevated)] p-3 flex items-center gap-2 border border-[color:var(--border)]">
                 <Laptop className="h-4 w-4 text-primary" />
                 <span>Mode: {internship.mode?.toUpperCase()}</span>
               </div>
               {internship.openings && (
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-3 flex items-center gap-2">
+                <div className="rounded-[12px] bg-[color:var(--card-elevated)] p-3 flex items-center gap-2 border border-[color:var(--border)]">
                   <MapPin className="h-4 w-4 text-primary" />
                   <span>Openings: {internship.openings}</span>
                 </div>
               )}
             </div>
-            <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
-              <h3 className="font-semibold text-slate-800 dark:text-slate-100">Overview</h3>
+            <div className="space-y-2 text-sm text-textSecondary">
+              <h3 className="font-semibold text-textPrimary">Overview</h3>
               <p className="whitespace-pre-line">{internship.description}</p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                <h4 className="text-sm font-semibold text-textPrimary mb-2">
                   Skills you'll use
                 </h4>
-                <div className="flex flex-wrap gap-1.5 text-[11px] text-slate-600 dark:text-slate-300">
+                <div className="flex flex-wrap gap-1.5 text-[11px] text-textSecondary">
                   {internship.skillsRequired?.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-full bg-slate-100 dark:bg-slate-900/50 px-2.5 py-0.5"
+                      className="rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-2.5 py-0.5"
                     >
                       {skill}
                     </span>
@@ -116,17 +116,17 @@ export default function InternshipDetail() {
                 </div>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                <h4 className="text-sm font-semibold text-textPrimary mb-2">
                   Duration options
                 </h4>
-                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <div className="space-y-1 text-xs text-textSecondary">
                   {internship.durations?.map((d) => (
                     <div
                       key={d.key}
-                      className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-3 py-2"
+                      className="flex items-center justify-between rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-2"
                     >
                       <span className="inline-flex items-center gap-2">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                        <Calendar className="h-3.5 w-3.5 text-textMuted" />
                         {d.label || d.key}
                       </span>
                       <span className="text-[11px]">
@@ -138,12 +138,12 @@ export default function InternshipDetail() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-900">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[color:var(--border)]">
+              <p className="text-xs text-textMuted">
                 You&apos;ll apply with your Navyan profile. Offer letter and tasks are
                 managed from your dashboard when selected.
               </p>
-              <Button onClick={() => navigate(`/student/internships?apply=${internship._id}`)}>
+              <Button variant="accent" onClick={() => navigate(`/student/internships?apply=${internship._id}`)}>
                 Apply via student dashboard
               </Button>
             </div>

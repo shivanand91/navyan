@@ -8,9 +8,10 @@ import api, { getApiErrorMessage } from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import BrandLogo from "@/components/BrandLogo";
 
 const schema = z.object({
-  email: z.string().email()
+  email: z.string().email("Please enter a valid email address")
 });
 
 export default function ForgotPassword() {
@@ -34,56 +35,57 @@ export default function ForgotPassword() {
   };
 
   return (
-    <section className="navyan-section px-4 md:px-6">
-      <div className="mx-auto max-w-xl">
-        <div className="navyan-panel p-6 md:p-8">
-          <div className="space-y-6">
+    <section className="navyan-section min-h-[75vh] flex items-center justify-center px-4 md:px-6">
+      <div className="w-full max-w-md">
+        <div className="navyan-panel p-6 md:p-10 space-y-6">
+          <div className="flex flex-col items-center text-center gap-4">
+            <BrandLogo imageClassName="h-9" surface="adaptive" />
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.04em] text-textPrimary">
+                Reset your password
+              </h1>
+              <p className="text-sm text-textSecondary">
+                Enter your registered email address to receive a secure recovery link.
+              </p>
+            </div>
+          </div>
+
+          {sentEmail ? (
+            <div className="rounded-[12px] border border-emerald-500/20 bg-emerald-500/10 p-5 text-center">
+              <MailCheck className="h-6 w-6 text-emerald-500 mx-auto" />
+              <p className="mt-3 text-sm font-semibold text-textPrimary">
+                Check your inbox
+              </p>
+              <p className="mt-2 text-xs leading-5 text-textSecondary">
+                If an account exists for <span className="font-semibold text-textPrimary">{sentEmail}</span>, a reset link has been sent.
+              </p>
+            </div>
+          ) : null}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-textMuted">
+                Email Address
+              </label>
+              <Input type="email" placeholder="you@example.com" {...register("email")} />
+              {errors.email ? (
+                <p className="text-xs text-danger font-medium mt-1">{errors.email.message}</p>
+              ) : null}
+            </div>
+
+            <Button variant="accent" type="submit" disabled={isSubmitting} className="w-full justify-center mt-2">
+              {isSubmitting ? "Sending reset link..." : "Send Reset Link"}
+            </Button>
+          </form>
+
+          <div className="flex items-center justify-center border-t border-border pt-4">
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to login
             </Link>
-
-            <div className="space-y-3">
-              <div className="navyan-pill">Password recovery</div>
-              <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-slate-950 dark:text-[#f5f7fa]">
-                Reset your Navyan password
-              </h1>
-              <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                Enter your registered email. We will send a secure reset link that expires in 30 minutes.
-              </p>
-            </div>
-
-            {sentEmail ? (
-              <div className="rounded-[24px] border border-emerald-500/20 bg-emerald-500/10 p-5">
-                <MailCheck className="h-6 w-6 text-emerald-500" />
-                <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-[#f5f7fa]">
-                  Check your inbox
-                </p>
-                <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                  If an account exists for <span className="font-semibold">{sentEmail}</span>, a reset
-                  link has been sent.
-                </p>
-              </div>
-            ) : null}
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-[#7e8794]">
-                  Email
-                </label>
-                <Input type="email" placeholder="you@example.com" {...register("email")} />
-                {errors.email ? (
-                  <p className="mt-2 text-xs text-danger">{errors.email.message}</p>
-                ) : null}
-              </div>
-
-              <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Sending reset link..." : "Send reset link"}
-              </Button>
-            </form>
           </div>
         </div>
       </div>

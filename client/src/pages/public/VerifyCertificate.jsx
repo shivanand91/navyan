@@ -45,10 +45,10 @@ export default function VerifyCertificate() {
     <section className="navyan-section">
       <div className="mx-auto max-w-xl px-4 space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl md:text-3xl font-semibold text-textPrimary">
             Verify a Navyan certificate
           </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          <p className="mt-2 text-sm text-textSecondary">
             Enter the unique certificate ID printed on the document to confirm its
             authenticity.
           </p>
@@ -56,7 +56,7 @@ export default function VerifyCertificate() {
 
         <form onSubmit={handleVerify} className="navyan-card space-y-4 p-5">
           <div>
-            <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label className="text-xs font-medium text-textSecondary mb-1 block">
               Certificate ID
             </label>
             <Input
@@ -65,7 +65,7 @@ export default function VerifyCertificate() {
               placeholder="e.g. NAV-INT-2026-XXXX"
             />
           </div>
-          <Button type="submit" disabled={loading || !certificateId}>
+          <Button variant="accent" type="submit" disabled={loading || !certificateId}>
             {loading ? "Verifying..." : "Verify"}
           </Button>
         </form>
@@ -73,7 +73,7 @@ export default function VerifyCertificate() {
         {result && (
           <div className="navyan-card p-5 text-sm">
             {result.valid ? (
-              <div className="space-y-1 text-slate-700 dark:text-slate-200">
+              <div className="space-y-1 text-textSecondary">
                 <p className="font-semibold text-emerald-700">
                   This certificate is valid and issued by Navyan.
                 </p>
@@ -92,7 +92,7 @@ export default function VerifyCertificate() {
                     href={result.certificate.verifyUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-block pt-2 text-primary"
+                    className="inline-block pt-2 text-primary ml-4"
                   >
                     Open verification link
                   </a>

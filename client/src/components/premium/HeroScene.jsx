@@ -1,107 +1,115 @@
-import { Suspense, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Sparkles } from "@react-three/drei";
-import { useMediaQuery } from "usehooks-ts";
-
-function FloatingForms() {
-  const groupRef = useRef(null);
-  const dustRef = useRef(null);
-
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.08;
-      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.22) * 0.08;
-    }
-    if (dustRef.current) {
-      dustRef.current.rotation.z += delta * 0.02;
-    }
-  });
-
-  return (
-    <group ref={groupRef}>
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[4, 4, 3]} intensity={1.2} color="#f8f1e2" />
-      <pointLight position={[-3, -2, 2]} intensity={1.1} color="#8b5cf6" />
-      <pointLight position={[3, 2, 1]} intensity={0.8} color="#d4a85f" />
-
-      <Float speed={1.15} rotationIntensity={0.12} floatIntensity={0.22}>
-        <mesh position={[-0.6, 0.25, 0]}>
-          <sphereGeometry args={[1.35, 96, 96]} />
-          <MeshDistortMaterial
-            color="#d4a85f"
-            emissive="#6d28d9"
-            emissiveIntensity={0.12}
-            roughness={0.18}
-            metalness={0.55}
-            distort={0.28}
-            speed={1.4}
-          />
-        </mesh>
-      </Float>
-
-      <Float speed={1.35} rotationIntensity={0.18} floatIntensity={0.35}>
-        <mesh position={[1.45, -0.55, -1.2]} scale={0.8}>
-          <icosahedronGeometry args={[0.9, 1]} />
-          <meshStandardMaterial
-            color="#1a2027"
-            emissive="#8b5cf6"
-            emissiveIntensity={0.22}
-            roughness={0.34}
-            metalness={0.64}
-          />
-        </mesh>
-      </Float>
-
-      <Float speed={1} rotationIntensity={0.2} floatIntensity={0.3}>
-        <mesh position={[0.9, 1.1, -1.5]} rotation={[0.4, 0.3, 0.2]} scale={0.7}>
-          <torusKnotGeometry args={[0.42, 0.14, 128, 16]} />
-          <meshStandardMaterial
-            color="#111418"
-            emissive="#67e8f9"
-            emissiveIntensity={0.15}
-            roughness={0.2}
-            metalness={0.8}
-          />
-        </mesh>
-      </Float>
-
-      <group ref={dustRef}>
-        <Sparkles
-          count={140}
-          scale={[7.2, 4.8, 3.6]}
-          size={1.8}
-          speed={0.18}
-          opacity={0.42}
-          color="#d4a85f"
-        />
-      </group>
-    </group>
-  );
-}
+import { CheckCircle2, ChevronRight, FileBadge, FolderGit2, LineChart, Shield } from "lucide-react";
 
 export default function HeroScene({ className }) {
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const dpr = useMemo(() => (isDesktop ? [1, 1.6] : [1, 1.2]), [isDesktop]);
-
-  if (!isDesktop) {
-    return (
-      <div
-        className={className}
+  return (
+    <div className={`relative w-full h-full overflow-hidden bg-[#0F0F14] p-8 flex flex-col justify-between select-none ${className}`}>
+      {/* Premium Tech Grid & Glow Backgrounds */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(139,92,246,0.12),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.15),transparent_50%)]" />
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
-          background:
-            "radial-gradient(circle at 30% 30%, rgba(212,168,95,0.22), transparent 35%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.18), transparent 30%), linear-gradient(180deg, rgba(20,24,29,0.72), rgba(11,13,16,0))"
+          backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
+          backgroundSize: "24px 24px"
         }}
       />
-    );
-  }
 
-  return (
-    <div className={className}>
-      <Canvas dpr={dpr} camera={{ position: [0, 0, 5.4], fov: 42 }}>
-        <Suspense fallback={null}>
-          <FloatingForms />
-        </Suspense>
-      </Canvas>
+      {/* Floating System Cards Wrapper */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6 w-full max-w-lg mx-auto">
+        {/* Terminal/IDE Mockup */}
+        <div className="w-full rounded-[12px] border border-white/8 bg-[#1A1A22]/90 backdrop-blur-md shadow-2xl p-5 space-y-4 transform -rotate-1 hover:rotate-0 transition-transform duration-700">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/60" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/60" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/60" />
+              <span className="ml-2 text-[10px] font-mono tracking-wider text-[#F6F5F8]/60 uppercase">nvy-workspace-console</span>
+            </div>
+            <div className="rounded-full bg-[#8B5CF6]/20 px-2 py-0.5 text-[9px] font-mono text-[#8B5CF6] font-semibold border border-[#8B5CF6]/30 animate-pulse">
+              SYS ACTIVE
+            </div>
+          </div>
+
+          {/* Timeline Process */}
+          <div className="space-y-3.5">
+            {[
+              {
+                title: "Register & Setup Profile",
+                desc: "Identify your target track & details",
+                status: "done",
+                icon: Shield
+              },
+              {
+                title: "Choose Internship & Apply",
+                desc: "Submit credentials to active pool",
+                status: "done",
+                icon: FolderGit2
+              },
+              {
+                title: "Under Review by Coordinator",
+                desc: "Reviewing intent, skills, and timeline",
+                status: "active",
+                icon: LineChart
+              },
+              {
+                title: "Unlocks Verifiable Badge",
+                desc: "Permanent registry entry on completion",
+                status: "pending",
+                icon: FileBadge
+              }
+            ].map((step, idx) => (
+              <div 
+                key={step.title} 
+                className={`flex gap-3.5 p-3 rounded-[8px] border transition duration-300 ${
+                  step.status === "active" 
+                    ? "border-[#8B5CF6]/30 bg-[#8B5CF6]/[0.06]" 
+                    : step.status === "done"
+                      ? "border-white/5 bg-white/[0.01]"
+                      : "border-transparent bg-transparent opacity-40"
+                }`}
+              >
+                <div className="relative flex flex-col items-center">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border text-xs font-semibold ${
+                    step.status === "done"
+                      ? "bg-[#8B5CF6]/20 border-[#8B5CF6] text-[#8B5CF6]"
+                      : step.status === "active"
+                        ? "bg-[#8B5CF6] text-[#0F0F14] border-[#8B5CF6] animate-pulse"
+                        : "bg-white/5 border-white/10 text-[#A39FAE]"
+                  }`}>
+                    {step.status === "done" ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
+                  </div>
+                  {idx < 3 && <div className="w-[1px] h-8 bg-white/10 mt-1 absolute top-6" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs font-semibold ${step.status === "active" ? "text-[#8B5CF6]" : "text-[#F6F5F8]"}`}>
+                      {step.title}
+                    </p>
+                    {step.status === "active" && (
+                      <span className="text-[9px] font-semibold text-[#8B5CF6] uppercase tracking-wider">in-review</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-[#F6F5F8]/60 mt-0.5 truncate">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Small Overlay Stats Card */}
+        <div className="w-3/4 self-end rounded-[12px] border border-white/8 bg-[#1A1A22]/92 backdrop-blur-md shadow-xl p-4 flex items-center justify-between gap-4 transform rotate-1 hover:rotate-0 transition-transform duration-700">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-[8px] bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6]">
+              <FileBadge className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold text-[#F6F5F8]">Verifiable Certificate</p>
+              <p className="text-[9px] text-[#F6F5F8]/60">Cryptographically signed</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-[#F6F5F8]/60" />
+        </div>
+      </div>
     </div>
   );
 }

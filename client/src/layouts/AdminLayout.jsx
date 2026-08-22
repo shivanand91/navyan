@@ -28,7 +28,6 @@ const links = [
   { to: "/admin/services", label: "Services", icon: PenTool, caption: "Studio" },
   { to: "/admin/jobs", label: "Jobs", icon: Briefcase, caption: "Hiring" },
   { to: "/admin/courses", label: "Courses", icon: GraduationCap, caption: "Learning" },
-  { to: "/admin/referrals", label: "Referrals", icon: Share2, caption: "Codes" },
   { to: "/admin/applications", label: "Applications", icon: Users2, caption: "Candidates" },
   { to: "/admin/submissions", label: "Submissions", icon: FileSearch, caption: "Reviews" },
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },
@@ -68,29 +67,29 @@ export function AdminLayout() {
         <aside className="navyan-panel sticky top-5 hidden h-[calc(100vh-2.5rem)] w-[304px] shrink-0 flex-col bg-[color:var(--sidebar)] text-[color:var(--text)] lg:flex">
           <div className="shrink-0 border-b border-[color:var(--border)] px-5 py-5">
             <Link to={dashboardHomePath}>
-              <BrandLogo imageClassName="h-12 md:h-14" />
+              <BrandLogo imageClassName="h-10" />
             </Link>
             <div className="mt-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-primary/18 bg-primary/10 text-primary">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-primary/18 bg-primary/10 text-primary">
                 <ShieldCheck className="h-4 w-4" />
               </div>
               <div>
-                <p className="font-display text-base font-semibold text-[color:var(--text)]">
+                <p className="font-display text-sm font-semibold text-[color:var(--text)]">
                   Admin control
                 </p>
-                <p className="text-xs text-[color:var(--text-muted)]">Operational oversight and workflow intelligence</p>
+                <p className="text-[10px] text-[color:var(--text-muted)] leading-tight">Operational oversight and workflow intelligence</p>
               </div>
             </div>
           </div>
 
-          <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 py-5">
+          <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-5">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 rounded-[20px] border border-transparent px-4 py-3 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/10 hover:text-[color:var(--text)]",
+                    "flex items-center gap-3 rounded-[10px] border border-transparent px-3.5 py-2.5 text-sm font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border)] hover:bg-primary/5 hover:text-[color:var(--text)]",
                     isActive && "border-primary/20 bg-primary/10 text-primary"
                   )
                 }
@@ -98,7 +97,7 @@ export function AdminLayout() {
                 <link.icon className="h-4 w-4" />
                 <div>
                   <p>{link.label}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     {link.caption}
                   </p>
                 </div>
@@ -107,10 +106,10 @@ export function AdminLayout() {
           </nav>
 
           <div className="mt-auto shrink-0 border-t border-[color:var(--border)] p-4">
-            <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
+            <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-display text-base font-semibold text-[color:var(--text)]">
+                  <p className="truncate font-display text-sm font-semibold text-[color:var(--text)]">
                     {user?.fullName}
                   </p>
                   <p className="truncate text-xs text-[color:var(--text-muted)]">{user?.email}</p>
@@ -120,7 +119,7 @@ export function AdminLayout() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="mt-4 w-full justify-start"
+                className="mt-4 w-full justify-start text-xs h-8 rounded-[8px]"
                 onClick={logout}
               >
                 Logout
@@ -150,7 +149,7 @@ export function AdminLayout() {
                   />
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-[color:var(--text)] md:text-xl">
+                  <p className="font-display text-base font-semibold text-[color:var(--text)]">
                     Admin console
                   </p>
                   <p className="text-xs text-[color:var(--text-muted)]">

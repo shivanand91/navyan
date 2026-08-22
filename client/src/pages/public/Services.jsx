@@ -9,10 +9,10 @@ import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 
 const deliveryModel = [
-  "Discovery-led scoping before engineering begins",
-  "Design system thinking instead of ad hoc screens",
-  "Clear build phases with practical milestone visibility",
-  "Product polish that feels premium across desktop and mobile"
+  "Understanding your needs & requirements",
+  "Creating high-quality designs & prototypes",
+  "Phase-wise development & coding",
+  "Final delivery with 24/7 support"
 ];
 
 export default function Services() {
@@ -41,20 +41,20 @@ export default function Services() {
       <section className="navyan-section px-4 pt-12 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1fr_0.92fr]">
           <RevealInView className="space-y-6">
-            <div className="navyan-pill">Navyan product studio</div>
+            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border border-border bg-backgroundSecondary text-textSecondary">
+              Navyan product studio
+            </div>
             <div className="space-y-4">
-              <h1 className="max-w-4xl font-display text-5xl font-semibold tracking-[-0.06em] text-slate-950 dark:text-[#f5f7fa] md:text-6xl">
-                Premium product execution for founders who want clarity and velocity.
+              <h1 className="max-w-4xl font-display text-5xl font-semibold tracking-[-0.06em] text-textPrimary md:text-6xl">
+                Professional IT &amp; Development Services
               </h1>
-              <p className="max-w-2xl text-base leading-8 text-slate-600 dark:text-[#b7c0cc]">
-                Navyan designs and ships websites, apps, dashboards, and startup MVPs with a
-                strong visual system and engineering discipline. Every service card below is
-                managed from the admin panel so your public trust layer stays current.
+              <p className="max-w-2xl text-base leading-8 text-textSecondary">
+                We build premium websites, mobile applications, and customized software to help your business grow. Get clean code, modern designs, and reliable support.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link to="/contact">
-                <Button size="lg">
+                <Button variant="accent" size="lg">
                   Start a project
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -68,17 +68,17 @@ export default function Services() {
           </RevealInView>
 
           <RevealInView className="navyan-panel p-6">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 dark:text-[#7e8794]">
-              Delivery model
+            <p className="text-[11px] uppercase tracking-[0.2em] text-textMuted font-semibold">
+              How We Deliver Projects
             </p>
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-3">
               {deliveryModel.map((item) => (
                 <div
                   key={item}
-                  className="flex items-start gap-3 rounded-[20px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-4"
+                  className="flex items-center gap-3 rounded-[12px] border border-border bg-backgroundSecondary px-4 py-3"
                 >
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-success" />
-                  <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">{item}</p>
+                  <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  <p className="text-sm font-medium text-textSecondary">{item}</p>
                 </div>
               ))}
             </div>
@@ -89,9 +89,9 @@ export default function Services() {
       <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
-            eyebrow="Service capabilities"
-            title="Built for startups, founders, and ambitious brands."
-            description="Every service can carry its own feature image, clear value proposition, and direct conversion path into inquiry or a booked call."
+            eyebrow="Our Services"
+            title="What We Can Build For You"
+            description="Explore our IT development capabilities and choose the right service for your business needs."
           />
 
           {loading ? (
@@ -105,19 +105,19 @@ export default function Services() {
             </div>
           ) : services.length === 0 ? (
             <div className="navyan-card px-6 py-12 text-center">
-              <p className="font-display text-2xl font-semibold text-slate-950 dark:text-[#f5f7fa]">
+              <p className="font-display text-2xl font-semibold text-textPrimary">
                 No services are live right now.
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-[#b7c0cc]">
-                Add service offerings from the admin panel to populate this page.
+              <p className="mt-3 text-sm text-textSecondary">
+                Check back later for our customized tech solutions.
               </p>
             </div>
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {services.map((service, index) => (
                 <RevealInView key={service._id} delay={index * 0.04}>
-                  <Card className="flex h-full min-h-[520px] flex-col overflow-hidden p-0">
-                    <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
+                  <Card className="flex h-full min-h-[480px] flex-col overflow-hidden p-0">
+                    <div className="relative aspect-video overflow-hidden border-b border-border bg-backgroundSecondary">
                       {service.featureImageUrl ? (
                         <img
                           src={service.featureImageUrl}
@@ -125,11 +125,11 @@ export default function Services() {
                           className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
+                        <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-textSecondary">
                           Navyan service capability
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
+                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-card/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                         <Sparkles className="h-3.5 w-3.5" />
                         {service.category || "Service"}
                       </div>
@@ -142,52 +142,30 @@ export default function Services() {
 
                     <CardContent className="flex flex-1 flex-col justify-between">
                       <div className="space-y-3">
-                        {(service.highlights || []).slice(0, 4).map((item) => (
+                        {(service.highlights || []).slice(0, 3).map((item) => (
                           <div key={item} className="flex items-start gap-3">
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
-                            <p className="text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">{item}</p>
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                            <p className="text-sm leading-7 text-textSecondary">{item}</p>
                           </div>
                         ))}
-                        {service.description ? (
-                          <p
-                            className="whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]"
-                            style={{
-                              display: "-webkit-box",
-                              WebkitBoxOrient: "vertical",
-                              WebkitLineClamp: 4,
-                              overflow: "hidden"
-                            }}
-                          >
-                            {service.description}
-                          </p>
-                        ) : null}
                       </div>
 
-                      <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4 sm:flex-row">
+                      <div className="mt-auto flex gap-3 border-t border-border pt-4">
                         <Link
                           to={`/contact?mode=inquiry&service=${encodeURIComponent(service.title)}&serviceId=${service._id}`}
-                          className="sm:flex-1"
+                          className="flex-1"
                         >
-                          <Button className="w-full">
-                            Apply
+                          <Button variant="accent" className="w-full justify-center">
+                            Get Started
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
                         </Link>
-                        <Link
-                          to={`/contact?mode=call&service=${encodeURIComponent(service.title)}&serviceId=${service._id}`}
-                          className="sm:flex-1"
-                        >
-                          <Button variant="outline" className="w-full">
-                            Book call
-                            <PhoneCall className="ml-2 h-4 w-4" />
-                          </Button>
-                        </Link>
                         <Button
-                          variant="ghost"
-                          className="sm:flex-1"
+                          variant="outline"
+                          className="flex-1 justify-center"
                           onClick={() => setActiveService(service)}
                         >
-                          More details
+                          Details
                           <Eye className="ml-2 h-4 w-4" />
                         </Button>
                       </div>
@@ -202,20 +180,21 @@ export default function Services() {
 
       <section className="navyan-section px-4 pb-16 md:px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="navyan-hero-panel p-8 md:p-10">
+          <div className="rounded-[16px] border border-border bg-[#2B2530] p-8 md:p-10 shadow-soft">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl space-y-3">
-                <div className="navyan-pill">Start the conversation</div>
+                <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border border-white/10 bg-white/5 text-white/80">
+                  Start the conversation
+                </div>
                 <h2 className="font-display text-4xl font-semibold tracking-[-0.05em] text-white">
-                  Need a product partner who can move fast without lowering the standard?
+                  Need a product partner who can deliver results?
                 </h2>
-                <p className="text-base leading-8 text-[#b7c0cc]">
-                  Choose a service, send your requirement, or book a call directly with your
-                  preferred date and time.
+                <p className="text-base leading-8 text-white/60">
+                  Choose a service, share your requirements, or book a free consultation call.
                 </p>
               </div>
               <Link to="/contact">
-                <Button size="lg">
+                <Button variant="accent" size="lg">
                   Contact Navyan
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -234,7 +213,7 @@ export default function Services() {
       >
         {activeService ? (
           <div className="space-y-6">
-            <div className="overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
+            <div className="overflow-hidden rounded-[16px] border border-border bg-card">
               {activeService.featureImageUrl ? (
                 <img
                   src={activeService.featureImageUrl}
@@ -242,18 +221,18 @@ export default function Services() {
                   className="aspect-video w-full object-cover"
                 />
               ) : (
-                <div className="flex aspect-video items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)]">
+                <div className="flex aspect-video items-center justify-center bg-primary/10 text-sm text-textSecondary">
                   Navyan service capability
                 </div>
               )}
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+              <div className="rounded-[12px] border border-border bg-card p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
                   Full description
                 </p>
-                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[color:var(--text-secondary)]">
+                <p className="mt-2 whitespace-pre-line text-sm leading-8 text-textSecondary">
                   {activeService.description || "No extended description added yet."}
                 </p>
               </div>
@@ -263,8 +242,8 @@ export default function Services() {
                   to={`/contact?mode=inquiry&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
                   className="sm:flex-1"
                 >
-                  <Button className="w-full">
-                    Apply
+                  <Button variant="accent" className="w-full justify-center">
+                    Inquire / Get Quote
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -272,20 +251,11 @@ export default function Services() {
                   to={`/contact?mode=call&service=${encodeURIComponent(activeService.title)}&serviceId=${activeService._id}`}
                   className="sm:flex-1"
                 >
-                  <Button variant="outline" className="w-full">
-                    Book call
+                  <Button variant="outline" className="w-full justify-center">
+                    Book Call
                     <PhoneCall className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-              </div>
-
-              <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Category
-                </p>
-                <p className="mt-3 text-sm font-semibold text-[color:var(--text)]">
-                  {activeService.category || "General"}
-                </p>
               </div>
             </div>
           </div>

@@ -175,7 +175,7 @@ export default function Applications() {
                         </div>
                         <div className="mt-1 h-2 overflow-hidden rounded-full bg-white dark:bg-[#15151e]">
                           <div
-                            className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
+                            className="h-full rounded-full bg-primary"
                             style={{ width: `${app.timeline.progressPercentage}%` }}
                           />
                         </div>

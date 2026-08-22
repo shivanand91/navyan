@@ -104,16 +104,14 @@ export default function Contact() {
     <section className="navyan-section">
       <div className="mx-auto max-w-3xl px-4 space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-semibold text-textPrimary">
             Let&apos;s talk about your product.
           </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          <p className="mt-2 text-sm text-textSecondary">
             Share a bit about your idea, timeline, and expectations, or book a call directly.
             We&apos;ll respond with an honest view of what it takes to ship it well.
           </p>
         </div>
-
-       
 
         <form onSubmit={handleSubmit(onSubmit)} className="navyan-card space-y-4 p-5">
           <input type="hidden" {...register("serviceId")} />
@@ -123,28 +121,28 @@ export default function Contact() {
             <button
               type="button"
               onClick={() => setValue("inquiryType", "inquiry")}
-              className={`rounded-[22px] border px-4 py-3 text-left transition ${
+              className={`rounded-[12px] border px-4 py-3 text-left transition ${
                 inquiryType === "inquiry"
                   ? "border-primary/25 bg-primary/10"
                   : "border-[color:var(--border)] bg-[color:var(--card-elevated)]"
               }`}
             >
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Service inquiry</p>
-              <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+              <p className="text-sm font-semibold text-textPrimary">Service inquiry</p>
+              <p className="mt-1 text-xs text-textSecondary">
                 Send requirements and let us get back with scope and next steps.
               </p>
             </button>
             <button
               type="button"
               onClick={() => setValue("inquiryType", "call")}
-              className={`rounded-[22px] border px-4 py-3 text-left transition ${
+              className={`rounded-[12px] border px-4 py-3 text-left transition ${
                 inquiryType === "call"
                   ? "border-primary/25 bg-primary/10"
                   : "border-[color:var(--border)] bg-[color:var(--card-elevated)]"
               }`}
             >
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Book a call</p>
-              <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+              <p className="text-sm font-semibold text-textPrimary">Book a call</p>
+              <p className="mt-1 text-xs text-textSecondary">
                 Reserve a preferred date and time for a discovery discussion.
               </p>
             </button>
@@ -152,7 +150,7 @@ export default function Contact() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Name
               </label>
               <Input {...register("name")} />
@@ -163,7 +161,7 @@ export default function Contact() {
               )}
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Email
               </label>
               <Input {...register("email")} />
@@ -177,13 +175,13 @@ export default function Contact() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Phone / WhatsApp
               </label>
               <Input {...register("phone")} />
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Company / Brand
               </label>
               <Input {...register("company")} />
@@ -192,7 +190,7 @@ export default function Contact() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Service
               </label>
               <Input placeholder="e.g. Web App, MVP" {...register("service")} />
@@ -203,7 +201,7 @@ export default function Contact() {
               )}
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Budget range (optional)
               </label>
               <Input placeholder="e.g. ₹2L–₹5L" {...register("budgetRange")} />
@@ -212,7 +210,7 @@ export default function Contact() {
 
           {inquiryType === "call" ? (
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label className="text-xs font-medium text-textSecondary mb-1 block">
                 Preferred date and time
               </label>
               <Input type="datetime-local" {...register("scheduledCallAt")} />
@@ -225,7 +223,7 @@ export default function Contact() {
           ) : null}
 
           <div>
-            <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label className="text-xs font-medium text-textSecondary mb-1 block">
               {inquiryType === "call" ? "What should we discuss?" : "Project description"}
             </label>
             <Textarea
@@ -245,14 +243,14 @@ export default function Contact() {
           </div>
 
           <div>
-            <label className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label className="text-xs font-medium text-textSecondary mb-1 block">
               Timeline (optional)
             </label>
             <Input placeholder="e.g. want to launch in 8–10 weeks" {...register("timeline")} />
           </div>
 
           <div className="pt-2">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button variant="accent" type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? inquiryType === "call"
                   ? "Booking..."
