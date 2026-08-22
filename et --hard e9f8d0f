@@ -1,0 +1,22 @@
+[33meec1729[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to ORIG_HEAD
+[33m22d39b6[m HEAD@{1}: reset: moving to ORIG_HEAD
+[33meec1729[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{2}: reset: moving to HEAD~3
+[33m22d39b6[m HEAD@{3}: reset: moving to HEAD~3
+[33m09081e4[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{4}: commit: Hackathon Update featues added
+[33m48c40ce[m HEAD@{5}: commit: Hackathon Update featues added
+[33me9f8d0f[m HEAD@{6}: commit: Hackathon Update featues added
+[33m22d39b6[m HEAD@{7}: commit: Hackathon Update featues added
+[33me763fe5[m HEAD@{8}: commit: Hackathon Update featues added
+[33mabfa6a6[m HEAD@{9}: commit: payment system change
+[33meec1729[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{10}: commit: Hackathon Update featues added
+[33m2d9985e[m HEAD@{11}: commit: Website Update
+[33m82cb1b9[m HEAD@{12}: commit: upadted in home
+[33m7430b87[m HEAD@{13}: commit: Alert System added in navyan
+[33m5f0262b[m HEAD@{14}: commit: service features on home page
+[33m7134e76[m HEAD@{15}: commit: updated in service page
+[33m6016b95[m HEAD@{16}: commit: updated in service page
+[33m4edd5df[m HEAD@{17}: commit: servie leads page updated
+[33m80555e4[m HEAD@{18}: commit: delete button added in every service lead projects
+[33m4fd961d[m HEAD@{19}: commit: servie leads page updated
+[33m2bca2f2[m HEAD@{20}: commit: contact backend change for something went wrong
+[33m78cdb3f[m HEAD@{21}: commit: internship pages changes
