@@ -485,8 +485,8 @@ export default function Home() {
             <div className="grid gap-6">
               {hackathons.map((hackathon, idx) => (
                 <RevealInView key={hackathon._id} delay={idx * 0.05}>
-                  <div className="navyan-card group grid overflow-hidden rounded-[30px] border border-[#f28b90]/60 bg-[#121212] p-4 dark:border-[#f28b90]/60 dark:bg-[#121212] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6 lg:p-5">
-                    <div className="relative overflow-hidden rounded-[24px] border border-[#f28b90]/70 bg-slate-950">
+                  <div className="navyan-card group grid overflow-hidden rounded-[30px] border border-[#f28b90]/60 bg-[#fff8f8] p-4 dark:border-[#f28b90]/60 dark:bg-[#121212] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6 lg:p-5">
+                    <div className="relative overflow-hidden rounded-[24px] border border-[#f28b90]/70 bg-slate-200 dark:bg-slate-950">
                       {hackathon.coverImageUrl ? (
                         <img
                           src={hackathon.coverImageUrl}
@@ -494,33 +494,33 @@ export default function Home() {
                           className="aspect-[16/9] h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] lg:aspect-auto lg:min-h-[360px]"
                         />
                       ) : (
-                        <div className="flex aspect-[16/9] h-full w-full items-center justify-center bg-slate-900 text-xs text-slate-400 lg:min-h-[360px]">
+                        <div className="flex aspect-[16/9] h-full w-full items-center justify-center bg-slate-200 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400 lg:min-h-[360px]">
                           No cover image
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-full border border-[#f28b90]/80 bg-[#121212]/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8f96]">
+                      <div className="absolute left-4 top-4 rounded-full border border-[#f28b90]/80 bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#cc5f67] dark:bg-[#121212]/85 dark:text-[#ff8f96]">
                         Live
                       </div>
                     </div>
                     <div className="flex min-h-full flex-col justify-between px-1 py-2 lg:px-2">
                       <div className="space-y-5">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#ff8f96]/80">
-                            Hackathon update
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#cc5f67] dark:text-[#ff8f96]/80">
+                            {hackathon.tag || "Hackathon"}
                           </p>
-                          <h3 className="font-display text-xl font-semibold tracking-[-0.03em] text-white md:text-2xl">
+                          <h3 className="font-display text-xl font-semibold tracking-[-0.03em] text-slate-950 dark:text-white md:text-2xl">
                             {hackathon.title}
                           </h3>
-                          <p className="text-sm leading-7 text-slate-300">
+                          <p className="text-sm leading-7 text-slate-600 dark:text-slate-300">
                             {getHackathonExcerpt(hackathon.description)}
                           </p>
                         </div>
 
-                        <div className="rounded-[20px] border border-[#f28b90]/60 bg-[#171717] px-4 py-3">
-                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#ff8f96]/80">
+                        <div className="rounded-[20px] border border-[#f28b90]/60 bg-white/70 px-4 py-3 dark:bg-[#171717]">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#cc5f67] dark:text-[#ff8f96]/80">
                             Team size
                           </p>
-                          <p className="mt-2 text-sm text-slate-200">
+                          <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
                             {hackathon.minTeamSize === hackathon.maxTeamSize ? `${hackathon.minTeamSize} member(s)` : `${hackathon.minTeamSize} to ${hackathon.maxTeamSize} members`}
                           </p>
                         </div>
@@ -530,7 +530,7 @@ export default function Home() {
                         <Button
                           type="button"
                           variant="outline"
-                          className="h-12 rounded-[20px] border-[#f28b90]/70 bg-transparent text-white hover:bg-white/5 hover:text-white"
+                          className="h-12 rounded-[20px] border-[#f28b90]/70 bg-transparent text-slate-900 hover:bg-[#fff0f1] hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
                           onClick={() => setActiveHackathon(hackathon)}
                         >
                           View Details
@@ -544,7 +544,7 @@ export default function Home() {
                           >
                             <Button
                               variant="outline"
-                              className="h-12 w-full rounded-[20px] border-[#f28b90]/70 bg-transparent text-white hover:bg-white/5 hover:text-white"
+                              className="h-12 w-full rounded-[20px] border-[#f28b90]/70 bg-transparent text-slate-900 hover:bg-[#fff0f1] hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
                             >
                               Open Form
                             </Button>
@@ -593,9 +593,11 @@ export default function Home() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">
-                  Event status
+                  Tag
                 </p>
-                <p className="mt-2 text-sm font-semibold text-textPrimary">Registration Open</p>
+                <p className="mt-2 text-sm font-semibold text-textPrimary">
+                  {activeHackathon.tag || "Hackathon"}
+                </p>
               </div>
               <div className="rounded-[20px] border border-border bg-backgroundSecondary/70 p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textMuted">

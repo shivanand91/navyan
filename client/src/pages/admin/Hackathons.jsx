@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
+const TAG_OPTIONS = ["Hackathon", "Hiring", "Internship", "Challenge", "Announcement"];
+
 const createEmptyForm = () => ({
   title: "",
-  slug: "",
+  tag: "Hackathon",
   description: "",
   minTeamSize: "1",
   maxTeamSize: "4",
@@ -57,7 +59,7 @@ export default function AdminHackathons() {
   const buildPayload = () => {
     const payload = new FormData();
     payload.append("title", form.title);
-    payload.append("slug", form.slug);
+    payload.append("tag", form.tag);
     payload.append("description", form.description);
     payload.append("minTeamSize", form.minTeamSize);
     payload.append("maxTeamSize", form.maxTeamSize);
@@ -108,7 +110,7 @@ export default function AdminHackathons() {
     setEditingId(hackathon._id);
     setForm({
       title: hackathon.title || "",
-      slug: hackathon.slug || "",
+      tag: hackathon.tag || "Hackathon",
       description: hackathon.description || "",
       minTeamSize: String(hackathon.minTeamSize || 1),
       maxTeamSize: String(hackathon.maxTeamSize || 4),
@@ -151,7 +153,7 @@ export default function AdminHackathons() {
       <div>
         <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Hackathon Management</h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          Create, edit, and delete hackathons. Active hackathons will automatically be showcased on the homepage.
+          Create, edit, and publish showcase cards. Choose a tag like Hackathon, Hiring, or Internship and it will appear on the homepage.
         </p>
       </div>
 
@@ -159,8 +161,19 @@ export default function AdminHackathons() {
         <Field label="Title">
           <Input name="title" value={form.title} onChange={handleChange} required />
         </Field>
-        <Field label="Slug (optional)">
-          <Input name="slug" value={form.slug} onChange={handleChange} placeholder="auto-generated from title if empty" />
+        <Field label="Tag">
+          <select
+            name="tag"
+            value={form.tag}
+            onChange={handleChange}
+            className="flex h-12 w-full rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-2 text-sm text-[color:var(--text)] transition focus-visible:border-primary/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
+          >
+            {TAG_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Minimum Team Size">
           <select
@@ -292,7 +305,7 @@ export default function AdminHackathons() {
                   <div>
                     <p className="font-medium text-slate-800 dark:text-slate-100">{hackathon.title}</p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Team Size: {hackathon.minTeamSize}-{hackathon.maxTeamSize} · Slug: {hackathon.slug}
+                      Tag: {hackathon.tag || "Hackathon"} · Team Size: {hackathon.minTeamSize}-{hackathon.maxTeamSize}
                     </p>
                   </div>
                 </div>

@@ -9,6 +9,30 @@ const slugify = (value) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 
+const buildUniqueSlug = async (baseValue, currentId = null) => {
+  const baseSlug = slugify(baseValue);
+  if (!baseSlug) {
+    return "";
+  }
+
+  let candidate = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await Hackathon.findOne({
+      slug: candidate,
+      ...(currentId ? { _id: { $ne: currentId } } : {})
+    }).select("_id");
+
+    if (!existing) {
+      return candidate;
+    }
+
+    counter += 1;
+    candidate = `${baseSlug}-${counter}`;
+  }
+};
+
 export const listPublicHackathons = async (req, res, next) => {
   try {
     const hackathons = await Hackathon.find({
@@ -38,13 +62,13 @@ export const adminCreateHackathon = async (req, res, next) => {
   try {
     const body = { ...req.body };
 
-    const { title, slug, description, minTeamSize, maxTeamSize, registrationLink, isPublished } = body;
+    const { title, tag, description, minTeamSize, maxTeamSize, registrationLink, isPublished } = body;
 
     if (!title || !description) {
       return res.status(400).json({ message: "Title and description are required." });
     }
 
-    const normalizedSlug = slugify(slug || title);
+    const normalizedSlug = await buildUniqueSlug(title);
     if (!normalizedSlug) {
       return res.status(400).json({ message: "A valid slug could not be generated." });
     }
@@ -64,6 +88,7 @@ export const adminCreateHackathon = async (req, res, next) => {
     const hackathon = await Hackathon.create({
       title,
       slug: normalizedSlug,
+      tag: String(tag || "Hackathon").trim() || "Hackathon",
       description,
       coverImageUrl,
       minTeamSize: Number(minTeamSize || 1),
@@ -75,9 +100,6 @@ export const adminCreateHackathon = async (req, res, next) => {
 
     res.status(201).json({ hackathon });
   } catch (error) {
-    if (error?.code === 11000) {
-      return res.status(400).json({ message: "A hackathon with this slug already exists." });
-    }
     next(error);
   }
 };
@@ -93,7 +115,7 @@ export const adminUpdateHackathon = async (req, res, next) => {
     }
 
     const title = updates.title ?? hackathon.title;
-    const nextSlug = slugify(updates.slug || hackathon.slug || title);
+    const nextSlug = await buildUniqueSlug(title, hackathon._id);
 
     if (req.file?.buffer) {
       const uploaded = await uploadBuffer({
@@ -108,6 +130,7 @@ export const adminUpdateHackathon = async (req, res, next) => {
 
     hackathon.title = title;
     hackathon.slug = nextSlug;
+    hackathon.tag = String(updates.tag ?? hackathon.tag || "Hackathon").trim() || "Hackathon";
     hackathon.description = updates.description ?? hackathon.description;
     if (updates.coverImageUrl !== undefined) {
       hackathon.coverImageUrl = updates.coverImageUrl;
@@ -123,9 +146,6 @@ export const adminUpdateHackathon = async (req, res, next) => {
 
     res.json({ hackathon });
   } catch (error) {
-    if (error?.code === 11000) {
-      return res.status(400).json({ message: "A hackathon with this slug already exists." });
-    }
     next(error);
   }
 };
