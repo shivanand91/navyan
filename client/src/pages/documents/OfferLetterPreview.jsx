@@ -6,6 +6,23 @@ import halfLogo from "@/assests/half_logo.png"; // Make sure this is your 'N' ic
 export default function OfferLetterPreview() {
   const { accessToken } = useParams();
   const [document, setDocument] = useState(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      // 210mm is ~794px at standard DPI. Let's base it on 794px.
+      if (width < 826) { // 794px + 32px padding
+        setScale((width - 32) / 794);
+      } else {
+        setScale(1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -33,16 +50,36 @@ export default function OfferLetterPreview() {
   if (!document) return <div className="flex justify-center mt-20">Loading...</div>;
 
   return (
-    <div className="bg-slate-200 min-h-screen py-10 print:p-0 print:bg-white">
+    <div className="bg-slate-200 min-h-screen py-10 print:p-0 print:bg-white flex flex-col items-center">
       {/* ACTIONS */}
       <div className="flex justify-center gap-4 mb-6 print:hidden">
         <button onClick={() => window.history.back()} className="bg-white border px-6 py-2 rounded shadow-sm">Back</button>
         <button onClick={() => window.print()} className="bg-[#0b2347] text-white px-6 py-2 rounded shadow-sm">Print Offer Letter</button>
       </div>
 
-      {/* A4 PAGE */}
-      <div className="mx-auto bg-white shadow-2xl print:shadow-none relative overflow-hidden" 
-           style={{ width: "210mm", height: "297mm", padding: "0" }}>
+      {/* WRAPPER TO PREVENT COLLAPSED HEIGHT */}
+      <div 
+        id="offer-letter-wrapper"
+        className="w-full flex justify-center overflow-hidden print:overflow-visible print:h-auto"
+        style={{ 
+          width: scale < 1 ? `${794 * scale}px` : "210mm",
+          height: scale < 1 ? `${1123 * scale}px` : "297mm",
+          position: "relative"
+        }}
+      >
+        {/* A4 PAGE */}
+        <div 
+          id="offer-letter-content"
+          className="bg-white shadow-2xl print:shadow-none relative overflow-hidden" 
+          style={{ 
+            width: "210mm", 
+            height: "297mm", 
+            padding: "0",
+            transform: scale < 1 ? `scale(${scale})` : "none",
+            transformOrigin: "top left",
+            flexShrink: 0
+          }}
+        >
         {/* HEADER SECTION */}
         <div className="px-16 pt-12 flex justify-between relative z-10">
           <div className="flex items-center gap-3">
@@ -175,12 +212,24 @@ export default function OfferLetterPreview() {
           <span className="flex items-center gap-1">📍 India</span>
         </div>
       </div>
+      </div>
 
       <style jsx global>{`
         @media print {
           body { background: none; margin: 0; padding: 0; }
           .print\:hidden { display: none !important; }
           @page { size: A4; margin: 0; }
+          #offer-letter-wrapper {
+            width: 210mm !important;
+            height: 297mm !important;
+            overflow: visible !important;
+          }
+          #offer-letter-content {
+            transform: none !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+          }
         }
       `}</style>
     </div>

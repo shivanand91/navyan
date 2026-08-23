@@ -16,6 +16,23 @@ const formatCertificateDate = (value) => {
 export default function CertificatePreview() {
   const { certificateId } = useParams();
   const [certificate, setCertificate] = useState(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      // 297mm is ~1123px at standard DPI. Let's base it on 1123px.
+      if (width < 1155) { // 1123px + 32px padding
+        setScale((width - 32) / 1123);
+      } else {
+        setScale(1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -49,7 +66,15 @@ export default function CertificatePreview() {
       </div>
 
       {/* CERTIFICATE CONTAINER */}
-      <div className="overflow-auto w-full flex justify-center print:block">
+      <div 
+        id="certificate-wrapper"
+        className="w-full flex justify-center overflow-hidden print:overflow-visible print:h-auto"
+        style={{ 
+          width: scale < 1 ? `${1123 * scale}px` : "297mm",
+          height: scale < 1 ? `${794 * scale}px` : "210mm",
+          position: "relative"
+        }}
+      >
         <div
           id="certificate-content"
           className="relative bg-white shadow-2xl overflow-hidden print:shadow-none"
@@ -58,7 +83,10 @@ export default function CertificatePreview() {
             height: "210mm", 
             minWidth: "297mm", 
             position: "relative",
-            backgroundColor: "white"
+            backgroundColor: "white",
+            transform: scale < 1 ? `scale(${scale})` : "none",
+            transformOrigin: "top left",
+            flexShrink: 0
           }}
         >
           {/* --- BORDER DESIGN --- */}
@@ -165,8 +193,8 @@ export default function CertificatePreview() {
             <p className="absolute bottom-[40px] left-[60px] text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">
               Verification ID: {certificate.certificateId}
             </p>
-          </div>
         </div>
+      </div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
@@ -183,7 +211,13 @@ export default function CertificatePreview() {
             print-color-adjust: exact !important;
           }
           .print\\:hidden { display: none !important; }
+          #certificate-wrapper {
+            width: 297mm !important;
+            height: 210mm !important;
+            overflow: visible !important;
+          }
           #certificate-content {
+            transform: none !important;
             width: 297mm !important;
             height: 210mm !important;
             margin: 0 !important;
