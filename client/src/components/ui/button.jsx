@@ -7,21 +7,21 @@ const buttonVariants = cva(
     variants: {
       variant: {
         solid:
-          "bg-primary text-white hover:bg-primary/90",
+          "bg-[color:var(--color-button-primary-bg)] text-[color:var(--color-button-primary-text)] hover:bg-[color:var(--color-button-primary-bg-hover)] active:bg-[color:var(--color-button-primary-bg-active)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         accent:
-          "bg-accent text-white hover:bg-accent/90",
+          "bg-[color:var(--color-button-accent-bg)] text-[color:var(--color-button-accent-text)] hover:bg-[color:var(--color-button-accent-bg-hover)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         outline:
-          "border border-border bg-transparent text-textPrimary hover:bg-primary/5 hover:border-primary/20",
+          "border border-[color:var(--color-button-secondary-border)] bg-[color:var(--color-button-secondary-bg)] text-[color:var(--color-button-secondary-text)] hover:bg-[color:var(--color-button-secondary-bg-hover)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         ghost:
-          "text-textSecondary hover:bg-primary/5 hover:text-textPrimary",
+          "text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-button-secondary-bg-hover)] hover:text-[color:var(--color-text-primary)]",
         subtle:
-          "border border-primary/15 bg-primary/10 text-primary hover:bg-primary/15",
+          "border border-[color:var(--color-info-border)] bg-[color:var(--color-info-bg)] text-[color:var(--color-info-text)] hover:opacity-90",
         success:
-          "border border-success/20 bg-success/12 text-success hover:bg-success/18",
+          "border border-[color:var(--color-success-border)] bg-[color:var(--color-success-bg)] text-[color:var(--color-success-text)] hover:opacity-90",
         danger:
-          "border border-danger/18 bg-danger/12 text-danger hover:bg-danger/18",
+          "bg-[color:var(--color-button-danger-bg)] text-[color:var(--color-button-danger-text)] hover:bg-[color:var(--color-button-danger-bg-hover)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         icon:
-          "h-10 w-10 rounded-[10px] border border-border bg-transparent text-textPrimary hover:bg-primary/20 hover:text-primary"
+          "h-10 w-10 rounded-[10px] border border-[color:var(--color-border)] bg-transparent text-[color:var(--color-text-primary)] hover:bg-[color:var(--color-button-secondary-bg-hover)] hover:text-[color:var(--color-button-primary-bg)]"
       },
       size: {
         sm: "h-9 px-4",

@@ -15,50 +15,249 @@
 @layer base {
   :root {
     color-scheme: light;
-    --bg: #F5F5F7;
-    --bg-secondary: #EBEAEF;
-    --bg-tertiary: #E0DFE5;
-    --card: #FFFFFF;
-    --card-elevated: #FFFFFF;
-    --sidebar: #FFFFFF;
-    --border: #E2E0E6;
-    --soft-border: rgba(226, 224, 230, 0.5);
-    --text: #0F0F14;
-    --text-secondary: #6B6673;
-    --text-muted: #8E8A96;
-    --accent: #6D28D9;
-    --accent-hover: #5B21B6;
-    --accent-soft: #F5F3FF;
-    --primary: #6D28D9;
-    --primary-hover: #5B21B6;
-    --primary-soft: #F5F3FF;
-    --success: #1F8A50;
-    --warning: #D97706;
-    --danger: #DC2626;
+
+    /* ==========================================================================
+       Navyan — Color System
+       Derived from logo: Blue #4FA8FF → #2897FF → #176CDE, Amber #FFC04D
+       ========================================================================== */
+
+    /* ---------- Page ---------- */
+    --color-background: #FFFFFF;          /* Page background */
+    --color-surface: #F6F8FB;             /* Cards, panels, sections */
+    --color-surface-raised: #FFFFFF;      /* Modals, dropdowns, popovers */
+
+    /* ---------- Text ---------- */
+    --color-text-primary: #0F172A;        /* Headings, body text */
+    --color-text-secondary: #5B6472;      /* Subtext, captions, labels */
+    --color-text-muted: #94A3B8;          /* Placeholders, disabled text */
+    --color-text-on-primary: #FFFFFF;     /* Text on blue buttons */
+    --color-text-on-accent: #3A2205;      /* Text on amber backgrounds */
+    --color-text-link: #2897FF;           /* Hyperlinks */
+
+    /* ---------- Borders ---------- */
+    --color-border: #D6DEE8;              /* Default border / divider */
+    --color-border-strong: #B7C3D1;       /* Hover / emphasized border */
+    --color-border-focus: #4FA8FF;        /* Focus ring */
+
+    /* ---------- Buttons ---------- */
+    --color-button-primary-bg: #2897FF;
+    --color-button-primary-bg-hover: #176CDE;
+    --color-button-primary-bg-active: #0F58B8;
+    --color-button-primary-text: #FFFFFF;
+
+    --color-button-secondary-bg: #FFFFFF;
+    --color-button-secondary-bg-hover: #F0F5FA;
+    --color-button-secondary-border: #D6DEE8;
+    --color-button-secondary-text: #0F172A;
+
+    --color-button-accent-bg: #FFC04D;
+    --color-button-accent-bg-hover: #F5AC24;
+    --color-button-accent-text: #3A2205;
+
+    --color-button-danger-bg: #EF4444;
+    --color-button-danger-bg-hover: #DC2626;
+    --color-button-danger-text: #FFFFFF;
+
+    --color-button-disabled-bg: #E9EDF2;
+    --color-button-disabled-text: #A8B2BE;
+
+    /* ---------- Input fields ---------- */
+    --color-input-bg: #FFFFFF;
+    --color-input-border: #D6DEE8;
+    --color-input-border-hover: #B7C3D1;
+    --color-input-border-focus: #2897FF;
+    --color-input-text: #0F172A;
+    --color-input-placeholder: #94A3B8;
+    --color-input-disabled-bg: #F1F4F8;
+    --color-input-error-border: #EF4444;
+    --color-input-success-border: #22C55E;
+
+    /* ---------- Navbar / header ---------- */
+    --color-navbar-bg: #FFFFFF;
+    --color-navbar-border: #E5EAF0;
+    --color-navbar-text: #0F172A;
+    --color-navbar-active: #2897FF;
+
+    /* ---------- Sidebar ---------- */
+    --color-sidebar-bg: #F6F8FB;
+    --color-sidebar-item-hover: #EAF1FB;
+    --color-sidebar-item-active-bg: #E6F1FB;
+    --color-sidebar-item-active-text: #176CDE;
+
+    /* ---------- Cards ---------- */
+    --color-card-bg: #FFFFFF;
+    --color-card-border: #E5EAF0;
+    --color-card-shadow: rgba(15, 23, 42, 0.06);
+
+    /* ---------- Status colors ---------- */
+    --color-success-bg: #E7F9EF;
+    --color-success-text: #16A34A;
+    --color-success-border: #86EFAC;
+
+    --color-warning-bg: #FFF6E5;
+    --color-warning-text: #B45309;
+    --color-warning-border: #FFC04D;
+
+    --color-error-bg: #FEECEC;
+    --color-error-text: #DC2626;
+    --color-error-border: #FCA5A5;
+
+    --color-info-bg: #E6F1FB;
+    --color-info-text: #176CDE;
+    --color-info-border: #85B7EB;
+
+    /* ---------- Badges / tags ---------- */
+    --color-badge-blue-bg: #E6F1FB;
+    --color-badge-blue-text: #176CDE;
+    --color-badge-amber-bg: #FFF1D6;
+    --color-badge-amber-text: #B45309;
+
+    /* ---------- Links / interactive icons ---------- */
+    --color-icon-default: #5B6472;
+    --color-icon-active: #2897FF;
+
+    /* ---------- Legacy theme mappings ---------- */
+    --bg: var(--color-background);
+    --bg-secondary: var(--color-surface);
+    --bg-tertiary: var(--color-surface-raised);
+    --card: var(--color-card-bg);
+    --card-elevated: var(--color-surface-raised);
+    --sidebar: var(--color-sidebar-bg);
+    --border: var(--color-border);
+    --soft-border: var(--color-card-border);
+    --text: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --accent: var(--color-button-accent-bg);
+    --accent-hover: var(--color-button-accent-bg-hover);
+    --accent-soft: var(--color-badge-amber-bg);
+    --primary: var(--color-button-primary-bg);
+    --primary-hover: var(--color-button-primary-bg-hover);
+    --primary-soft: var(--color-badge-blue-bg);
+    --success: var(--color-success-text);
+    --warning: var(--color-warning-text);
+    --danger: var(--color-button-danger-bg);
   }
 
-  :root.dark {
+  :root.dark, [data-theme="dark"], .dark {
     color-scheme: dark;
-    --bg: #0F0F14;
-    --bg-secondary: #16161D;
-    --bg-tertiary: #22222B;
-    --card: #1A1A22;
-    --card-elevated: #24242E;
-    --sidebar: #1A1A22;
-    --border: #2E2E38;
-    --soft-border: rgba(46, 46, 56, 0.5);
-    --text: #F6F5F8;
-    --text-secondary: #A39FAE;
-    --text-muted: #7E7A8A;
-    --accent: #8B5CF6;
-    --accent-hover: #7C3AED;
-    --accent-soft: #2E1E4F;
-    --primary: #8B5CF6;
-    --primary-hover: #7C3AED;
-    --primary-soft: #2E1E4F;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
+
+    /* ---------- Page ---------- */
+    --color-background: #0B1220;
+    --color-surface: #121A2B;
+    --color-surface-raised: #151E2E;
+
+    /* ---------- Text ---------- */
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+    --color-text-on-primary: #0B1220;
+    --color-text-on-accent: #2A1A03;
+    --color-text-link: #7DBEFF;
+
+    /* ---------- Borders ---------- */
+    --color-border: #2A2E35;
+    --color-border-strong: #3B424C;
+    --color-border-focus: #4FA8FF;
+
+    /* ---------- Buttons ---------- */
+    --color-button-primary-bg: #4FA8FF;
+    --color-button-primary-bg-hover: #7DBEFF;
+    --color-button-primary-bg-active: #2897FF;
+    --color-button-primary-text: #0B1220;
+
+    --color-button-secondary-bg: #151E2E;
+    --color-button-secondary-bg-hover: #1C2740;
+    --color-button-secondary-border: #2A2E35;
+    --color-button-secondary-text: #F1F5F9;
+
+    --color-button-accent-bg: #FFC966;
+    --color-button-accent-bg-hover: #FFD584;
+    --color-button-accent-text: #2A1A03;
+
+    --color-button-danger-bg: #F87171;
+    --color-button-danger-bg-hover: #FCA5A5;
+    --color-button-danger-text: #2A0A0A;
+
+    --color-button-disabled-bg: #1C2333;
+    --color-button-disabled-text: #4B5563;
+
+    /* ---------- Input fields ---------- */
+    --color-input-bg: #121A2B;
+    --color-input-border: #2A2E35;
+    --color-input-border-hover: #3B424C;
+    --color-input-border-focus: #4FA8FF;
+    --color-input-text: #F1F5F9;
+    --color-input-placeholder: #64748B;
+    --color-input-disabled-bg: #1A2233;
+    --color-input-error-border: #F87171;
+    --color-input-success-border: #34D399;
+
+    /* ---------- Navbar / header ---------- */
+    --color-navbar-bg: #0B1220;
+    --color-navbar-border: #1E2635;
+    --color-navbar-text: #F1F5F9;
+    --color-navbar-active: #4FA8FF;
+
+    /* ---------- Sidebar ---------- */
+    --color-sidebar-bg: #0E1626;
+    --color-sidebar-item-hover: #1A2438;
+    --color-sidebar-item-active-bg: #16233A;
+    --color-sidebar-item-active-text: #7DBEFF;
+
+    /* ---------- Cards ---------- */
+    --color-card-bg: #151E2E;
+    --color-card-border: #232B3B;
+    --color-card-shadow: rgba(0, 0, 0, 0.4);
+
+    /* ---------- Status colors ---------- */
+    --color-success-bg: #0F2A1C;
+    --color-success-text: #34D399;
+    --color-success-border: #15803D;
+
+    --color-warning-bg: #2E2408;
+    --color-warning-text: #FFC966;
+    --color-warning-border: #B45309;
+
+    --color-error-bg: #2E1414;
+    --color-error-text: #F87171;
+    --color-error-border: #B91C1C;
+
+    --color-info-bg: #14233A;
+    --color-info-text: #7DBEFF;
+    --color-info-border: #2897FF;
+
+    /* ---------- Badges / tags ---------- */
+    --color-badge-blue-bg: #16233A;
+    --color-badge-blue-text: #7DBEFF;
+    --color-badge-amber-bg: #2E2408;
+    --color-badge-amber-text: #FFC966;
+
+    /* ---------- Links / interactive icons ---------- */
+    --color-icon-default: #94A3B8;
+    --color-icon-active: #4FA8FF;
+
+    /* ---------- Legacy theme mappings ---------- */
+    --bg: var(--color-background);
+    --bg-secondary: var(--color-surface);
+    --bg-tertiary: var(--color-surface-raised);
+    --card: var(--color-card-bg);
+    --card-elevated: var(--color-surface-raised);
+    --sidebar: var(--color-sidebar-bg);
+    --border: var(--color-border);
+    --soft-border: var(--color-card-border);
+    --text: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --accent: var(--color-button-accent-bg);
+    --accent-hover: var(--color-button-accent-bg-hover);
+    --accent-soft: var(--color-badge-amber-bg);
+    --primary: var(--color-button-primary-bg);
+    --primary-hover: var(--color-button-primary-bg-hover);
+    --primary-soft: var(--color-badge-blue-bg);
+    --success: var(--color-success-text);
+    --warning: var(--color-warning-text);
+    --danger: var(--color-button-danger-bg);
   }
 
   * {
