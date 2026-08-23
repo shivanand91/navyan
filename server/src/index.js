@@ -147,7 +147,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || (isProduction ? "0.0.0.0" : "127.0.0.1");
 
-connectDB()
+connectDB() // trigger restart
   .then(async () => {
     await runDatabaseMaintenance();
 

@@ -191,6 +191,64 @@ const normalizeExternalUrl = (value) => {
   return `https://${normalized}`;
 };
 
+const getInitials = (name) => {
+  if (!name) return "SK";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "SK";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const renderCertificateCard = (cert, index) => {
+  const initials = getInitials(cert.fullName);
+  const durationLabel = durationFallbackLabels[cert.durationKey] || cert.durationKey || "Internship";
+
+  return (
+    <div
+      key={`${cert._id}-${index}`}
+      className="relative flex flex-col justify-between w-[320px] sm:w-[350px] shrink-0 rounded-[28px] border border-[#ff8f96]/60 bg-[#121212] p-6 text-white shadow-xl whitespace-normal"
+    >
+      {/* Verified indicator in the top right */}
+      <span className="absolute top-5 right-6 text-xs font-semibold tracking-wider text-[#ff8f96]/80 uppercase">
+        Verified
+      </span>
+
+      {/* Main card info: Avatar + Names */}
+      <div className="flex items-center gap-6 mt-4">
+        {/* Avatar */}
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[#ff8f96]/60 text-2xl font-bold uppercase text-[#ff8f96] font-display">
+          {initials}
+        </div>
+
+        {/* Text details */}
+        <div className="space-y-1 overflow-hidden">
+          <h4 className="font-display text-xl font-bold text-[#ff8f96] truncate" title={cert.fullName}>
+            {cert.fullName}
+          </h4>
+          <p className="text-sm font-medium text-white/90 truncate">
+            {cert.role}
+          </p>
+          <p className="text-xs text-white/60 truncate">
+            {durationLabel}
+          </p>
+        </div>
+      </div>
+
+      {/* Action button */}
+      <a
+        href={`/verify-certificate?cid=${cert.certificateId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-8 block w-full"
+      >
+        <div className="w-full py-3.5 border border-[#ff8f96]/60 rounded-[16px] text-center text-sm font-bold text-[#ff8f96] hover:bg-[#ff8f96]/10 transition uppercase tracking-wide">
+          view Certificate
+        </div>
+      </a>
+    </div>
+  );
+};
+
 export default function Home() {
   const [internships, setInternships] = useState([]);
   const [services, setServices] = useState([]);
@@ -1009,7 +1067,7 @@ export default function Home() {
 
 
 
-      <section id="verification" className="navyan-section px-4 md:px-6 bg-backgroundSecondary/20 py-16 border-y border-border">
+      <section id="verification" className="navyan-section px-4 md:px-6 bg-[#0c0c0e] py-16 border-y border-border">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
             eyebrow="Verification Desk"
@@ -1019,7 +1077,7 @@ export default function Home() {
 
           {/* Search Bar */}
           <div className="max-w-xl mx-auto relative">
-            <div className="relative rounded-[20px] border border-border bg-backgroundSecondary shadow-sm focus-within:border-primary/50 transition">
+            <div className="relative rounded-[20px] border border-border bg-[#18181b] shadow-sm focus-within:border-primary/50 transition">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                 <Search className="h-5 w-5 text-textMuted" />
               </div>
@@ -1051,16 +1109,16 @@ export default function Home() {
               </div>
 
               {searchLoading ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 justify-center">
                   {Array.from({ length: 3 }).map((_, index) => (
                     <div
                       key={index}
-                      className="navyan-card h-48 animate-pulse bg-white/40 dark:bg-white/5"
+                      className="w-[320px] sm:w-[350px] h-52 animate-pulse bg-white/5 rounded-[28px] border border-border"
                     />
                   ))}
                 </div>
               ) : searchResults.length === 0 ? (
-                <div className="navyan-card py-12 text-center max-w-md mx-auto">
+                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-[#121212] border border-border text-white">
                   <p className="font-display text-lg font-semibold text-textPrimary">
                     No verified graduate found
                   </p>
@@ -1069,60 +1127,8 @@ export default function Home() {
                   </p>
                 </div>
               ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {searchResults.map((cert) => (
-                    <div key={cert._id} className="navyan-card flex flex-col justify-between p-6 bg-white dark:bg-card">
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-display text-lg font-bold text-textPrimary">
-                                {cert.fullName}
-                              </h4>
-                              <BadgeCheck className="h-5 w-5 text-primary shrink-0" />
-                            </div>
-                            <p className="text-xs text-textMuted">
-                              ID: {cert.certificateId}
-                            </p>
-                          </div>
-                          <span className="rounded-full border border-success/20 bg-success/12 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-success">
-                            Verified
-                          </span>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs">
-                            <span className="text-textMuted">Domain</span>
-                            <span className="font-medium text-textPrimary">{cert.role}</span>
-                          </div>
-                          <div className="flex justify-between text-xs">
-                            <span className="text-textMuted">Completed</span>
-                            <span className="font-medium text-textPrimary">
-                              {cert.completionDate ? new Date(cert.completionDate).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric"
-                              }) : "—"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-6 flex gap-2">
-                        <a
-                          href={`/verify-certificate?cid=${cert.certificateId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1"
-                        >
-                          <Button size="sm" className="w-full justify-center text-xs font-semibold">
-                            View Certificate
-                            <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                          </Button>
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 justify-center">
+                  {searchResults.map((cert, index) => renderCertificateCard(cert, index))}
                 </div>
               )}
             </div>
@@ -1130,11 +1136,11 @@ export default function Home() {
             /* Auto-scrolling Marquee */
             <div className="relative w-full overflow-hidden py-4">
               {/* Fade gradients on edges for premium visual finish */}
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0c0c0e] to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0c0c0e] to-transparent z-10" />
 
               {publicCertificates.length === 0 ? (
-                <div className="navyan-card py-12 text-center max-w-md mx-auto">
+                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-[#121212] border border-border text-white">
                   <p className="font-display text-lg font-semibold text-textPrimary">
                     No completed certificates yet
                   </p>
@@ -1145,62 +1151,7 @@ export default function Home() {
               ) : (
                 <div className="flex gap-6 animate-marquee whitespace-nowrap">
                   {/* We double the array to allow seamless looping animation */}
-                  {[...publicCertificates, ...publicCertificates].map((cert, index) => (
-                    <div
-                      key={`${cert._id}-${index}`}
-                      className="inline-block w-[300px] shrink-0 navyan-card p-6 bg-white dark:bg-card whitespace-normal shadow-sm border border-border"
-                    >
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-display text-base font-bold text-textPrimary truncate max-w-[170px]">
-                                {cert.fullName}
-                              </h4>
-                              <BadgeCheck className="h-4.5 w-4.5 text-primary shrink-0" />
-                            </div>
-                            <p className="text-[10px] text-textMuted">
-                              ID: {cert.certificateId}
-                            </p>
-                          </div>
-                          <span className="rounded-full border border-success/20 bg-success/12 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-success">
-                            Verified
-                          </span>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs">
-                            <span className="text-textMuted">Domain</span>
-                            <span className="font-medium text-textPrimary truncate max-w-[150px]">{cert.role}</span>
-                          </div>
-                          <div className="flex justify-between text-xs">
-                            <span className="text-textMuted">Completed</span>
-                            <span className="font-medium text-textPrimary">
-                              {cert.completionDate ? new Date(cert.completionDate).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric"
-                              }) : "—"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-5">
-                        <a
-                          href={`/verify-certificate?cid=${cert.certificateId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-full"
-                        >
-                          <Button size="sm" className="w-full justify-center text-xs font-semibold">
-                            View Certificate
-                            <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                          </Button>
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+                  {[...publicCertificates, ...publicCertificates].map((cert, index) => renderCertificateCard(cert, index))}
                 </div>
               )}
             </div>
