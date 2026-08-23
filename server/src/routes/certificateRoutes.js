@@ -3,6 +3,9 @@ import QRCode from "qrcode";
 import { format } from "date-fns";
 import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 import { Certificate } from "../models/Certificate.js";
+import { User } from "../models/User.js";
+import { Internship } from "../models/Internship.js";
+import { Application } from "../models/Application.js";
 import { buildCertificateVerifyUrl } from "../services/certificateService.js";
 import { createCertificateHtml, renderCertificatePdf } from "../services/pdfService.js";
 import { resolveInternshipRoleLabel } from "../services/taskAssignmentService.js";
@@ -56,6 +59,129 @@ router.get("/me", protect, async (req, res, next) => {
           endDate: timeline.endDate,
           startDateStr: timeline.startDateStr,
           endDateStr: timeline.endDateStr,
+          pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
+          verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
+        };
+      })
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const seedMockCertificates = async () => {
+  try {
+    const mockUsersData = [
+      { fullName: "Aayushi Singh", email: "aayushi@example.com", passwordHash: "dummy" },
+      { fullName: "Rahul Verma", email: "rahul@example.com", passwordHash: "dummy" },
+      { fullName: "Nikita Sharma", email: "nikita@example.com", passwordHash: "dummy" },
+      { fullName: "Ankit Patel", email: "ankit@example.com", passwordHash: "dummy" }
+    ];
+
+    const users = [];
+    for (const uData of mockUsersData) {
+      let user = await User.findOne({ email: uData.email });
+      if (!user) {
+        user = await User.create(uData);
+      }
+      users.push(user);
+    }
+
+    const mockInternshipsData = [
+      { title: "Web Development", slug: "web-development", shortDescription: "Learn HTML/CSS, React, Node.js", role: "Web Developer", isPublished: true },
+      { title: "Data Science", slug: "data-science", shortDescription: "Learn Python, Pandas, Machine Learning", role: "Data Scientist", isPublished: true },
+      { title: "UI/UX Design", slug: "ui-ux-design", shortDescription: "Learn Figma, User Research, Wireframing", role: "UI/UX Designer", isPublished: true }
+    ];
+
+    const internships = [];
+    for (const iData of mockInternshipsData) {
+      let internship = await Internship.findOne({ slug: iData.slug });
+      if (!internship) {
+        internship = await Internship.create(iData);
+      }
+      internships.push(internship);
+    }
+
+    const roles = ["Web Developer", "Data Scientist", "UI/UX Designer", "Frontend Developer"];
+    const names = ["Aayushi Singh", "Rahul Verma", "Nikita Sharma", "Ankit Patel"];
+
+    for (let i = 0; i < 4; i++) {
+      const user = users[i];
+      const internship = internships[i % internships.length];
+      
+      let application = await Application.findOne({ user: user._id, internship: internship._id });
+      if (!application) {
+        application = await Application.create({
+          user: user._id,
+          internship: internship._id,
+          durationKey: "4-weeks",
+          status: "Completed",
+          internshipMeta: {
+            startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            endDate: new Date()
+          }
+        });
+      }
+
+      const certificateId = `NAV-CERT-2026-MOCK0${i + 1}`;
+      let certificate = await Certificate.findOne({ certificateId });
+      if (!certificate) {
+        await Certificate.create({
+          application: application._id,
+          user: user._id,
+          internship: internship._id,
+          fullName: names[i],
+          role: roles[i],
+          durationKey: "4-weeks",
+          completionDate: new Date(),
+          issueDate: new Date(),
+          certificateId,
+          pdfUrl: `/api/certificates/download/${certificateId}`,
+          verifyUrl: `/verify-certificate?cid=${certificateId}`,
+          verificationStatus: "Valid"
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error seeding mock certificates:", error);
+  }
+};
+
+router.get("/public", async (req, res, next) => {
+  try {
+    const certCount = await Certificate.countDocuments({ verificationStatus: "Valid" });
+    if (certCount === 0) {
+      await seedMockCertificates();
+    }
+
+    const { search } = req.query;
+    let query = { verificationStatus: "Valid" };
+
+    if (search) {
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.$or = [
+        { fullName: { $regex: escapedSearch, $options: "i" } },
+        { certificateId: { $regex: escapedSearch, $options: "i" } }
+      ];
+    }
+
+    const certificates = await Certificate.find(query)
+      .populate("application")
+      .populate("internship")
+      .sort({ completionDate: -1 })
+      .limit(30);
+
+    res.json({
+      certificates: certificates.map((certificate) => {
+        const timeline = getCertificateTimeline(certificate);
+
+        return {
+          _id: certificate._id,
+          fullName: certificate.fullName,
+          role: getCertificateRoleLabel(certificate),
+          certificateId: certificate.certificateId,
+          completionDate: certificate.completionDate,
+          issueDate: certificate.issueDate || certificate.createdAt,
           pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
           verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
         };

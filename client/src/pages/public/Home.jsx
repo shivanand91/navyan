@@ -17,7 +17,9 @@ import {
   Stars,
   Users2,
   WalletCards,
-  Trophy
+  Trophy,
+  Search,
+  ExternalLink
 } from "lucide-react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
@@ -197,6 +199,10 @@ export default function Home() {
   const [visitorStats, setVisitorStats] = useState(null);
   const [hackathons, setHackathons] = useState([]);
   const [activeHackathon, setActiveHackathon] = useState(null);
+  const [publicCertificates, setPublicCertificates] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const faqItems = useMemo(
     () =>
@@ -221,19 +227,22 @@ export default function Home() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [internshipsResponse, servicesResponse, hackathonsResponse] = await Promise.all([
+        const [internshipsResponse, servicesResponse, hackathonsResponse, certificatesResponse] = await Promise.all([
           api.get("/internships"),
           api.get("/services"),
-          api.get("/hackathons").catch(() => ({ data: { hackathons: [] } }))
+          api.get("/hackathons").catch(() => ({ data: { hackathons: [] } })),
+          api.get("/certificates/public").catch(() => ({ data: { certificates: [] } }))
         ]);
         setInternships(internshipsResponse.data.internships || []);
         setServices(servicesResponse.data.services || []);
         setHackathons(hackathonsResponse.data.hackathons || []);
+        setPublicCertificates(certificatesResponse.data.certificates || []);
       } catch (error) {
         console.error(error);
         setInternships([]);
         setServices([]);
         setHackathons([]);
+        setPublicCertificates([]);
       } finally {
         setLoading(false);
         setServicesLoading(false);
@@ -242,6 +251,26 @@ export default function Home() {
 
     load();
   }, []);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    const delayDebounce = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const res = await api.get(`/certificates/public?search=${encodeURIComponent(searchQuery)}`);
+        setSearchResults(res.data.certificates || []);
+      } catch (error) {
+        console.error("Error searching certificates:", error);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
 
   useEffect(() => {
     let ignore = false;
@@ -980,36 +1009,202 @@ export default function Home() {
 
 
 
-      <section id="testimonials" className="navyan-section px-4 md:px-6">
-        <div className="mx-auto max-w-7xl space-y-8">
+      <section id="verification" className="navyan-section px-4 md:px-6 bg-backgroundSecondary/20 py-16 border-y border-border">
+        <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            eyebrow="Student Testimonials"
-            title="What students say about NAVYAN."
-            description="Short feedback helps future applicants understand the experience clearly."
+            eyebrow="Verification Desk"
+            title="Verified Internship Graduates"
+            description="Navyan issues tamper-proof, fully verifiable certificates. Search by student name or certificate ID to instantly check their credentials."
           />
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            {testimonialCards.map((item, index) => (
-              <RevealInView key={item.name} delay={index * 0.05}>
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-primary/15 bg-primary/10 text-primary">
-                      <Building2 className="h-4 w-4" />
-                    </div>
-                    <CardDescription className="mt-5 text-base leading-8 text-textSecondary">
-                      “{item.quote}”
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="font-display text-lg font-semibold text-textPrimary">
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-textMuted">{item.role}</p>
-                  </CardContent>
-                </Card>
-              </RevealInView>
-            ))}
+          {/* Search Bar */}
+          <div className="max-w-xl mx-auto relative">
+            <div className="relative rounded-[20px] border border-border bg-backgroundSecondary shadow-sm focus-within:border-primary/50 transition">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                <Search className="h-5 w-5 text-textMuted" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search graduate name or Certificate ID (e.g. NAV-CERT-2026-MOCK01)..."
+                className="block w-full rounded-[20px] bg-transparent py-4 pl-12 pr-4 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-semibold text-textMuted hover:text-textPrimary"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Dynamic Content */}
+          {searchQuery.trim() ? (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
+                  {searchLoading ? "Searching..." : `Search Results (${searchResults.length})`}
+                </h3>
+              </div>
+
+              {searchLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="navyan-card h-48 animate-pulse bg-white/40 dark:bg-white/5"
+                    />
+                  ))}
+                </div>
+              ) : searchResults.length === 0 ? (
+                <div className="navyan-card py-12 text-center max-w-md mx-auto">
+                  <p className="font-display text-lg font-semibold text-textPrimary">
+                    No verified graduate found
+                  </p>
+                  <p className="mt-2 text-sm text-textSecondary">
+                    We couldn't find any certificates matching "{searchQuery}". Please verify the name spelling or ID.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {searchResults.map((cert) => (
+                    <div key={cert._id} className="navyan-card flex flex-col justify-between p-6 bg-white dark:bg-card">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5">
+                              <h4 className="font-display text-lg font-bold text-textPrimary">
+                                {cert.fullName}
+                              </h4>
+                              <BadgeCheck className="h-5 w-5 text-primary shrink-0" />
+                            </div>
+                            <p className="text-xs text-textMuted">
+                              ID: {cert.certificateId}
+                            </p>
+                          </div>
+                          <span className="rounded-full border border-success/20 bg-success/12 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-success">
+                            Verified
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-textMuted">Domain</span>
+                            <span className="font-medium text-textPrimary">{cert.role}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-textMuted">Completed</span>
+                            <span className="font-medium text-textPrimary">
+                              {cert.completionDate ? new Date(cert.completionDate).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                              }) : "—"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 flex gap-2">
+                        <a
+                          href={`/verify-certificate?cid=${cert.certificateId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1"
+                        >
+                          <Button size="sm" className="w-full justify-center text-xs font-semibold">
+                            View Certificate
+                            <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Auto-scrolling Marquee */
+            <div className="relative w-full overflow-hidden py-4">
+              {/* Fade gradients on edges for premium visual finish */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
+
+              {publicCertificates.length === 0 ? (
+                <div className="navyan-card py-12 text-center max-w-md mx-auto">
+                  <p className="font-display text-lg font-semibold text-textPrimary">
+                    No completed certificates yet
+                  </p>
+                  <p className="mt-2 text-sm text-textSecondary">
+                    As soon as students graduate, their credentials will auto-scroll here.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-6 animate-marquee whitespace-nowrap">
+                  {/* We double the array to allow seamless looping animation */}
+                  {[...publicCertificates, ...publicCertificates].map((cert, index) => (
+                    <div
+                      key={`${cert._id}-${index}`}
+                      className="inline-block w-[300px] shrink-0 navyan-card p-6 bg-white dark:bg-card whitespace-normal shadow-sm border border-border"
+                    >
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5">
+                              <h4 className="font-display text-base font-bold text-textPrimary truncate max-w-[170px]">
+                                {cert.fullName}
+                              </h4>
+                              <BadgeCheck className="h-4.5 w-4.5 text-primary shrink-0" />
+                            </div>
+                            <p className="text-[10px] text-textMuted">
+                              ID: {cert.certificateId}
+                            </p>
+                          </div>
+                          <span className="rounded-full border border-success/20 bg-success/12 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-success">
+                            Verified
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-textMuted">Domain</span>
+                            <span className="font-medium text-textPrimary truncate max-w-[150px]">{cert.role}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-textMuted">Completed</span>
+                            <span className="font-medium text-textPrimary">
+                              {cert.completionDate ? new Date(cert.completionDate).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                              }) : "—"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-5">
+                        <a
+                          href={`/verify-certificate?cid=${cert.certificateId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full"
+                        >
+                          <Button size="sm" className="w-full justify-center text-xs font-semibold">
+                            View Certificate
+                            <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
