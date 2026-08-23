@@ -16,23 +16,6 @@ const formatCertificateDate = (value) => {
 export default function CertificatePreview() {
   const { certificateId } = useParams();
   const [certificate, setCertificate] = useState(null);
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      // 297mm is ~1123px at standard DPI. Let's base it on 1123px.
-      if (width < 1155) { // 1123px + 32px padding
-        setScale((width - 32) / 1123);
-      } else {
-        setScale(1);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -68,25 +51,17 @@ export default function CertificatePreview() {
       {/* CERTIFICATE CONTAINER */}
       <div 
         id="certificate-wrapper"
-        className="w-full flex justify-center overflow-hidden print:overflow-visible print:h-auto"
-        style={{ 
-          width: scale < 1 ? `${1123 * scale}px` : "297mm",
-          height: scale < 1 ? `${794 * scale}px` : "210mm",
-          position: "relative"
-        }}
+        className="w-full max-w-full overflow-auto flex justify-start lg:justify-center p-4 print:p-0 print:overflow-visible print:block"
       >
         <div
           id="certificate-content"
-          className="relative bg-white shadow-2xl overflow-hidden print:shadow-none"
+          className="relative bg-white shadow-2xl overflow-hidden print:shadow-none shrink-0"
           style={{ 
             width: "297mm", 
             height: "210mm", 
             minWidth: "297mm", 
             position: "relative",
-            backgroundColor: "white",
-            transform: scale < 1 ? `scale(${scale})` : "none",
-            transformOrigin: "top left",
-            flexShrink: 0
+            backgroundColor: "white"
           }}
         >
           {/* --- BORDER DESIGN --- */}
@@ -212,12 +187,12 @@ export default function CertificatePreview() {
           }
           .print\\:hidden { display: none !important; }
           #certificate-wrapper {
-            width: 297mm !important;
-            height: 210mm !important;
+            width: auto !important;
+            height: auto !important;
             overflow: visible !important;
+            padding: 0 !important;
           }
           #certificate-content {
-            transform: none !important;
             width: 297mm !important;
             height: 210mm !important;
             margin: 0 !important;

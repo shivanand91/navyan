@@ -6,23 +6,6 @@ import halfLogo from "@/assests/half_logo.png"; // Make sure this is your 'N' ic
 export default function OfferLetterPreview() {
   const { accessToken } = useParams();
   const [document, setDocument] = useState(null);
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      // 210mm is ~794px at standard DPI. Let's base it on 794px.
-      if (width < 826) { // 794px + 32px padding
-        setScale((width - 32) / 794);
-      } else {
-        setScale(1);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -57,27 +40,19 @@ export default function OfferLetterPreview() {
         <button onClick={() => window.print()} className="bg-[#0b2347] text-white px-6 py-2 rounded shadow-sm">Print Offer Letter</button>
       </div>
 
-      {/* WRAPPER TO PREVENT COLLAPSED HEIGHT */}
+      {/* SCROLLABLE WRAPPER */}
       <div 
         id="offer-letter-wrapper"
-        className="w-full flex justify-center overflow-hidden print:overflow-visible print:h-auto"
-        style={{ 
-          width: scale < 1 ? `${794 * scale}px` : "210mm",
-          height: scale < 1 ? `${1123 * scale}px` : "297mm",
-          position: "relative"
-        }}
+        className="w-full max-w-full overflow-auto flex justify-start md:justify-center p-4 print:p-0 print:overflow-visible"
       >
         {/* A4 PAGE */}
         <div 
           id="offer-letter-content"
-          className="bg-white shadow-2xl print:shadow-none relative overflow-hidden" 
+          className="bg-white shadow-2xl print:shadow-none relative overflow-hidden shrink-0" 
           style={{ 
             width: "210mm", 
             height: "297mm", 
-            padding: "0",
-            transform: scale < 1 ? `scale(${scale})` : "none",
-            transformOrigin: "top left",
-            flexShrink: 0
+            padding: "0"
           }}
         >
         {/* HEADER SECTION */}
@@ -220,12 +195,12 @@ export default function OfferLetterPreview() {
           .print\:hidden { display: none !important; }
           @page { size: A4; margin: 0; }
           #offer-letter-wrapper {
-            width: 210mm !important;
-            height: 297mm !important;
+            width: auto !important;
+            height: auto !important;
             overflow: visible !important;
+            padding: 0 !important;
           }
           #offer-letter-content {
-            transform: none !important;
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
