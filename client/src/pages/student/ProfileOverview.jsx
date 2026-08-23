@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ArrowRight, Award, BriefcaseBusiness, PencilLine, Sparkles, User2 } from "lucide-react";
+import { normalizeExternalUrl } from "@/lib/utils";
 
 export default function ProfileOverview() {
   const [profile, setProfile] = useState(null);
@@ -233,7 +234,7 @@ function Detail({ label, value, isLink = false }) {
     <div className="space-y-1 rounded-[10px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-3">
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-textMuted">{label}</p>
       {isLink && value ? (
-        <a href={value} target="_blank" rel="noreferrer" className="break-all text-sm text-primary">
+        <a href={normalizeExternalUrl(value)} target="_blank" rel="noreferrer" className="break-all text-sm text-primary">
           {value}
         </a>
       ) : (

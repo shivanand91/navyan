@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { toast } from "sonner";
+import { normalizeExternalUrl } from "@/lib/utils";
 
 const WORKFLOW_TABS = [
   { key: "new", label: "New", description: "Fresh applications awaiting first review." },
@@ -746,6 +747,17 @@ function ModalAction({ href, children }) {
     );
   }
 
+  const isMailOrTel = href.startsWith("mailto:") || href.startsWith("tel:");
+  if (isMailOrTel) {
+    return (
+      <a href={href}>
+        <Button size="sm" variant="outline" className="w-full">
+          {children}
+        </Button>
+      </a>
+    );
+  }
+
   const isInternalDocument = href.startsWith("/documents/");
   if (isInternalDocument) {
     return (
@@ -757,8 +769,10 @@ function ModalAction({ href, children }) {
     );
   }
 
+  const normalizedHref = normalizeExternalUrl(href);
+
   return (
-    <a href={href} {...getExternalLinkProps(href)}>
+    <a href={normalizedHref} {...getExternalLinkProps(normalizedHref)}>
       <Button size="sm" variant="outline" className="w-full">
         {children}
       </Button>

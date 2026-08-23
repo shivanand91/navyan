@@ -249,7 +249,7 @@ const renderCertificateCard = (cert, index) => {
         </a>
         {cert.linkedinUrl ? (
           <a
-            href={cert.linkedinUrl}
+            href={normalizeExternalUrl(cert.linkedinUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full"

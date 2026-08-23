@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { normalizeExternalUrl } from "@/lib/utils";
 
 const createEmptyForm = () => ({
   title: "",
@@ -401,7 +402,7 @@ Requirements:
                       </span>
                       {application.applicantSnapshot?.resumeUrl ? (
                         <a
-                          href={application.applicantSnapshot.resumeUrl}
+                          href={normalizeExternalUrl(application.applicantSnapshot.resumeUrl)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-primary"
@@ -411,7 +412,7 @@ Requirements:
                       ) : null}
                       {application.applicantSnapshot?.portfolioUrl ? (
                         <a
-                          href={application.applicantSnapshot.portfolioUrl}
+                          href={normalizeExternalUrl(application.applicantSnapshot.portfolioUrl)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-primary"
@@ -421,7 +422,7 @@ Requirements:
                       ) : null}
                       {application.applicantSnapshot?.githubUrl ? (
                         <a
-                          href={application.applicantSnapshot.githubUrl}
+                          href={normalizeExternalUrl(application.applicantSnapshot.githubUrl)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-primary"
@@ -431,7 +432,7 @@ Requirements:
                       ) : null}
                       {application.applicantSnapshot?.linkedinUrl ? (
                         <a
-                          href={application.applicantSnapshot.linkedinUrl}
+                          href={normalizeExternalUrl(application.applicantSnapshot.linkedinUrl)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-primary"
