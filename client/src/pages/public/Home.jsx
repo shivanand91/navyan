@@ -19,7 +19,8 @@ import {
   WalletCards,
   Trophy,
   Search,
-  ExternalLink
+  ExternalLink,
+  Linkedin
 } from "lucide-react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
