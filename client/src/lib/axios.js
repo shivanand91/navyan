@@ -30,6 +30,7 @@ const readStoredAccessToken = () => {
 let accessToken = readStoredAccessToken();
 let refreshRequest = null;
 let unauthorizedHandler = null;
+const CACHE_PREFIX = "navyan_api_cache_";
 const getCache = new Map();
 const pendingGetRequests = new Map();
 
@@ -64,6 +65,21 @@ const buildGetCacheKey = (url, config = {}) =>
 export const clearApiCache = () => {
   getCache.clear();
   pendingGetRequests.clear();
+  
+  if (typeof window !== "undefined") {
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(CACHE_PREFIX)) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+    } catch (e) {
+      console.warn("Failed to clear localStorage API cache", e);
+    }
+  }
 };
 
 const rawGet = api.get.bind(api);
@@ -81,23 +97,66 @@ api.get = (url, config = {}) => {
 
   const cacheKey = buildGetCacheKey(url, config);
   const ttl = Number.isFinite(config.cacheTtl) ? config.cacheTtl : DEFAULT_GET_CACHE_TTL;
-  const cached = getCache.get(cacheKey);
+  
+  // 1. Try to read from in-memory cache first
+  let cached = getCache.get(cacheKey);
 
-  if (cached && Date.now() - cached.createdAt < ttl) {
-    return Promise.resolve(cached.response);
+  // 2. Try to read from localStorage if not found in memory
+  if (!cached && typeof window !== "undefined") {
+    try {
+      const serialized = localStorage.getItem(CACHE_PREFIX + cacheKey);
+      if (serialized) {
+        const parsed = JSON.parse(serialized);
+        if (parsed && parsed.createdAt && parsed.response) {
+          cached = parsed;
+          getCache.set(cacheKey, cached);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to read from localStorage API cache", e);
+    }
   }
 
+  // 3. If cache entry is found and not expired, return resolved promise
+  if (cached && Date.now() - cached.createdAt < ttl) {
+    const responseWithConfig = {
+      ...cached.response,
+      config: { ...config, url, baseURL: api.defaults.baseURL }
+    };
+    return Promise.resolve(responseWithConfig);
+  }
+
+  // 4. Return existing pending request to avoid duplicates
   const pendingRequest = pendingGetRequests.get(cacheKey);
   if (pendingRequest) {
     return pendingRequest;
   }
 
+  // 5. Fetch fresh data from server
   const request = rawGet(url, config)
     .then((response) => {
-      getCache.set(cacheKey, {
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers
+      };
+
+      const cacheEntry = {
         createdAt: Date.now(),
-        response
-      });
+        response: serializableResponse
+      };
+
+      getCache.set(cacheKey, cacheEntry);
+
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(CACHE_PREFIX + cacheKey, JSON.stringify(cacheEntry));
+        } catch (e) {
+          console.warn("Failed to write to localStorage API cache", e);
+        }
+      }
+
       return response;
     })
     .finally(() => {

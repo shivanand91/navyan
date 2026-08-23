@@ -9,7 +9,7 @@ const buttonVariants = cva(
         solid:
           "bg-[color:var(--color-button-primary-bg)] text-[color:var(--color-button-primary-text)] hover:bg-[color:var(--color-button-primary-bg-hover)] active:bg-[color:var(--color-button-primary-bg-active)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         accent:
-          "bg-[color:var(--color-button-accent-bg)] text-[color:var(--color-button-accent-text)] hover:bg-[color:var(--color-button-accent-bg-hover)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
+          "bg-[color:var(--color-button-primary-bg)] text-[color:var(--color-button-primary-text)] hover:bg-[color:var(--color-button-primary-bg-hover)] active:bg-[color:var(--color-button-primary-bg-active)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         outline:
           "border border-[color:var(--color-button-secondary-border)] bg-[color:var(--color-button-secondary-bg)] text-[color:var(--color-button-secondary-text)] hover:bg-[color:var(--color-button-secondary-bg-hover)] disabled:bg-[color:var(--color-button-disabled-bg)] disabled:text-[color:var(--color-button-disabled-text)]",
         ghost:
