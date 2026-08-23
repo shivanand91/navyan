@@ -234,17 +234,37 @@ const renderCertificateCard = (cert, index) => {
         </div>
       </div>
 
-      {/* Action button */}
-      <a
-        href={`/verify-certificate?cid=${cert.certificateId}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-8 block w-full"
-      >
-        <div className="w-full py-3.5 border border-[#2897FF]/70 rounded-[16px] text-center text-sm font-bold text-[#2897FF] hover:bg-[#2897FF]/10 dark:text-[#4FA8FF] dark:border-[#4FA8FF]/70 dark:hover:bg-[#4FA8FF]/10 transition tracking-wide">
-          view Certificate
-        </div>
-      </a>
+      {/* Action buttons */}
+      <div className="mt-8 grid grid-cols-2 gap-3">
+        <a
+          href={`/verify-certificate?cid=${cert.certificateId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full"
+        >
+          <div className="w-full py-3 border border-[#2897FF]/75 rounded-[16px] text-center text-[10px] sm:text-[11px] font-bold text-[#2897FF] hover:bg-[#2897FF]/10 dark:text-[#4FA8FF] dark:border-[#4FA8FF]/75 dark:hover:bg-[#4FA8FF]/10 transition uppercase tracking-wide">
+            View Cert
+          </div>
+        </a>
+        {cert.linkedinUrl ? (
+          <a
+            href={cert.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full"
+          >
+            <div className="w-full py-3 border border-[#2897FF]/75 bg-[#2897FF]/5 rounded-[16px] text-center text-[10px] sm:text-[11px] font-bold text-[#2897FF] hover:bg-[#2897FF]/15 dark:text-[#4FA8FF] dark:border-[#4FA8FF]/75 dark:hover:bg-[#4FA8FF]/20 transition uppercase tracking-wide flex items-center justify-center gap-1">
+              <Linkedin className="h-3 w-3 shrink-0" />
+              <span>LinkedIn</span>
+            </div>
+          </a>
+        ) : (
+          <div className="w-full py-3 border border-slate-200 dark:border-slate-800 rounded-[16px] text-center text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-600 bg-slate-50 dark:bg-slate-900/40 select-none uppercase tracking-wide cursor-not-allowed flex items-center justify-center gap-1">
+            <Linkedin className="h-3 w-3 shrink-0" />
+            <span>No Link</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

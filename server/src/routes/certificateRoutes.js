@@ -72,10 +72,10 @@ router.get("/me", protect, async (req, res, next) => {
 const seedMockCertificates = async () => {
   try {
     const mockUsersData = [
-      { fullName: "Aayushi Singh", email: "aayushi@example.com", passwordHash: "dummy" },
-      { fullName: "Rahul Verma", email: "rahul@example.com", passwordHash: "dummy" },
-      { fullName: "Nikita Sharma", email: "nikita@example.com", passwordHash: "dummy" },
-      { fullName: "Ankit Patel", email: "ankit@example.com", passwordHash: "dummy" }
+      { fullName: "Aayushi Singh", email: "aayushi@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/aayushisingh" } },
+      { fullName: "Rahul Verma", email: "rahul@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/rahulverma" } },
+      { fullName: "Nikita Sharma", email: "nikita@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/nikitasharma" } },
+      { fullName: "Ankit Patel", email: "ankit@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/ankitpatel" } }
     ];
 
     const users = [];
@@ -83,6 +83,12 @@ const seedMockCertificates = async () => {
       let user = await User.findOne({ email: uData.email });
       if (!user) {
         user = await User.create(uData);
+      } else if (!user.profile || !user.profile.linkedinUrl) {
+        user.profile = {
+          ...user.profile,
+          ...uData.profile
+        };
+        await user.save();
       }
       users.push(user);
     }
@@ -168,6 +174,10 @@ router.get("/public", async (req, res, next) => {
     const certificates = await Certificate.find(query)
       .populate("application")
       .populate("internship")
+      .populate({
+        path: "user",
+        select: "profile.linkedinUrl"
+      })
       .sort({ completionDate: -1 })
       .limit(30);
 
@@ -183,7 +193,8 @@ router.get("/public", async (req, res, next) => {
           completionDate: certificate.completionDate,
           issueDate: certificate.issueDate || certificate.createdAt,
           pdfUrl: buildServerUrl(req, `/api/certificates/download/${certificate.certificateId}`),
-          verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl)
+          verifyUrl: buildCertificateVerifyUrl(req, certificate.certificateId, certificate.verifyUrl),
+          linkedinUrl: certificate.user?.profile?.linkedinUrl || ""
         };
       })
     });
