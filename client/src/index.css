@@ -373,7 +373,7 @@
 
 .animate-marquee {
   display: inline-flex;
-  animation: marquee 20s linear infinite;
+  animation: marquee 45s linear infinite;
 }
 
 .animate-marquee:hover {

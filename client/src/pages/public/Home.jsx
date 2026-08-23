@@ -206,29 +206,29 @@ const renderCertificateCard = (cert, index) => {
   return (
     <div
       key={`${cert._id}-${index}`}
-      className="relative flex flex-col justify-between w-[320px] sm:w-[350px] shrink-0 rounded-[28px] border border-[#ff8f96]/60 bg-[#121212] p-6 text-white shadow-xl whitespace-normal"
+      className="relative flex flex-col justify-between w-[320px] sm:w-[350px] shrink-0 rounded-[28px] border border-[#2897FF]/30 bg-white dark:bg-slate-900 p-6 shadow-md hover:shadow-lg transition whitespace-normal"
     >
       {/* Verified indicator in the top right */}
-      <span className="absolute top-5 right-6 text-xs font-semibold tracking-wider text-[#ff8f96]/80 uppercase">
+      <span className="absolute top-5 right-6 text-xs font-semibold tracking-wider text-[#2897FF] dark:text-[#4FA8FF] uppercase">
         Verified
       </span>
 
       {/* Main card info: Avatar + Names */}
       <div className="flex items-center gap-6 mt-4">
         {/* Avatar */}
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[#ff8f96]/60 text-2xl font-bold uppercase text-[#ff8f96] font-display">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[#2897FF]/35 bg-[#2897FF]/5 text-2xl font-bold uppercase text-[#2897FF] dark:text-[#4FA8FF] font-display">
           {initials}
         </div>
 
         {/* Text details */}
         <div className="space-y-1 overflow-hidden">
-          <h4 className="font-display text-xl font-bold text-[#ff8f96] truncate" title={cert.fullName}>
+          <h4 className="font-display text-xl font-bold text-slate-900 dark:text-white truncate" title={cert.fullName}>
             {cert.fullName}
           </h4>
-          <p className="text-sm font-medium text-white/90 truncate">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
             {cert.role}
           </p>
-          <p className="text-xs text-white/60 truncate">
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
             {durationLabel}
           </p>
         </div>
@@ -241,7 +241,7 @@ const renderCertificateCard = (cert, index) => {
         rel="noopener noreferrer"
         className="mt-8 block w-full"
       >
-        <div className="w-full py-3.5 border border-[#ff8f96]/60 rounded-[16px] text-center text-sm font-bold text-[#ff8f96] hover:bg-[#ff8f96]/10 transition uppercase tracking-wide">
+        <div className="w-full py-3.5 border border-[#2897FF]/70 rounded-[16px] text-center text-sm font-bold text-[#2897FF] hover:bg-[#2897FF]/10 dark:text-[#4FA8FF] dark:border-[#4FA8FF]/70 dark:hover:bg-[#4FA8FF]/10 transition tracking-wide">
           view Certificate
         </div>
       </a>
@@ -572,8 +572,8 @@ export default function Home() {
             <div className="grid gap-6">
               {hackathons.map((hackathon, idx) => (
                 <RevealInView key={hackathon._id} delay={idx * 0.05}>
-                  <div className="navyan-card group grid overflow-hidden rounded-[30px] border border-[#f28b90]/60 bg-[#fff8f8] p-4 dark:border-[#f28b90]/60 dark:bg-[#121212] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6 lg:p-5">
-                    <div className="relative overflow-hidden rounded-[24px] border border-[#f28b90]/70 bg-slate-200 dark:bg-slate-950">
+                  <div className="navyan-card group grid overflow-hidden rounded-[30px] border border-[#2897FF]/30 bg-[#f8fafc] p-4 dark:border-[#2897FF]/20 dark:bg-[#0f172a] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6 lg:p-5">
+                    <div className="relative overflow-hidden rounded-[24px] border border-[#2897FF]/25 bg-slate-200 dark:bg-slate-950">
                       {hackathon.coverImageUrl ? (
                         <img
                           src={hackathon.coverImageUrl}
@@ -585,14 +585,14 @@ export default function Home() {
                           No cover image
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-full border border-[#f28b90]/80 bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#cc5f67] dark:bg-[#121212]/85 dark:text-[#ff8f96]">
+                      <div className="absolute left-4 top-4 rounded-full border border-[#2897FF]/40 bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#176CDE] dark:bg-[#0f172a]/85 dark:text-[#4FA8FF]">
                         Live
                       </div>
                     </div>
                     <div className="flex min-h-full flex-col justify-between px-1 py-2 lg:px-2">
                       <div className="space-y-5">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#cc5f67] dark:text-[#ff8f96]/80">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#176CDE] dark:text-[#2897FF]">
                             {hackathon.tag || "Hackathon"}
                           </p>
                           <h3 className="font-display text-xl font-semibold tracking-[-0.03em] text-slate-950 dark:text-white md:text-2xl">
@@ -603,8 +603,8 @@ export default function Home() {
                           </p>
                         </div>
 
-                        <div className="rounded-[20px] border border-[#f28b90]/60 bg-white/70 px-4 py-3 dark:bg-[#171717]">
-                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#cc5f67] dark:text-[#ff8f96]/80">
+                        <div className="rounded-[20px] border border-[#2897FF]/30 bg-white/70 px-4 py-3 dark:bg-slate-900/50">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#176CDE] dark:text-[#2897FF]">
                             Team size
                           </p>
                           <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
@@ -617,7 +617,7 @@ export default function Home() {
                         <Button
                           type="button"
                           variant="outline"
-                          className="h-12 rounded-[20px] border-[#f28b90]/70 bg-transparent text-slate-900 hover:bg-[#fff0f1] hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
+                          className="h-12 rounded-[20px] border-[#2897FF]/60 bg-transparent text-slate-900 hover:bg-[#2897FF]/10 hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
                           onClick={() => setActiveHackathon(hackathon)}
                         >
                           View Details
@@ -631,7 +631,7 @@ export default function Home() {
                           >
                             <Button
                               variant="outline"
-                              className="h-12 w-full rounded-[20px] border-[#f28b90]/70 bg-transparent text-slate-900 hover:bg-[#fff0f1] hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
+                              className="h-12 w-full rounded-[20px] border-[#2897FF]/60 bg-transparent text-slate-900 hover:bg-[#2897FF]/10 hover:text-slate-950 dark:text-white dark:hover:bg-white/5 dark:hover:text-white"
                             >
                               Open Form
                             </Button>
@@ -640,7 +640,7 @@ export default function Home() {
                           <Button
                             disabled
                             variant="outline"
-                            className="h-12 rounded-[20px] border-[#f28b90]/40 bg-transparent text-slate-400"
+                            className="h-12 rounded-[20px] border-[#2897FF]/30 bg-transparent text-slate-400"
                           >
                             Closed
                           </Button>
@@ -1067,7 +1067,7 @@ export default function Home() {
 
 
 
-      <section id="verification" className="navyan-section px-4 md:px-6 bg-[#0c0c0e] py-16 border-y border-border">
+      <section id="verification" className="navyan-section px-4 md:px-6 bg-backgroundSecondary/20 py-16 border-y border-border">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
             eyebrow="Verification Desk"
@@ -1077,7 +1077,7 @@ export default function Home() {
 
           {/* Search Bar */}
           <div className="max-w-xl mx-auto relative">
-            <div className="relative rounded-[20px] border border-border bg-[#18181b] shadow-sm focus-within:border-primary/50 transition">
+            <div className="relative rounded-[20px] border border-border bg-backgroundSecondary shadow-sm focus-within:border-primary/50 transition">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                 <Search className="h-5 w-5 text-textMuted" />
               </div>
@@ -1113,12 +1113,12 @@ export default function Home() {
                   {Array.from({ length: 3 }).map((_, index) => (
                     <div
                       key={index}
-                      className="w-[320px] sm:w-[350px] h-52 animate-pulse bg-white/5 rounded-[28px] border border-border"
+                      className="w-[320px] sm:w-[350px] h-52 animate-pulse bg-[#2897FF]/5 rounded-[28px] border border-border"
                     />
                   ))}
                 </div>
               ) : searchResults.length === 0 ? (
-                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-[#121212] border border-border text-white">
+                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-white dark:bg-slate-900 border border-border">
                   <p className="font-display text-lg font-semibold text-textPrimary">
                     No verified graduate found
                   </p>
@@ -1136,11 +1136,11 @@ export default function Home() {
             /* Auto-scrolling Marquee */
             <div className="relative w-full overflow-hidden py-4">
               {/* Fade gradients on edges for premium visual finish */}
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0c0c0e] to-transparent z-10" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0c0c0e] to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
 
               {publicCertificates.length === 0 ? (
-                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-[#121212] border border-border text-white">
+                <div className="navyan-card py-12 text-center max-w-md mx-auto bg-white dark:bg-slate-900 border border-border">
                   <p className="font-display text-lg font-semibold text-textPrimary">
                     No completed certificates yet
                   </p>
