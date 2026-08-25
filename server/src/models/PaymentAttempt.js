@@ -11,7 +11,6 @@ const paymentAttemptSchema = new mongoose.Schema(
     },
     durationKey: {
       type: String,
-      enum: ["4-weeks", "3-months", "6-months"],
       required: true
     },
     amount: { type: Number, required: true },

@@ -91,6 +91,8 @@ export default function App() {
           <Route path="/courses" element={<LazyPage><Courses /></LazyPage>} />
           <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
           <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
+          <Route path="/internships/:slug/:duration" element={<LazyPage><InternshipDetail /></LazyPage>} />
+          <Route path="/internship/:slug/:duration" element={<LazyPage><InternshipDetail /></LazyPage>} />
           <Route path="/jobs" element={<LazyPage><Jobs /></LazyPage>} />
           <Route path="/services" element={<LazyPage><Services /></LazyPage>} />
           <Route path="/about" element={<LazyPage><About /></LazyPage>} />

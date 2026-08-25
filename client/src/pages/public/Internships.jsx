@@ -31,6 +31,17 @@ export default function Internships() {
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeInternship, setActiveInternship] = useState(null);
+  const [selectedDurations, setSelectedDurations] = useState({});
+
+  const getRewardsText = (duration) => {
+    if (duration.rewards && duration.rewards.length > 0) {
+      return duration.rewards.join(", ");
+    }
+    if (duration.key === "3-months") return "Top Performer Reward: ₹5,000";
+    if (duration.key === "6-months") return "Top Performer Reward: ₹8,000";
+    if (duration.key === "4-weeks") return "Swag & Performance Recognition";
+    return null;
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -82,109 +93,127 @@ export default function Internships() {
             </div>
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {internships.map((internship, index) => (
-                <RevealInView key={internship._id} delay={index * 0.03}>
-                  <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
-                    <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
-                      {internship.coverImageUrl ? (
-                        <img
-                          src={internship.coverImageUrl}
-                          alt={internship.title}
-                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
-                          Navyan internship live
-                        </div>
-                      )}
-                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Open now
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 flex-col px-5 py-5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
-                          {internship.role || "Internship track"}
-                        </span>
-                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
-                          {internship.mode?.toUpperCase() || "REMOTE"}
-                        </span>
-                      </div>
-
-                      <div className="mt-4">
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
-                          {internship.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-7 text-textSecondary">
-                          {internship.shortDescription}
-                        </p>
-                      </div>
-
-                      <div className="mt-4 rounded-[12px] border border-primary/15 bg-primary/10 px-4 py-3">
-                        <div className="flex items-center gap-2 text-primary">
-                          <WalletCards className="h-4 w-4" />
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">
-                            Duration model
-                          </span>
-                        </div>
-                        <p className="mt-2 text-sm font-semibold text-textPrimary">
-                          {(internship.durations || []).some(isPaidDuration)
-                            ? "Paid tracks available"
-                            : "Free tracks available"}
-                        </p>
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
-                          <span
-                            key={skill}
-                            className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="mt-4 grid gap-2">
-                        {(internship.durations || []).map((duration) => (
-                          <div
-                            key={duration.key}
-                            className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3"
-                          >
-                            <p className="text-xs font-semibold text-[color:var(--text)]">
-                              {getDurationLabel(duration)}
-                            </p>
-                            <p className="mt-1 text-[11px] text-[color:var(--text-muted)]">
-                              {isPaidDuration(duration)
-                                ? `Paid • ${getDurationPriceLabel(duration)}`
-                               : "Free"}
-                            </p>
+              {internships.map((internship, index) => {
+                const selectedKey = selectedDurations[internship._id] || internship.durations?.[0]?.key || "4-weeks";
+                const selectedDuration = internship.durations?.find(d => d.key === selectedKey) || internship.durations?.[0];
+                return (
+                  <RevealInView key={internship._id} delay={index * 0.03}>
+                    <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
+                      <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
+                        {internship.coverImageUrl ? (
+                          <img
+                            src={internship.coverImageUrl}
+                            alt={internship.title}
+                            className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
+                            Navyan internship live
                           </div>
-                        ))}
+                        )}
+                        <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Open now
+                        </div>
                       </div>
 
-                      <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4">
-                        <p className="text-xs text-[color:var(--text-muted)]">
-                          Preview the role first, then move into the full application flow.
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <Button variant="outline" onClick={() => setActiveInternship(internship)}>
-                            Preview role
-                          </Button>
-                          <Link to={`/internships/${internship.slug}`}>
-                            <Button variant="accent">
-                              Apply now
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                      <div className="flex flex-1 flex-col px-5 py-5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                            {internship.role || "Internship track"}
+                          </span>
+                          <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                            {internship.mode?.toUpperCase() || "REMOTE"}
+                          </span>
+                        </div>
+
+                        <div className="mt-4">
+                          <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
+                            {internship.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-7 text-textSecondary">
+                            {internship.shortDescription}
+                          </p>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
+                            <span
+                              key={skill}
+                              className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Segmented Duration Selector */}
+                        <div className="mt-5 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 space-y-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-wider text-[color:var(--text-secondary)]">
+                            Select Cohort Duration:
+                          </p>
+                          <div className="flex rounded-[8px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-0.5">
+                            {(internship.durations || []).map((duration) => {
+                              const isSelected = selectedKey === duration.key;
+                              return (
+                                <button
+                                  key={duration.key}
+                                  type="button"
+                                  onClick={() => setSelectedDurations(prev => ({ ...prev, [internship._id]: duration.key }))}
+                                  className={`flex-1 text-center py-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-[6px] transition-all ${
+                                    isSelected
+                                      ? "bg-primary text-white shadow-sm font-bold"
+                                      : "text-[color:var(--text-secondary)] hover:text-[color:var(--text)]"
+                                  }`}
+                                >
+                                  {getDurationLabel(duration)}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {selectedDuration && (
+                            <div className="flex items-center justify-between border-t border-[color:var(--border)] pt-3 text-xs">
+                              <div>
+                                <span className="text-[10px] text-[color:var(--text-muted)] uppercase tracking-wider">Type</span>
+                                <p className="font-semibold text-[color:var(--text)]">
+                                  {isPaidDuration(selectedDuration) ? "Paid Internship" : "Unpaid Track"}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[10px] text-[color:var(--text-muted)] uppercase tracking-wider">Price</span>
+                                <p className="font-semibold text-[color:var(--text)]">
+                                  {getDurationPriceLabel(selectedDuration)}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedDuration && getRewardsText(selectedDuration) && (
+                            <div className="mt-2 rounded-[8px] bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold text-center uppercase tracking-wide">
+                              {getRewardsText(selectedDuration)}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4">
+                          <div className="flex flex-wrap gap-2">
+                            <Button variant="outline" onClick={() => setActiveInternship(internship)} className="flex-1">
+                              Preview role
                             </Button>
-                          </Link>
+                            <Link to={`/internship/${internship.slug}/${selectedKey}`} className="flex-[2]">
+                              <Button variant="accent" className="w-full">
+                                View {getDurationLabel(selectedDuration)} Plan
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </RevealInView>
-              ))}
+                  </RevealInView>
+                );
+              })}
             </div>
           )}
         </div>

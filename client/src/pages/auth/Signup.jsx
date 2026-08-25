@@ -20,6 +20,8 @@ const schema = z.object({
 export default function Signup() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectParam = searchParams.get("redirect");
   const {
     register,
     handleSubmit,
@@ -36,7 +38,7 @@ export default function Signup() {
       const { data } = await api.post("/auth/register", payload);
       login(data.accessToken, data.user);
       toast.success("Welcome to Navyan. Let’s set up your profile.");
-      navigate("/student/profile");
+      navigate(redirectParam || "/student/profile");
     } catch (error) {
       console.error(error);
       toast.error(getApiErrorMessage(error, "Could not create account. Try a different email."));
@@ -98,7 +100,7 @@ export default function Signup() {
 
           <div className="rounded-[12px] border border-border bg-backgroundSecondary p-4 text-sm text-center text-textSecondary">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
+            <Link to={redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : "/login"} className="font-semibold text-primary hover:underline">
               Log in
             </Link>
           </div>

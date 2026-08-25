@@ -4,13 +4,27 @@ const durationOptionSchema = new mongoose.Schema(
   {
     key: {
       type: String,
-      enum: ["4-weeks", "3-months", "6-months"],
       required: true
     },
     label: String,
     isPaid: { type: Boolean, default: false },
     price: { type: Number, default: 0 },
     benefits: [String],
+    rewards: [String],
+    description: String,
+    mentorship: String,
+    schedule: String,
+    projects: [String],
+    tasks: [String],
+    certificate: String,
+    swag: String,
+    eligibility: String,
+    faqs: [
+      {
+        question: String,
+        answer: String
+      }
+    ],
     taskPdfUrl: String
   },
   { _id: false }

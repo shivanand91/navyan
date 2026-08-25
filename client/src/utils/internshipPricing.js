@@ -8,7 +8,7 @@ const DEFAULT_DURATION_PRICING = {
 
 export const getEffectiveDurationPrice = (duration) => {
   if (!duration) return 0;
-  return DEFAULT_DURATION_PRICING[duration.key] || 0;
+  return typeof duration.price === "number" ? duration.price : (DEFAULT_DURATION_PRICING[duration.key] || 0);
 };
 
 export const isPaidDuration = (duration) => {

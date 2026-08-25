@@ -23,6 +23,11 @@ const getCertificateRoleLabel = (certificate) =>
     ? resolveInternshipRoleLabel(certificate.internship)
     : certificate?.role || "Intern";
 
+const getCertificateDurationLabel = (certificate) => {
+  const duration = certificate?.internship?.durations?.find((item) => item.key === certificate.durationKey);
+  return duration?.label || durationLabels[certificate.durationKey] || certificate.durationKey;
+};
+
 const formatCertificateDate = (value) => {
   if (!value) return "";
   const date = new Date(value);
@@ -251,7 +256,7 @@ router.get("/download/:certificateId", async (req, res, next) => {
       studentName: certificate.fullName,
       internshipTitle: certificate.internship?.title || roleLabel || "Internship",
       role: roleLabel,
-      durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
+      durationLabel: getCertificateDurationLabel(certificate),
       startDateStr: timeline.startDateStr,
       endDateStr: timeline.endDateStr,
       completionDateStr: format(certificate.completionDate, "dd MMM yyyy"),
@@ -296,7 +301,7 @@ router.get("/preview/:certificateId", async (req, res, next) => {
         internshipTitle: certificate.internship?.title || roleLabel || "Internship",
         role: roleLabel,
         durationKey: certificate.durationKey,
-        durationLabel: durationLabels[certificate.durationKey] || certificate.durationKey,
+        durationLabel: getCertificateDurationLabel(certificate),
         startDate: timeline.startDateStr,
         endDate: timeline.endDateStr,
         startDateStr: timeline.startDateStr,

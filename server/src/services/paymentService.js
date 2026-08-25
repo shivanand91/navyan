@@ -12,12 +12,13 @@ export const getDurationPricing = (internship, durationKey) => {
     return { duration: null, amount: 0, isPaid: false };
   }
 
-  const amount = DEFAULT_PRICING[durationKey] || 0;
+  const amount = typeof duration.price === "number" ? duration.price : (DEFAULT_PRICING[durationKey] || 0);
+  const isPaid = typeof duration.isPaid === "boolean" ? duration.isPaid : (duration.isPaid || amount > 0);
 
   return {
     duration,
     amount,
-    isPaid: duration.isPaid || amount > 0
+    isPaid: isPaid || amount > 0
   };
 };
 

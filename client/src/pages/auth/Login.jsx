@@ -20,6 +20,8 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const redirectParam = searchParams.get("redirect");
   const {
     register,
     handleSubmit,
@@ -38,7 +40,7 @@ export default function Login() {
       const redirect =
         data.user.role === "admin"
           ? "/admin"
-          : (location.state && location.state.from) || "/student";
+          : redirectParam || (location.state && location.state.from) || "/student";
       navigate(redirect, { replace: true });
     } catch (error) {
       console.error(error);
@@ -96,7 +98,7 @@ export default function Login() {
 
           <div className="rounded-[12px] border border-border bg-backgroundSecondary p-4 text-sm text-center text-textSecondary">
             New to Navyan?{" "}
-            <Link to="/signup" className="font-semibold text-primary hover:underline">
+            <Link to={redirectParam ? `/signup?redirect=${encodeURIComponent(redirectParam)}` : "/signup"} className="font-semibold text-primary hover:underline">
               Create your account
             </Link>
           </div>

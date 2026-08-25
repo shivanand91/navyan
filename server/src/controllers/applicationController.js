@@ -51,14 +51,14 @@ const getDurationLabel = (application) => {
     (item) => item.key === application.durationKey
   );
 
-  return (
-    durationOption?.label ||
-    (application.durationKey === "4-weeks"
-      ? "4 weeks"
-      : application.durationKey === "3-months"
-        ? "3 months"
-        : "6 months")
-  );
+  if (durationOption?.label) return durationOption.label;
+
+  const durationLabels = {
+    "4-weeks": "4 weeks",
+    "3-months": "3 months",
+    "6-months": "6 months"
+  };
+  return durationLabels[application.durationKey] || application.durationKey;
 };
 
 const createOfferLetterAccessToken = () => crypto.randomBytes(24).toString("hex");
@@ -115,13 +115,23 @@ const getOfferLetterDocumentPayload = (application) => {
   const startDate = application.internshipMeta?.startDate
     ? new Date(application.internshipMeta.startDate)
     : new Date();
+  const calculateEndDate = (start, key) => {
+    const match = key.match(/^(\d+)-(week|month|day|year)s?$/i) || key.match(/^(\d+)\s*(week|month|day|year)s?$/i);
+    if (match) {
+      const value = parseInt(match[1], 10);
+      const unit = match[2].toLowerCase();
+      if (unit.startsWith("week")) return addWeeks(start, value);
+      if (unit.startsWith("month")) return addMonths(start, value);
+    }
+    if (key === "4-weeks") return addWeeks(start, 4);
+    if (key === "3-months") return addMonths(start, 3);
+    if (key === "6-months") return addMonths(start, 6);
+    return addMonths(start, 1);
+  };
+
   const endDate = application.internshipMeta?.endDate
     ? new Date(application.internshipMeta.endDate)
-    : application.durationKey === "4-weeks"
-      ? addWeeks(startDate, 4)
-      : application.durationKey === "3-months"
-        ? addMonths(startDate, 3)
-        : addMonths(startDate, 6);
+    : calculateEndDate(startDate, application.durationKey);
   const pricing = getDurationPricing(internship, application.durationKey);
   const roleLabel = resolveInternshipRoleLabel(internship);
   const offerId =

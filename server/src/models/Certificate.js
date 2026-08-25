@@ -18,7 +18,6 @@ const certificateSchema = new mongoose.Schema(
     role: String,
     durationKey: {
       type: String,
-      enum: ["4-weeks", "3-months", "6-months"],
       required: true
     },
     completionDate: { type: Date, required: true },

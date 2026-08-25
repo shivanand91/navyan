@@ -33,7 +33,6 @@ const applicationSchema = new mongoose.Schema(
     },
     durationKey: {
       type: String,
-      enum: ["4-weeks", "3-months", "6-months"],
       required: true
     },
     motivation: String,
