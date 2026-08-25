@@ -455,7 +455,8 @@ export const createPaymentIntent = async (req, res, next) => {
     const { qrCodeDataUrl } = await buildUpiPaymentPayload({
       upiId,
       amount,
-      paymentReference
+      paymentReference,
+      payeeName: "Navyan"
     });
 
     const paymentAttempt = await PaymentAttempt.create({
