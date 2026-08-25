@@ -11,7 +11,13 @@ import { processPendingEvents } from "./automationWorker.js";
 
 async function run() {
   console.log("Connecting to database...");
-  await connectDB();
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27018/navyan");
+    console.log("MongoDB connected.");
+  } catch (err) {
+    console.error("Database connection failed:", err);
+    return;
+  }
 
   try {
     // 1. Create a mock student user
@@ -28,6 +34,8 @@ async function run() {
     const mockInternship = await Internship.create({
       title: "Test Full Stack Internship",
       role: "Full Stack Developer",
+      slug: `test-full-stack-${Date.now()}`,
+      shortDescription: "A test internship program for automation verification.",
       durationKey: "4-weeks",
       price: 49,
       projects: ["Task 1", "Task 2", "Task 3"]
@@ -64,11 +72,11 @@ async function run() {
     });
 
     // Let's manually backdate one event to test worker processing!
-    // We will make the "reminder-3-days" event scheduled for 1 hour ago
-    console.log("Backdating reminder-3-days event to simulate elapsed time...");
+    // We will make the "final-day" event scheduled for 1 hour ago
+    console.log("Backdating final-day event to simulate elapsed time...");
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     await AutomationEvent.updateOne(
-      { application: mockApplication._id, eventType: "reminder-3-days" },
+      { application: mockApplication._id, eventType: "final-day" },
       { $set: { scheduledFor: oneHourAgo } }
     );
 
@@ -80,7 +88,7 @@ async function run() {
     // Verify event status and logs
     const executedEvent = await AutomationEvent.findOne({
       application: mockApplication._id,
-      eventType: "reminder-3-days"
+      eventType: "final-day"
     });
     console.log(`Executed Event Status: ${executedEvent?.status}, Attempts: ${executedEvent?.attempts}`);
 

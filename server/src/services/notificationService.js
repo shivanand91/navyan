@@ -1,4 +1,3 @@
-import axios from "axios";
 import { User } from "../models/User.js";
 import { Notification } from "../models/Notification.js";
 import { sendBroadcastAlertEmail } from "./emailService.js";
@@ -38,25 +37,27 @@ export const sendToUser = async ({
 
     if (config.isConfigured) {
       try {
-        const response = await axios.post(
+        const response = await fetch(
           "https://onesignal.com/api/v1/notifications",
           {
-            app_id: config.appId,
-            headings: { en: title },
-            contents: { en: message },
-            url: link || undefined,
-            include_aliases: { external_id: [String(userId)] },
-            target_channel: "push"
-          },
-          {
+            method: "POST",
             headers: {
               Authorization: `Key ${config.apiKey}`,
               "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify({
+              app_id: config.appId,
+              headings: { en: title },
+              contents: { en: message },
+              url: link || undefined,
+              include_aliases: { external_id: [String(userId)] },
+              target_channel: "push"
+            })
           }
         );
         pushSuccess = response.status === 200 || response.status === 201;
-        providerMessageId = response.data?.id || "";
+        const resData = await response.json().catch(() => ({}));
+        providerMessageId = resData?.id || "";
       } catch (err) {
         console.error(`[OneSignal] Push failed for user ${userId}:`, err.message);
       }
@@ -125,20 +126,21 @@ export const sendBroadcast = async ({
 
     if (config.isConfigured) {
       try {
-        const response = await axios.post(
+        const response = await fetch(
           "https://onesignal.com/api/v1/notifications",
           {
-            app_id: config.appId,
-            headings: { en: title },
-            contents: { en: message },
-            url: link || undefined,
-            included_segments: ["All Subscribed Users"]
-          },
-          {
+            method: "POST",
             headers: {
               Authorization: `Key ${config.apiKey}`,
               "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify({
+              app_id: config.appId,
+              headings: { en: title },
+              contents: { en: message },
+              url: link || undefined,
+              included_segments: ["All Subscribed Users"]
+            })
           }
         );
         pushSuccess = response.status === 200 || response.status === 201;
