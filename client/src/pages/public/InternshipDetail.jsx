@@ -27,7 +27,8 @@ import {
   QrCode,
   AlertTriangle,
   ChevronRight,
-  FileText
+  FileText,
+  X
 } from "lucide-react";
 
 export default function InternshipDetail() {
@@ -305,7 +306,7 @@ export default function InternshipDetail() {
                 <Sparkles className="h-3.5 w-3.5" />
                 Live Application Window Open
               </div>
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] text-textPrimary leading-none">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] text-textPrimary leading-tight">
                 {internship.title}
               </h1>
               <p className="text-base md:text-lg leading-relaxed text-textSecondary max-w-2xl">
@@ -521,9 +522,9 @@ export default function InternshipDetail() {
             {/* Program Timeline */}
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold text-textPrimary">Program Timeline & Milestones</h2>
-              <div className="relative border-l border-[color:var(--border)] ml-3 pl-6 space-y-8">
+              <div className="relative border-l-2 border-[color:var(--border)] ml-4 pl-6 space-y-8">
                 <div className="relative">
-                  <div className="absolute -left-[31px] top-0.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                  <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
                     <div className="h-2 w-2 rounded-full bg-primary" />
                   </div>
                   <h4 className="font-bold text-textPrimary text-base">Week 1: Foundations & Architecture Setup</h4>
@@ -533,7 +534,7 @@ export default function InternshipDetail() {
                 </div>
 
                 <div className="relative">
-                  <div className="absolute -left-[31px] top-0.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                  <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
                     <div className="h-2 w-2 rounded-full bg-primary" />
                   </div>
                   <h4 className="font-bold text-textPrimary text-base">Week 2-4: Core Development & Mid-term Evaluations</h4>
@@ -545,7 +546,7 @@ export default function InternshipDetail() {
                 {!is4W && (
                   <>
                     <div className="relative">
-                      <div className="absolute -left-[31px] top-0.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                      <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
                         <div className="h-2 w-2 rounded-full bg-primary" />
                       </div>
                       <h4 className="font-bold text-textPrimary text-base">Month 2-3: Advanced Features, Integrations & Live Classes</h4>
@@ -556,7 +557,7 @@ export default function InternshipDetail() {
 
                     {is6M && (
                       <div className="relative">
-                        <div className="absolute -left-[31px] top-0.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                        <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
                           <div className="h-2 w-2 rounded-full bg-primary" />
                         </div>
                         <h4 className="font-bold text-textPrimary text-base">Month 4-6: Production Capstones & Direct Placement referrals</h4>
@@ -649,14 +650,14 @@ export default function InternshipDetail() {
               </div>
 
               {/* Mobile Carousel / Cards scroll */}
-              <div className="md:hidden flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
+              <div className="md:hidden flex gap-4 overflow-x-auto pb-4 px-4 -mx-4 scrollbar-thin snap-x snap-mandatory">
                 {plans.map((p) => (
                   <div
                     key={p.key}
                     onClick={() => handleKeySelect(p.key)}
-                    className={`flex-shrink-0 w-[270px] rounded-[16px] border p-5 space-y-4 bg-[color:var(--card)] ${
+                    className={`flex-shrink-0 w-[270px] rounded-[16px] border p-5 space-y-4 bg-[color:var(--card)] snap-center ${
                       selectedKey === p.key
-                        ? "border-primary bg-primary/5"
+                        ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/20"
                         : "border-[color:var(--border)] bg-[color:var(--card-elevated)]"
                     }`}
                   >
@@ -815,7 +816,7 @@ export default function InternshipDetail() {
       {/* Checkout / Enrollment Flow Modal */}
       {showApplyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="relative w-full max-w-lg rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 shadow-2xl space-y-6 my-8">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 shadow-2xl space-y-6 my-8">
             
             {/* Close Button */}
             {!submitting && (
@@ -823,7 +824,7 @@ export default function InternshipDetail() {
                 onClick={() => setShowApplyModal(false)}
                 className="absolute right-4 top-4 p-2 text-[color:var(--text-muted)] hover:text-textPrimary transition-colors"
               >
-                <ChevronDown className="h-5 w-5 rotate-90" />
+                <X className="h-5 w-5" />
               </button>
             )}
 

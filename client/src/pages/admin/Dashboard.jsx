@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { BarChart3, FileCheck2, TrendingUp, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Area,
   AreaChart,
@@ -17,75 +18,50 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
-  const [applications, setApplications] = useState([]);
-  const [internships, setInternships] = useState([]);
-  const [inquiries, setInquiries] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
-  const [certificates, setCertificates] = useState([]);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [apps, ints, leads, submitted, issued] = await Promise.all([
-          api.get("/applications/admin", { params: { view: "summary" } }),
-          api.get("/internships/admin"),
-          api.get("/service-inquiries/admin"),
-          api.get("/submissions/admin"),
-          api.get("/certificates/admin")
-        ]);
-
-        setApplications(apps.data.applications || []);
-        setInternships(ints.data.internships || []);
-        setInquiries(leads.data.inquiries || []);
-        setSubmissions(submitted.data.submissions || []);
-        setCertificates(issued.data.certificates || []);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    load();
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["adminDashboardStats"],
+    queryFn: async () => {
+      const response = await api.get("/analytics/admin-dashboard");
+      return response.data;
+    }
+  });
 
   const stats = useMemo(
     () => [
       {
         label: "Total Applications",
-        value: applications.length,
+        value: data?.totalApplications || 0,
         icon: Users,
         color: "from-amber-500 to-amber-600",
         trend: "+12%"
       },
       {
         label: "Selected Candidates",
-        value: applications.filter((a) => a.status === "Selected").length,
+        value: data?.selectedCandidates || 0,
         icon: TrendingUp,
         color: "from-emerald-500 to-emerald-600",
         trend: "+8%"
       },
       {
         label: "Pending Review",
-        value: submissions.filter((s) => s.reviewStatus === "Submitted").length,
+        value: data?.pendingReview || 0,
         icon: BarChart3,
         color: "from-amber-500 to-amber-600",
-        trend: "5 items"
+        trend: `${data?.pendingReview || 0} items`
       },
       {
         label: "Certificates Issued",
-        value: certificates.length,
+        value: data?.certificatesIssued || 0,
         icon: FileCheck2,
         color: "from-purple-500 to-purple-600",
         trend: "+3 new"
       }
     ],
-    [applications, submissions, certificates]
+    [data]
   );
 
   const applicationStatusData = useMemo(() => {
-    const counts = applications.reduce((acc, application) => {
-      acc[application.status] = (acc[application.status] || 0) + 1;
-      return acc;
-    }, {});
+    const counts = data?.statusCounts || {};
 
     return [
       "Applied",
@@ -102,16 +78,33 @@ export default function AdminDashboard() {
         total: counts[status] || 0
       }))
       .filter((item) => item.total > 0);
-  }, [applications]);
+  }, [data]);
 
-  const recentApplications = applications.slice(0, 8);
+  const recentApplications = data?.recentApplications || [];
   const submissionStatus = useMemo(() => {
     return [
-      { status: "Pending Review", count: submissions.filter((s) => s.reviewStatus === "Submitted").length },
-      { status: "Reviewed", count: submissions.filter((s) => s.reviewStatus === "Reviewed").length },
-      { status: "Completed", count: submissions.filter((s) => s.reviewStatus === "Completed").length }
+      { status: "Pending Review", count: data?.pendingReview || 0 },
+      { status: "Reviewed", count: data?.reviewedSubmissions || 0 },
+      { status: "Completed", count: data?.completedSubmissions || 0 }
     ];
-  }, [submissions]);
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-pulse">
+        <div className="h-12 bg-black/5 dark:bg-white/5 rounded-xl w-1/4 mt-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 bg-black/5 dark:bg-white/5 rounded-2xl border border-[color:var(--border)]" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-2 h-96 bg-black/5 dark:bg-white/5 rounded-2xl border border-[color:var(--border)]" />
+          <div className="h-96 bg-black/5 dark:bg-white/5 rounded-2xl border border-[color:var(--border)]" />
+        </div>
+      </div>
+    );
+  }
 
   const panelClass =
     "overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] backdrop-blur-sm";

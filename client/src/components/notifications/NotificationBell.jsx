@@ -1,31 +1,28 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, CheckCheck, Inbox, MessageSquare } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 
 export default function NotificationBell() {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const fetchNotifications = async () => {
-    try {
-      const { data } = await api.get("/notifications");
-      setNotifications(data.notifications || []);
-      setUnreadCount(data.unreadCount || 0);
-    } catch (err) {
-      console.error("Failed to fetch notifications:", err);
-    }
-  };
+  const { data, refetch } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const response = await api.get("/notifications");
+      return response.data;
+    },
+    refetchInterval: 2 * 60 * 1000 // Poll for notifications every 2 minutes
+  });
+
+  const notifications = data?.notifications || [];
+  const unreadCount = data?.unreadCount || 0;
 
   useEffect(() => {
-    fetchNotifications();
-
-    // Poll for notifications every 2 minutes
-    const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
-
     // Close dropdown on click outside
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -33,9 +30,7 @@ export default function NotificationBell() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
-      clearInterval(interval);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
@@ -43,36 +38,82 @@ export default function NotificationBell() {
   const handleToggle = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
-      fetchNotifications();
+      refetch();
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
+  const markAllReadMutation = useMutation({
+    mutationFn: async () => {
       await api.post("/notifications/mark-read");
-      setUnreadCount(0);
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    } catch (err) {
-      console.error("Failed to mark read:", err);
-    }
-  };
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      const previousData = queryClient.getQueryData(["notifications"]);
 
-  const handleNotificationClick = async (notification) => {
-    try {
+      queryClient.setQueryData(["notifications"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          unreadCount: 0,
+          notifications: old.notifications.map((n) => ({ ...n, isRead: true }))
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(["notifications"], context.previousData);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }
+  });
+
+  const clickNotificationMutation = useMutation({
+    mutationFn: async (notification) => {
       if (!notification.isRead) {
         await api.post("/notifications/mark-read", { id: notification._id });
-        setUnreadCount((c) => Math.max(0, c - 1));
       }
-      setIsOpen(false);
-      if (notification.link) {
-        if (notification.link.startsWith("http")) {
-          window.open(notification.link, "_blank");
-        } else {
-          navigate(notification.link);
-        }
+    },
+    onMutate: async (notification) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      const previousData = queryClient.getQueryData(["notifications"]);
+
+      queryClient.setQueryData(["notifications"], (old) => {
+        if (!old) return old;
+        const wasUnread = !notification.isRead;
+        return {
+          ...old,
+          unreadCount: wasUnread ? Math.max(0, old.unreadCount - 1) : old.unreadCount,
+          notifications: old.notifications.map((n) =>
+            n._id === notification._id ? { ...n, isRead: true } : n
+          )
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(["notifications"], context.previousData);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }
+  });
+
+  const handleMarkAllRead = () => {
+    markAllReadMutation.mutate();
+  };
+
+  const handleNotificationClick = (notification) => {
+    clickNotificationMutation.mutate(notification);
+    setIsOpen(false);
+    if (notification.link) {
+      if (notification.link.startsWith("http")) {
+        window.open(notification.link, "_blank");
+      } else {
+        navigate(notification.link);
       }
-    } catch (err) {
-      console.error("Failed to process notification click:", err);
     }
   };
 

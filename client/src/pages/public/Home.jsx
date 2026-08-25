@@ -67,7 +67,7 @@ const workflowSteps = [
 const programCards = [
   {
     duration: "4 Weeks",
-    billing: "FREE",
+    billing: "Paid",
     summary: "Basic learning, task execution, and verified certificate support.",
     points: [
       "Basic learning roadmap",

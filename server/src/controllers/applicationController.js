@@ -1,4 +1,5 @@
 import { Application } from "../models/Application.js";
+import { User } from "../models/User.js";
 import { Internship } from "../models/Internship.js";
 import { PaymentAttempt } from "../models/PaymentAttempt.js";
 import { Submission } from "../models/Submission.js";
@@ -702,59 +703,172 @@ export const listMyApplications = async (req, res, next) => {
 
 export const adminListApplications = async (req, res, next) => {
   try {
-    const { status, search } = req.query;
-    const view = normalizeView(req.query.view);
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const search = req.query.search;
+    const status = req.query.status;
+    const workflow = req.query.workflow;
+
     const query = {};
+
+    let userIds = null;
+    let internshipIds = null;
+
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), "i");
+      const [matchedUsers, matchedInternships] = await Promise.all([
+        User.find({
+          $or: [
+            { fullName: searchRegex },
+            { email: searchRegex },
+            { "profile.phone": searchRegex },
+            { "profile.whatsapp": searchRegex },
+            { "profile.city": searchRegex },
+            { "profile.state": searchRegex },
+            { "profile.college": searchRegex },
+            { "profile.degree": searchRegex }
+          ]
+        }).select("_id").lean(),
+        Internship.find({
+          $or: [
+            { title: searchRegex },
+            { role: searchRegex }
+          ]
+        }).select("_id").lean()
+      ]);
+
+      userIds = matchedUsers.map(u => u._id);
+      internshipIds = matchedInternships.map(i => i._id);
+    }
 
     if (status) {
       query.status = status;
+    } else if (workflow) {
+      if (workflow === "completed") {
+        query.status = { $in: ["Completed", "Rejected"] };
+      } else if (workflow === "inprogress") {
+        query.status = { $in: ["Selected", "In Progress", "Submission Pending"] };
+      } else if (workflow === "review") {
+        query.$or = [
+          { status: { $in: ["Submitted", "Revision Requested"] } },
+          { "payment.status": "Pending" }
+        ];
+      } else if (workflow === "new") {
+        query.status = { $nin: ["Completed", "Rejected", "Selected", "In Progress", "Submission Pending", "Submitted", "Revision Requested"] };
+        query["payment.status"] = { $ne: "Pending" };
+      }
     }
 
-    const applications = await Application.find(query)
-      .select(APPLICATION_BASE_SELECT)
-      .populate({ path: "user", select: ADMIN_USER_SELECT })
-      .populate({ path: "internship", select: INTERNSHIP_SELECT })
-      .populate({ path: "certificate", select: CERTIFICATE_SELECT })
-      .sort({ createdAt: -1 });
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), "i");
+      const searchOrs = [
+        { internalNotes: searchRegex },
+        { durationKey: searchRegex },
+        { status: searchRegex },
+        { "referral.code": searchRegex },
+        { "referral.ownerName": searchRegex }
+      ];
+
+      if (userIds && userIds.length > 0) {
+        searchOrs.push({ user: { $in: userIds } });
+      }
+      if (internshipIds && internshipIds.length > 0) {
+        searchOrs.push({ internship: { $in: internshipIds } });
+      }
+
+      if (query.$or) {
+        query.$and = [
+          { $or: query.$or },
+          { $or: searchOrs }
+        ];
+        delete query.$or;
+      } else {
+        query.$or = searchOrs;
+      }
+    }
+
+    // Build the search counts base query
+    const countBaseQuery = {};
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), "i");
+      const searchOrs = [
+        { internalNotes: searchRegex },
+        { durationKey: searchRegex },
+        { status: searchRegex },
+        { "referral.code": searchRegex },
+        { "referral.ownerName": searchRegex }
+      ];
+      if (userIds && userIds.length > 0) {
+        searchOrs.push({ user: { $in: userIds } });
+      }
+      if (internshipIds && internshipIds.length > 0) {
+        searchOrs.push({ internship: { $in: internshipIds } });
+      }
+      countBaseQuery.$or = searchOrs;
+    }
+
+    const [
+      newCount,
+      reviewCount,
+      inprogressCount,
+      completedCount,
+      applications
+    ] = await Promise.all([
+      Application.countDocuments({
+        ...countBaseQuery,
+        status: { $nin: ["Completed", "Rejected", "Selected", "In Progress", "Submission Pending", "Submitted", "Revision Requested"] },
+        "payment.status": { $ne: "Pending" }
+      }),
+      Application.countDocuments({
+        ...countBaseQuery,
+        $or: [
+          { status: { $in: ["Submitted", "Revision Requested"] } },
+          { "payment.status": "Pending" }
+        ]
+      }),
+      Application.countDocuments({
+        ...countBaseQuery,
+        status: { $in: ["Selected", "In Progress", "Submission Pending"] }
+      }),
+      Application.countDocuments({
+        ...countBaseQuery,
+        status: { $in: ["Completed", "Rejected"] }
+      }),
+      Application.find(query)
+        .select(APPLICATION_BASE_SELECT)
+        .populate({ path: "user", select: ADMIN_USER_SELECT })
+        .populate({ path: "internship", select: INTERNSHIP_SELECT })
+        .populate({ path: "certificate", select: CERTIFICATE_SELECT })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+    ]);
 
     await syncApplicationsForListing(applications);
 
-    const normalizedSearch = typeof search === "string" ? search.trim().toLowerCase() : "";
-
-    const filteredApplications = normalizedSearch
-      ? applications.filter((application) => {
-          const haystack = [
-            application.internalNotes,
-            application.user?.fullName,
-            application.user?.email,
-            application.user?.profile?.phone,
-            application.user?.profile?.whatsapp,
-            application.user?.profile?.city,
-            application.user?.profile?.state,
-            application.user?.profile?.college,
-            application.user?.profile?.degree,
-            ...(application.user?.profile?.skills || []),
-            ...(application.user?.profile?.preferredRoles || []),
-            application.internship?.title,
-            application.internship?.role,
-            application.referral?.code,
-            application.referral?.ownerName,
-            application.durationKey,
-            application.status
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-          return haystack.includes(normalizedSearch);
-        })
-      : applications;
+    let total = 0;
+    if (workflow === "completed") total = completedCount;
+    else if (workflow === "inprogress") total = inprogressCount;
+    else if (workflow === "review") total = reviewCount;
+    else if (workflow === "new") total = newCount;
+    else total = newCount + reviewCount + inprogressCount + completedCount;
 
     res.json({
-      applications: filteredApplications.map((application) =>
+      applications: applications.map((application) =>
         serializeApplicationForResponse(application, req)
       ),
-      ...(view === "detail" ? { groups: buildApplicationGroups(filteredApplications) } : {})
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      },
+      workflowCounts: {
+        new: newCount,
+        review: reviewCount,
+        inprogress: inprogressCount,
+        completed: completedCount
+      }
     });
   } catch (err) {
     next(err);

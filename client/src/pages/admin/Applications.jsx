@@ -120,9 +120,12 @@ const getEndDateHint = (value) => {
 const getExternalLinkProps = (href) =>
   /^https?:\/\//i.test(href || "") ? { target: "_blank", rel: "noreferrer" } : {};
 
+import { useQuery } from "@tanstack/react-query";
+
 export default function AdminApplications() {
-  const [applications, setApplications] = useState([]);
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
   const [reminderId, setReminderId] = useState(null);
   const [notesById, setNotesById] = useState({});
@@ -130,44 +133,62 @@ export default function AdminApplications() {
   const [activeRoleKey, setActiveRoleKey] = useState("all");
   const [detailApplicationId, setDetailApplicationId] = useState(null);
 
-  const load = async () => {
-    try {
-      const { data } = await api.get("/applications/admin", {
-        params: search ? { search } : {}
-      });
-      const nextApplications = data.applications || [];
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-      setApplications(nextApplications);
-      setNotesById(
-        Object.fromEntries(
-          nextApplications.map((application) => [
-            application._id,
-            application.internalNotes || ""
-          ])
-        )
-      );
-    } catch (error) {
-      console.error(error);
-      toast.error(getApiErrorMessage(error, "Could not load applications."));
+  const { data, isLoading, isFetching, refetch } = useQuery({
+    queryKey: ["adminApplications", activeWorkflowKey, debouncedSearch, page],
+    queryFn: async () => {
+      const response = await api.get("/applications/admin", {
+        params: {
+          workflow: activeWorkflowKey,
+          search: debouncedSearch,
+          page,
+          limit: 10
+        }
+      });
+      return response.data;
     }
+  });
+
+  const load = () => {
+    refetch();
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    if (data?.applications) {
+      setNotesById((prev) => {
+        const next = { ...prev };
+        data.applications.forEach((app) => {
+          if (next[app._id] === undefined) {
+            next[app._id] = app.internalNotes || "";
+          }
+        });
+        return next;
+      });
+    }
+  }, [data]);
+
+  const workflowCounts = data?.workflowCounts || { new: 0, review: 0, inprogress: 0, completed: 0 };
 
   const workflowTabs = useMemo(
     () =>
       WORKFLOW_TABS.map((tab) => ({
         ...tab,
-        count: applications.filter((application) => getWorkflowBucket(application) === tab.key).length
+        count: workflowCounts[tab.key] || 0
       })),
-    [applications]
+    [workflowCounts]
   );
 
   const workflowApplications = useMemo(
-    () => applications.filter((application) => getWorkflowBucket(application) === activeWorkflowKey),
-    [activeWorkflowKey, applications]
+    () => data?.applications || [],
+    [data]
   );
 
   const roleOptions = useMemo(() => {
@@ -207,8 +228,8 @@ export default function AdminApplications() {
   );
 
   const detailApplication = useMemo(
-    () => applications.find((application) => application._id === detailApplicationId) || null,
-    [applications, detailApplicationId]
+    () => (data?.applications || []).find((application) => application._id === detailApplicationId) || null,
+    [data, detailApplicationId]
   );
 
   const handleStatusChange = async (application, status) => {
@@ -318,6 +339,7 @@ export default function AdminApplications() {
               onClick={() => {
                 setActiveWorkflowKey(tab.key);
                 setActiveRoleKey("all");
+                setPage(1);
               }}
               className={`rounded-2xl px-4 py-3 text-left transition ${
                 activeWorkflowKey === tab.key
@@ -343,7 +365,7 @@ export default function AdminApplications() {
                 Role filter
               </p>
               <CardTitle className="mt-1 text-base">
-                {workflowApplications.length} application{workflowApplications.length === 1 ? "" : "s"} in{" "}
+                {data?.pagination?.total || 0} application{data?.pagination?.total === 1 ? "" : "s"} in{" "}
                 {WORKFLOW_TABS.find((tab) => tab.key === activeWorkflowKey)?.label}
               </CardTitle>
             </div>
@@ -364,7 +386,7 @@ export default function AdminApplications() {
               <RoleFilterButton
                 active={activeRoleKey === "all"}
                 label="All roles"
-                count={workflowApplications.length}
+                count={data?.pagination?.total || 0}
                 onClick={() => setActiveRoleKey("all")}
               />
               {roleOptions.map((role) => (
@@ -382,7 +404,13 @@ export default function AdminApplications() {
       </Card>
 
       <div className="grid gap-3">
-        {visibleApplications.length === 0 ? (
+        {isLoading ? (
+          [1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="h-24 bg-black/5 dark:bg-white/5" />
+            </Card>
+          ))
+        ) : visibleApplications.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
               No applications found for the selected workflow and role.
@@ -400,6 +428,35 @@ export default function AdminApplications() {
           ))
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {data?.pagination && data.pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-slate-200 dark:border-white/8 pt-4 mt-6">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            Showing Page <span className="font-semibold text-slate-900 dark:text-slate-100">{data.pagination.page}</span> of{" "}
+            <span className="font-semibold text-slate-900 dark:text-slate-100">{data.pagination.totalPages}</span> (Total{" "}
+            <span className="font-semibold text-slate-900 dark:text-slate-100">{data.pagination.total}</span> items)
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === data.pagination.totalPages}
+              onClick={() => setPage((prev) => Math.min(prev + 1, data.pagination.totalPages))}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       <ApplicationDetailModal
         application={detailApplication}

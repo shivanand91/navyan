@@ -1,7 +1,11 @@
 import express from "express";
 import { SiteVisitor } from "../models/SiteVisitor.js";
+import { getAdminDashboardStats } from "../controllers/analyticsController.js";
+import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.get("/admin-dashboard", protect, requireAdmin, getAdminDashboardStats);
 
 const buildPublicStats = async () => {
   const [uniqueVisitors, totals] = await Promise.all([

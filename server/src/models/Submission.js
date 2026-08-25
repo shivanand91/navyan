@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const projectItemSchema = new mongoose.Schema(
@@ -39,5 +40,7 @@ const submissionSchema = new mongoose.Schema(
 );
 
 submissionSchema.index({ application: 1, attemptNumber: 1 }, { unique: true });
+submissionSchema.index({ reviewStatus: 1 });
+submissionSchema.index({ application: 1 });
 
 export const Submission = mongoose.model("Submission", submissionSchema);

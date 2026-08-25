@@ -7,6 +7,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import path from "path";
+import compression from "compression";
 
 import { connectDB } from "./config/db.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
@@ -104,6 +105,7 @@ const trustProxySetting = (() => {
 app.set("trust proxy", trustProxySetting);
 
 // Security & core middleware
+app.use(compression());
 app.use(helmet());
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
