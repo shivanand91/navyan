@@ -181,6 +181,26 @@ export default function Applications() {
                         </div>
                       </div>
                     )}
+                    {app.extension?.granted && (
+                      <div className="mt-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-[11px] text-emerald-700 dark:text-emerald-300">
+                        🎉 <strong>Extension Granted:</strong> Your internship deadline has been extended to <strong>{new Date(app.extension.extendedEndDate).toLocaleDateString("en-IN")}</strong>. Reason: <em>{app.extension.reason}</em>
+                      </div>
+                    )}
+                    {!app.extension?.granted && app.timeline?.daysLeft !== undefined && app.timeline.daysLeft <= 3 && app.timeline.daysLeft > 0 && app.projectSubmissionStatus !== "Submitted" && (
+                      <div className="mt-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3 text-[11px] text-amber-700 dark:text-amber-300 animate-pulse">
+                        ⏰ <strong>Urgent:</strong> Only {app.timeline.daysLeft} days left to submit your required 3 projects to avoid automatic rejection.
+                      </div>
+                    )}
+                    {app.timeline?.daysLeft !== undefined && app.timeline.daysLeft <= 0 && app.projectSubmissionStatus !== "Submitted" && app.status !== "Completed" && app.status !== "Rejected" && (
+                      <div className="mt-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] text-rose-700 dark:text-rose-300">
+                        ⚠️ <strong>Submission Overdue:</strong> Your deadline has passed. Please submit your project immediately to avoid automatic rejection.
+                      </div>
+                    )}
+                    {app.status === "Rejected" && app.rejectionReason && (
+                      <div className="mt-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] text-rose-700 dark:text-rose-300">
+                        🚫 <strong>Internship Closed:</strong> {app.rejectionReason}
+                      </div>
+                    )}
                   </div>
                   <StatusBadge status={app.status} />
                 </div>

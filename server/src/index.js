@@ -25,6 +25,9 @@ import referralRoutes from "./routes/referralRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import alertRoutes from "./routes/alertRoutes.js";
 import hackathonRoutes from "./routes/hackathonRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import automationRoutes from "./routes/automationRoutes.js";
+import { startAutomationWorker } from "./services/automationWorker.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
@@ -139,6 +142,8 @@ app.use("/api/referrals", referralRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/hackathons", hackathonRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/automation", automationRoutes);
 
 // 404 + errors
 app.use(notFound);
@@ -150,6 +155,7 @@ const HOST = process.env.HOST || (isProduction ? "0.0.0.0" : "127.0.0.1");
 connectDB() // trigger restart
   .then(async () => {
     await runDatabaseMaintenance();
+    startAutomationWorker();
 
     app.listen(PORT, HOST, () => {
       console.log(`Navyan API running on http://${HOST}:${PORT}`);

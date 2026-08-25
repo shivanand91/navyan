@@ -13,7 +13,8 @@ import {
   Share2,
   ShieldCheck,
   Users2,
-  Trophy
+  Trophy,
+  Clock
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ const links = [
   { to: "/admin/certificates", label: "Certificates", icon: BadgeCheck, caption: "Registry" },
   { to: "/admin/service-inquiries", label: "Service Leads", icon: Layers3, caption: "Pipeline" },
   { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" },
-  { to: "/admin/hackathons", label: "Hackathons", icon: Trophy, caption: "Events" }
+  { to: "/admin/hackathons", label: "Hackathons", icon: Trophy, caption: "Events" },
+  { to: "/admin/automation", label: "Automation", icon: Clock, caption: "Lifecycle" }
 ];
 
 export function AdminLayout() {

@@ -85,7 +85,29 @@ const applicationSchema = new mongoose.Schema(
     certificate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Certificate"
-    }
+    },
+    projectSubmissionStatus: {
+      type: String,
+      enum: ["Pending", "Submitted"],
+      default: "Pending",
+      index: true
+    },
+    projectSubmittedAt: Date,
+    projectSubmission: {
+      githubUrl: String,
+      demoUrl: String,
+      description: String
+    },
+    rejectionReason: String,
+    rejectedAt: Date,
+    extension: {
+      granted: { type: Boolean, default: false },
+      extendedEndDate: Date,
+      reason: String,
+      grantedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      grantedAt: Date
+    },
+    lastActivityAt: { type: Date, default: Date.now }
   },
   { timestamps: true }
 );

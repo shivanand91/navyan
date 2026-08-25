@@ -16,6 +16,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import BrandLogo from "@/components/BrandLogo";
 import { CommandPalette } from "@/components/premium/CommandPalette";
 import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
+import NotificationBell from "@/components/notifications/NotificationBell";
+import PushPermissionBanner from "@/components/notifications/PushPermissionBanner";
 
 const links = [
   { to: "/student", label: "Dashboard", icon: LayoutDashboard, caption: "Overview" },
@@ -130,6 +132,7 @@ export function StudentLayout() {
               <div className="hidden items-center gap-2 md:flex">
                 <CommandPalette items={paletteItems} title="Jump to anything" />
                 <ThemeToggle variant="outline" />
+                <NotificationBell />
                 <Button variant="icon" size="icon">
                   <Search className="h-4 w-4" />
                 </Button>
@@ -140,6 +143,7 @@ export function StudentLayout() {
           <main className="navyan-panel min-h-[calc(100vh-7rem)] px-4 py-5 md:px-6 md:py-6">
             <Outlet />
           </main>
+          <PushPermissionBanner user={user} />
         </div>
       </div>
     </div>

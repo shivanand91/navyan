@@ -3,6 +3,7 @@ import { Submission } from "../models/Submission.js";
 import { ensureCertificateForApplication } from "../services/certificateService.js";
 import { sendApplicationStatusEmail } from "../services/emailService.js";
 import { syncApplicationLifecycle } from "../services/applicationLifecycleService.js";
+import { scheduleInternshipLifecycleEvents } from "../services/automationScheduler.js";
 
 const SUBMISSION_ALLOWED_STATUSES = [
   "Selected",
@@ -139,7 +140,12 @@ export const submitProject = async (req, res, next) => {
 
     application.submission = submission._id;
     application.status = "Submitted";
+    application.projectSubmissionStatus = "Submitted";
+    application.projectSubmittedAt = new Date();
     await application.save();
+
+    // Re-schedule/cancel pending reminders since they submitted
+    await scheduleInternshipLifecycleEvents(application._id);
 
     res.status(201).json({ submission });
   } catch (err) {
@@ -208,6 +214,9 @@ export const adminReviewSubmission = async (req, res, next) => {
 
     await submission.save();
     await application.save();
+    
+    // Sync automation events with new status (e.g. if Completed or Rejected)
+    await scheduleInternshipLifecycleEvents(application._id);
     await sendApplicationStatusEmail({
       user: application.user,
       internship: application.internship,

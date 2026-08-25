@@ -19,6 +19,7 @@ import {
   findActiveReferralCodeByValue,
   incrementReferralUsage
 } from "./referralController.js";
+import { scheduleInternshipLifecycleEvents } from "../services/automationScheduler.js";
 import {
   sendApplicationReceivedEmail,
   sendApplicationStatusEmail,
@@ -851,6 +852,9 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     await application.save();
+
+    // Trigger/Sync internship lifecycle automation events
+    await scheduleInternshipLifecycleEvents(application._id);
 
     if (application.status !== prevStatus) {
       try {
