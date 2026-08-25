@@ -77,10 +77,10 @@ router.get("/me", protect, async (req, res, next) => {
 const seedMockCertificates = async () => {
   try {
     const mockUsersData = [
-      { fullName: "Aayushi Singh", email: "aayushi@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/aayushisingh" } },
-      { fullName: "Rahul Verma", email: "rahul@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/rahulverma" } },
-      { fullName: "Nikita Sharma", email: "nikita@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/nikitasharma" } },
-      { fullName: "Ankit Patel", email: "ankit@example.com", passwordHash: "dummy", profile: { linkedinUrl: "https://linkedin.com/in/ankitpatel" } }
+      { fullName: "Aayushi Singh", email: "aayushi@example.com", passwordHash: "dummy", profile: { fullName: "Aayushi Singh", email: "aayushi@example.com", linkedinUrl: "https://linkedin.com/in/aayushisingh" } },
+      { fullName: "Rahul Verma", email: "rahul@example.com", passwordHash: "dummy", profile: { fullName: "Rahul Verma", email: "rahul@example.com", linkedinUrl: "https://linkedin.com/in/rahulverma" } },
+      { fullName: "Nikita Sharma", email: "nikita@example.com", passwordHash: "dummy", profile: { fullName: "Nikita Sharma", email: "nikita@example.com", linkedinUrl: "https://linkedin.com/in/nikitasharma" } },
+      { fullName: "Ankit Patel", email: "ankit@example.com", passwordHash: "dummy", profile: { fullName: "Ankit Patel", email: "ankit@example.com", linkedinUrl: "https://linkedin.com/in/ankitpatel" } }
     ];
 
     const users = [];
@@ -99,9 +99,177 @@ const seedMockCertificates = async () => {
     }
 
     const mockInternshipsData = [
-      { title: "Web Development", slug: "web-development", shortDescription: "Learn HTML/CSS, React, Node.js", role: "Web Developer", isPublished: true },
-      { title: "Data Science", slug: "data-science", shortDescription: "Learn Python, Pandas, Machine Learning", role: "Data Scientist", isPublished: true },
-      { title: "UI/UX Design", slug: "ui-ux-design", shortDescription: "Learn Figma, User Research, Wireframing", role: "UI/UX Designer", isPublished: true }
+      {
+        title: "Web Development",
+        slug: "web-development",
+        shortDescription: "Learn HTML/CSS, React, Node.js",
+        role: "Web Developer",
+        isPublished: true,
+        durations: [
+          {
+            key: "4-weeks",
+            label: "4 weeks",
+            isPaid: true,
+            price: 49,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"],
+            rewards: ["Performance Recognition"],
+            description: "Introductory developer track",
+            mentorship: "Weekly group Q&A",
+            schedule: "Self-paced",
+            projects: ["3 Practice projects"],
+            tasks: ["Weekly submissions"],
+            certificate: "Digital Certificate",
+            swag: "Digital Certificate only",
+            eligibility: "Open to all students"
+          },
+          {
+            key: "3-months",
+            label: "3 months",
+            isPaid: true,
+            price: 2499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Stipend Reward", "Navyan Swag Box"],
+            rewards: ["Top 3 Performers: ₹5,000"],
+            description: "Deep-dive professional developer track",
+            mentorship: "1-on-1 Project reviews",
+            schedule: "Weekend Live Classes",
+            projects: ["3 Portfolio projects"],
+            tasks: ["Advanced task sets"],
+            certificate: "Premium Certificate",
+            swag: "Navyan Swag Box (T-shirt, Sticker)",
+            eligibility: "Basic coding knowledge"
+          },
+          {
+            key: "6-months",
+            label: "6 months",
+            isPaid: true,
+            price: 4499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Dedicated Mentor", "Elite Swag Hoodie Box"],
+            rewards: ["Top Performer: ₹8,000"],
+            description: "Production grade enterprise developer track",
+            mentorship: "Dedicated Slack Coach & reviews",
+            schedule: "Weekend Live Classes & Roadmaps",
+            projects: ["3 Production capstone projects"],
+            tasks: ["Enterprise architecture tasks"],
+            certificate: "Elite Certificate",
+            swag: "Navyan Elite Swag (Hoodie, T-Shirt, Swag Kit)",
+            eligibility: "Intermediate programming skills"
+          }
+        ]
+      },
+      {
+        title: "Data Science",
+        slug: "data-science",
+        shortDescription: "Learn Python, Pandas, Machine Learning",
+        role: "Data Scientist",
+        isPublished: true,
+        durations: [
+          {
+            key: "4-weeks",
+            label: "4 weeks",
+            isPaid: true,
+            price: 49,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"],
+            rewards: ["Performance Recognition"],
+            description: "Introductory data track",
+            mentorship: "Weekly group Q&A",
+            schedule: "Self-paced",
+            projects: ["3 Practice projects"],
+            tasks: ["Weekly submissions"],
+            certificate: "Digital Certificate",
+            swag: "Digital Certificate only",
+            eligibility: "Open to all students"
+          },
+          {
+            key: "3-months",
+            label: "3 months",
+            isPaid: true,
+            price: 2499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Stipend Reward", "Navyan Swag Box"],
+            rewards: ["Top 3 Performers: ₹5,000"],
+            description: "Deep-dive professional data track",
+            mentorship: "1-on-1 Project reviews",
+            schedule: "Weekend Live Classes",
+            projects: ["3 Data science projects"],
+            tasks: ["Advanced task sets"],
+            certificate: "Premium Certificate",
+            swag: "Navyan Swag Box (T-shirt, Sticker)",
+            eligibility: "Basic math & python"
+          },
+          {
+            key: "6-months",
+            label: "6 months",
+            isPaid: true,
+            price: 4499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Dedicated Mentor", "Elite Swag Hoodie Box"],
+            rewards: ["Top Performer: ₹8,000"],
+            description: "Production grade enterprise data track",
+            mentorship: "Dedicated Slack Coach & reviews",
+            schedule: "Weekend Live Classes & Roadmaps",
+            projects: ["3 Production machine learning projects"],
+            tasks: ["Enterprise architecture tasks"],
+            certificate: "Elite Certificate",
+            swag: "Navyan Elite Swag (Hoodie, T-Shirt, Swag Kit)",
+            eligibility: "Intermediate math & data science skills"
+          }
+        ]
+      },
+      {
+        title: "UI/UX Design",
+        slug: "ui-ux-design",
+        shortDescription: "Learn Figma, User Research, Wireframing",
+        role: "UI/UX Designer",
+        isPublished: true,
+        durations: [
+          {
+            key: "4-weeks",
+            label: "4 weeks",
+            isPaid: true,
+            price: 49,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"],
+            rewards: ["Performance Recognition"],
+            description: "Introductory UI/UX track",
+            mentorship: "Weekly group Q&A",
+            schedule: "Self-paced",
+            projects: ["3 Practice projects"],
+            tasks: ["Weekly submissions"],
+            certificate: "Digital Certificate",
+            swag: "Digital Certificate only",
+            eligibility: "Open to all students"
+          },
+          {
+            key: "3-months",
+            label: "3 months",
+            isPaid: true,
+            price: 2499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Stipend Reward", "Navyan Swag Box"],
+            rewards: ["Top 3 Performers: ₹5,000"],
+            description: "Deep-dive professional UI/UX track",
+            mentorship: "1-on-1 Project reviews",
+            schedule: "Weekend Live Classes",
+            projects: ["3 Case studies"],
+            tasks: ["Advanced design tasks"],
+            certificate: "Premium Certificate",
+            swag: "Navyan Swag Box (T-shirt, Sticker)",
+            eligibility: "Basic creative skills"
+          },
+          {
+            key: "6-months",
+            label: "6 months",
+            isPaid: true,
+            price: 4499,
+            benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Dedicated Mentor", "Elite Swag Hoodie Box"],
+            rewards: ["Top Performer: ₹8,000"],
+            description: "Production grade enterprise UI/UX track",
+            mentorship: "Dedicated Slack Coach & reviews",
+            schedule: "Weekend Live Classes & Roadmaps",
+            projects: ["3 Complete product designs"],
+            tasks: ["Enterprise product design challenges"],
+            certificate: "Elite Certificate",
+            swag: "Navyan Elite Swag (Hoodie, T-Shirt, Swag Kit)",
+            eligibility: "Intermediate UI/UX design skills"
+          }
+        ]
+      }
     ];
 
     const internships = [];

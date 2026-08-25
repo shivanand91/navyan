@@ -103,7 +103,14 @@ export default function InternshipDetail() {
   // Get currently selected duration options
   const selectedDuration = useMemo(() => {
     if (!internship || !selectedKey) return null;
-    return internship.durations?.find((d) => d.key === selectedKey) || internship.durations?.[0];
+    const durations = internship.durations && internship.durations.length > 0
+      ? internship.durations
+      : [
+          { key: "4-weeks", label: "4 weeks", isPaid: true, price: 49, benefits: ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"] },
+          { key: "3-months", label: "3 months", isPaid: true, price: 2499, benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Stipend Reward", "Navyan Swag Box"] },
+          { key: "6-months", label: "6 months", isPaid: true, price: 4499, benefits: ["Workspace Access", "3 Real-world Projects", "Live Classes", "Dedicated Mentor", "Elite Swag Hoodie Box"] }
+        ];
+    return durations.find((d) => d.key === selectedKey) || durations[0];
   }, [internship, selectedKey]);
 
   // Get dynamic reward description text
@@ -121,7 +128,14 @@ export default function InternshipDetail() {
   // Construct plans list for dynamic comparison table
   const plans = useMemo(() => {
     if (!internship) return [];
-    return (internship.durations || []).map((d) => {
+    const durationsList = internship.durations && internship.durations.length > 0
+      ? internship.durations
+      : [
+          { key: "4-weeks", label: "4 weeks", isPaid: true, price: 49 },
+          { key: "3-months", label: "3 months", isPaid: true, price: 2499 },
+          { key: "6-months", label: "6 months", isPaid: true, price: 4499 }
+        ];
+    return durationsList.map((d) => {
       const is4W = d.key === "4-weeks";
       const is3M = d.key === "3-months";
       const is6M = d.key === "6-months";
@@ -134,7 +148,7 @@ export default function InternshipDetail() {
         mentorship: d.mentorship || (is4W ? "Weekly group Q&A" : is3M ? "1-on-1 Project reviews" : is6M ? "Dedicated Slack Mentor & reviews" : "Group Support"),
         swag: d.swag || (is4W ? "Digital Certificate" : is3M ? "Navyan T-shirt & Sticker Box" : is6M ? "Premium Hoodie, T-shirt & Swag Kit" : "Digital Certificate"),
         reward: d.rewards?.join(", ") || (is4W ? "Performance Recognition" : is3M ? "Top 3: ₹5,000" : is6M ? "Top Performer: ₹8,000" : "Certificate of Merit"),
-        projects: d.projects?.join(", ") || (is4W ? "1 Micro-project" : is3M ? "2 Full-stack projects" : is6M ? "1 Production Capstone project" : "Practical tasks")
+        projects: d.projects?.join(", ") || "3 Real-world Projects"
       };
     });
   }, [internship]);
@@ -391,7 +405,10 @@ export default function InternshipDetail() {
                     <span>Included in the {selectedDuration.label || selectedKey} Plan:</span>
                   </div>
                   <ul className="grid gap-2 sm:grid-cols-2 text-xs text-textSecondary">
-                    {(selectedDuration.benefits || []).map((benefit, i) => (
+                    {(selectedDuration.benefits && selectedDuration.benefits.length > 0
+                      ? selectedDuration.benefits
+                      : ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"]
+                    ).map((benefit, i) => (
                       <li key={i} className="flex items-center gap-2">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
                         <span>{benefit}</span>
