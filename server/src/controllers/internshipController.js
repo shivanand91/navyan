@@ -1,7 +1,7 @@
 import { Internship } from "../models/Internship.js";
 import { uploadBuffer } from "../services/cloudinaryUpload.js";
 
-const ensureDefaultDurations = async (internship) => {
+const ensureDefaultDurations = (internship) => {
   if (!internship) return;
   const standardDurations = [
     {
@@ -60,17 +60,17 @@ const ensureDefaultDurations = async (internship) => {
 
   if (!fourWeeks || fourWeeks.price !== 49 || !threeMonths || threeMonths.price !== 2499 || !sixMonths || sixMonths.price !== 4499) {
     internship.durations = standardDurations;
-    await internship.save();
   }
 };
 
 export const listPublishedInternships = async (req, res, next) => {
   try {
-    const internships = await Internship.find({ isPublished: true, isDeleted: { $ne: true } }).sort({
-      createdAt: -1
-    });
+    const internships = await Internship.find({ isPublished: true, isDeleted: { $ne: true } })
+      .sort({ createdAt: -1 })
+      .lean();
+
     for (const internship of internships) {
-      await ensureDefaultDurations(internship);
+      ensureDefaultDurations(internship);
     }
     res.json({ internships });
   } catch (err) {
@@ -85,11 +85,12 @@ export const getInternshipBySlug = async (req, res, next) => {
       slug,
       isPublished: true,
       isDeleted: { $ne: true }
-    });
+    }).lean();
+
     if (!internship) {
       return res.status(404).json({ message: "Internship not found" });
     }
-    await ensureDefaultDurations(internship);
+    ensureDefaultDurations(internship);
     res.json({ internship });
   } catch (err) {
     next(err);
@@ -98,9 +99,12 @@ export const getInternshipBySlug = async (req, res, next) => {
 
 export const adminListInternships = async (req, res, next) => {
   try {
-    const internships = await Internship.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 });
+    const internships = await Internship.find({ isDeleted: { $ne: true } })
+      .sort({ createdAt: -1 })
+      .lean();
+
     for (const internship of internships) {
-      await ensureDefaultDurations(internship);
+      ensureDefaultDurations(internship);
     }
     res.json({ internships });
   } catch (err) {

@@ -48,7 +48,8 @@ export const createTicket = async (req, res, next) => {
 export const getMyTickets = async (req, res, next) => {
   try {
     const tickets = await SupportTicket.find({ student: req.user._id })
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     res.status(200).json({ tickets });
   } catch (error) {
@@ -186,7 +187,8 @@ export const getAllTicketsAdmin = async (req, res, next) => {
 
     let tickets = await SupportTicket.find(filter)
       .populate("student", "fullName email profile")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     if (search && search.trim()) {
       const q = search.trim().toLowerCase();
