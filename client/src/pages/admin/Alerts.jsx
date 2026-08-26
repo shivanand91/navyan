@@ -11,7 +11,9 @@ const createEmptyForm = () => ({
   subject: "",
   message: "",
   actionLabel: "Open update",
-  actionHref: ""
+  actionHref: "",
+  type: "Announcement",
+  sendEmail: true
 });
 
 const LinkPreview = ({ value }) => {
@@ -29,8 +31,11 @@ export default function AdminAlerts() {
   const [result, setResult] = useState(null);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    const { name, value, type, checked } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: type === "checkbox" ? checked : value
+    }));
   };
 
   const previewMessage = useMemo(() => {
@@ -55,12 +60,18 @@ export default function AdminAlerts() {
         subject: form.subject,
         message: form.message,
         actionLabel: form.actionLabel,
-        actionHref: form.actionHref
+        actionHref: form.actionHref,
+        type: form.type,
+        sendEmail: form.sendEmail
       });
 
       setResult(data?.stats || null);
       toast.success(data?.message || "Broadcast sent.");
-      setForm((current) => ({ ...current, subject: "", message: "" }));
+      setForm((current) => ({
+        ...current,
+        subject: "",
+        message: ""
+      }));
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.message || "Could not send broadcast.");
@@ -81,16 +92,16 @@ export default function AdminAlerts() {
             Send a message to all students
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-[color:var(--text-secondary)]">
-            Use this page for announcements, reminders, and daily updates. You can include one
-            clickable action link that appears inside the email.
+            Use this page for announcements, reminders, and daily updates. Broadcasts appear in student in-app notification bells and are emailed directly to student inboxes.
           </p>
         </div>
 
         {result ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <Stat label="Total" value={result.total} />
             <Stat label="Sent" value={result.sent} accent="success" />
-            <Stat label="Failed" value={result.failed} accent="danger" />
+            <Stat label="Emails" value={result.emailsSent} accent="success" />
+            <Stat label="In-App" value={result.inAppSent} />
           </div>
         ) : null}
       </div>
@@ -103,13 +114,43 @@ export default function AdminAlerts() {
               Compose broadcast
             </CardTitle>
             <CardDescription>
-              Keep the tone short, actionable, and clear. The email will be sent to every student
+              Keep the tone short, actionable, and clear. The message will be sent to every student
               account.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Category / Type">
+                    <select
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--input-bg)] p-2.5 text-xs text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="Announcement">Announcement</option>
+                      <option value="General">General</option>
+                      <option value="Important">Important</option>
+                      <option value="Deadline">Deadline</option>
+                      <option value="Internship">Internship</option>
+                    </select>
+                  </Field>
+
+                  <Field label="Send Email Broadcast">
+                    <label className="flex items-center gap-2 mt-2 text-xs font-semibold text-[color:var(--text)] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="sendEmail"
+                        checked={form.sendEmail}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded border-[color:var(--border)] text-primary focus:ring-primary/20"
+                      />
+                      <span>Send Email to Student Inboxes</span>
+                    </label>
+                  </Field>
+                </div>
+
                 <Field label="Subject">
                   <Input
                     name="subject"
@@ -149,9 +190,9 @@ export default function AdminAlerts() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                 <p className="text-xs leading-6 text-[color:var(--text-muted)]">
-                  Plain URLs in the message will also be clickable in the email.
+                  Plain URLs in the message will also be clickable in the email and notification popup.
                 </p>
                 <Button type="submit" disabled={sending} className="sm:min-w-44">
                   {sending ? "Sending..." : "Send to all students"}
@@ -166,13 +207,13 @@ export default function AdminAlerts() {
           <CardHeader>
             <CardTitle>Live preview</CardTitle>
             <CardDescription>
-              This is how the message will feel in the inbox.
+              This is how the message will feel in the inbox and notification panel.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                Navyan alert
+                Navyan {form.type || "alert"}
               </div>
               <h2 className="mt-4 font-display text-2xl font-semibold text-[color:var(--text)]">
                 {form.subject || "Your broadcast subject will appear here"}
@@ -232,12 +273,12 @@ function Field({ label, children }) {
 
 function Stat({ label, value, accent }) {
   return (
-    <div className="min-w-0 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3">
+    <div className="min-w-0 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2.5 text-center">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
         {label}
       </p>
       <p
-        className={`mt-2 text-xl font-semibold ${
+        className={`mt-1 text-lg font-semibold ${
           accent === "success"
             ? "text-emerald-500"
             : accent === "danger"

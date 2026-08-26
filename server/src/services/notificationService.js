@@ -99,28 +99,37 @@ export const sendBroadcast = async ({
   title,
   message,
   link = "",
-  type = "General",
-  sendEmail = false
+  type = "Announcement",
+  sendEmail = true
 }) => {
   try {
-    // 1. Fetch all student users
-    const students = await User.find({ role: "student" }).select("_id email fullName");
+    // 1. Fetch all non-admin users (students)
+    const students = await User.find({ role: { $ne: "admin" } }).select("_id email fullName profile");
     if (students.length === 0) {
-      return { total: 0, successful: 0, failed: 0 };
+      return { total: 0, successful: 0, failed: 0, emailsSent: 0, inAppSent: 0 };
     }
 
     // 2. Create in-app notifications in bulk
-    const inAppNotifications = students.map((student) => ({
-      user: student._id,
-      broadcastId,
-      title,
-      message,
-      link,
-      type
-    }));
-    await Notification.insertMany(inAppNotifications);
+    let inAppCreatedCount = 0;
+    try {
+      const validTypes = ["General", "Internship", "Application", "Project", "Deadline", "Announcement", "Important"];
+      const notificationType = validTypes.includes(type) ? type : "Announcement";
 
-    // 3. Send Web Push to all subscribed users via OneSignal
+      const inAppNotifications = students.map((student) => ({
+        user: student._id,
+        broadcastId: broadcastId || undefined,
+        title: title.trim(),
+        message: message.trim(),
+        link: link ? link.trim() : "",
+        type: notificationType
+      }));
+      const created = await Notification.insertMany(inAppNotifications);
+      inAppCreatedCount = created ? created.length : 0;
+    } catch (err) {
+      console.error("[Notification DB] Bulk insert error:", err);
+    }
+
+    // 3. Send Web Push to all subscribed users via OneSignal if configured
     const config = getOneSignalConfig();
     let pushSuccess = false;
 
@@ -148,17 +157,16 @@ export const sendBroadcast = async ({
         console.error("[OneSignal] Broadcast push failed:", err.message);
       }
     } else {
-      console.warn(`[OneSignal] Configuration missing. Mocked Broadcast push: "${title}"`);
       pushSuccess = true;
     }
 
-    // 4. Optional Email Fallback (batch chunk processing to avoid timeouts/overlimits)
+    // 4. Optional Email Fallback (batch processing)
     let emailSentCount = 0;
     if (sendEmail) {
       const BATCH_SIZE = 10;
       for (let i = 0; i < students.length; i += BATCH_SIZE) {
         const batch = students.slice(i, i + BATCH_SIZE);
-        await Promise.allSettled(
+        const results = await Promise.allSettled(
           batch.map((student) =>
             sendBroadcastAlertEmail({
               user: student,
@@ -166,17 +174,26 @@ export const sendBroadcast = async ({
               message,
               actionLabel: "Open Navyan",
               actionHref: link || process.env.CLIENT_URL || "https://navyan.online"
-            }).then(() => { emailSentCount++; })
+            })
           )
         );
+
+        results.forEach((res) => {
+          if (res.status === "fulfilled" && res.value === true) {
+            emailSentCount++;
+          }
+        });
       }
     }
 
+    const successfulDeliveries = Math.max(inAppCreatedCount, emailSentCount);
+
     return {
       total: students.length,
-      successful: pushSuccess ? students.length : 0,
-      failed: pushSuccess ? 0 : students.length,
-      emailsSent: emailSentCount
+      successful: successfulDeliveries,
+      failed: Math.max(0, students.length - successfulDeliveries),
+      emailsSent: emailSentCount,
+      inAppSent: inAppCreatedCount
     };
   } catch (error) {
     console.error("sendBroadcast Error:", error);
