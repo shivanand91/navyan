@@ -1,6 +1,8 @@
 import { Application } from "../models/Application.js";
 import { Submission } from "../models/Submission.js";
 import { Certificate } from "../models/Certificate.js";
+import { Internship } from "../models/Internship.js";
+import { ServiceInquiry } from "../models/ServiceInquiry.js";
 
 export const getAdminDashboardStats = async (req, res, next) => {
   try {
@@ -12,7 +14,11 @@ export const getAdminDashboardStats = async (req, res, next) => {
       completedSubmissions,
       certificatesIssued,
       statusGroups,
-      recentApplications
+      recentApplications,
+      totalInternships,
+      totalSubmissions,
+      totalInquiries,
+      activeInternshipsCount
     ] = await Promise.all([
       Application.countDocuments(),
       Application.countDocuments({ status: "Selected" }),
@@ -33,7 +39,11 @@ export const getAdminDashboardStats = async (req, res, next) => {
         .limit(8)
         .populate("user", "name email")
         .populate("internship", "title")
-        .lean()
+        .lean(),
+      Internship.countDocuments({ isDeleted: { $ne: true } }),
+      Submission.countDocuments(),
+      ServiceInquiry.countDocuments(),
+      Internship.countDocuments({ isPublished: true, isDeleted: { $ne: true } })
     ]);
 
     const statusCounts = {
@@ -60,7 +70,11 @@ export const getAdminDashboardStats = async (req, res, next) => {
       completedSubmissions,
       certificatesIssued,
       statusCounts,
-      recentApplications
+      recentApplications,
+      totalInternships,
+      totalSubmissions,
+      totalInquiries,
+      activeInternshipsCount
     });
   } catch (error) {
     next(error);

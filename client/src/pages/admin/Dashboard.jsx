@@ -270,25 +270,25 @@ export default function AdminDashboard() {
                 <Link to="/admin/applications">
                   <Button variant="ghost" className="w-full justify-start text-left" size="sm">
                     <Users className="h-4 w-4 mr-2" />
-                    Applications ({applications.length})
+                    Applications ({data?.totalApplications || 0})
                   </Button>
                 </Link>
                 <Link to="/admin/internships">
                   <Button variant="ghost" className="w-full justify-start text-left" size="sm">
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    Internships ({internships.length})
+                    Internships ({data?.totalInternships || 0})
                   </Button>
                 </Link>
                 <Link to="/admin/submissions">
                   <Button variant="ghost" className="w-full justify-start text-left" size="sm">
                     <FileCheck2 className="h-4 w-4 mr-2" />
-                    Submissions ({submissions.length})
+                    Submissions ({data?.totalSubmissions || 0})
                   </Button>
                 </Link>
                 <Link to="/admin/service-inquiries">
                   <Button variant="ghost" className="w-full justify-start text-left" size="sm">
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    Service Leads ({inquiries.length})
+                    Service Leads ({data?.totalInquiries || 0})
                   </Button>
                 </Link>
               </div>
@@ -300,9 +300,9 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-[color:var(--text-secondary)]">Selection Rate</span>
                   <span className="text-lg font-bold text-[color:var(--text)]">
-                    {applications.length
+                    {data?.totalApplications
                       ? Math.round(
-                          (applications.filter((a) => a.status === "Selected").length / applications.length) * 100
+                          ((data?.selectedCandidates || 0) / data.totalApplications) * 100
                         )
                       : 0}
                     %
@@ -311,9 +311,9 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-[color:var(--text-secondary)]">Completion Rate</span>
                   <span className="text-lg font-bold text-[color:var(--text)]">
-                    {applications.length
+                    {data?.totalApplications
                       ? Math.round(
-                          (applications.filter((a) => a.status === "Completed").length / applications.length) * 100
+                          ((data?.statusCounts?.Completed || 0) / data.totalApplications) * 100
                         )
                       : 0}
                     %
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-[color:var(--text-secondary)]">Active Programs</span>
-                  <span className="text-lg font-bold text-[color:var(--text)]">{internships.filter((i) => i.isPublished).length}</span>
+                  <span className="text-lg font-bold text-[color:var(--text)]">{data?.activeInternshipsCount || 0}</span>
                 </div>
               </div>
             </div>
