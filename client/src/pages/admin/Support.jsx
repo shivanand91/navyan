@@ -311,12 +311,12 @@ export default function AdminSupport() {
                       status: e.target.value
                     })
                   }
-                  className="rounded-lg border border-[color:var(--border)] bg-[color:var(--card)] px-2.5 py-1 text-xs font-semibold text-[color:var(--text)]"
+                  className="rounded-lg border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-2.5 py-1 text-xs font-semibold text-[color:var(--text)] focus:outline-none"
                 >
-                  <option value="Open">Open</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                  <option value="Closed">Closed</option>
+                  <option value="Open" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Open</option>
+                  <option value="In Progress" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">In Progress</option>
+                  <option value="Resolved" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Resolved</option>
+                  <option value="Closed" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Closed</option>
                 </select>
               </div>
             </div>
@@ -379,10 +379,10 @@ export default function AdminSupport() {
                   <select
                     value={updateStatus}
                     onChange={(e) => setUpdateStatus(e.target.value)}
-                    className="rounded-md border border-[color:var(--border)] bg-[color:var(--input-bg)] px-2 py-0.5 text-xs text-[color:var(--text)]"
+                    className="rounded-md border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-2 py-1 text-xs font-semibold text-[color:var(--text)] focus:outline-none"
                   >
-                    <option value="In Progress">Keep In Progress</option>
-                    <option value="Resolved">Mark as Resolved</option>
+                    <option value="In Progress" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Keep In Progress</option>
+                    <option value="Resolved" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Mark as Resolved</option>
                   </select>
                 </div>
               </div>

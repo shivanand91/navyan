@@ -242,14 +242,14 @@ export default function StudentSupport() {
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--input-bg)] p-3 text-sm text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-3 text-sm font-medium text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="General">General Question</option>
-                  <option value="Internship">Internship Guidance</option>
-                  <option value="Task & Submission">Task & Submission Doubt</option>
-                  <option value="Certificate">Certificate Request</option>
-                  <option value="Technical">Technical Error / Issue</option>
-                  <option value="Other">Other</option>
+                  <option value="General" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">General Question</option>
+                  <option value="Internship" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Internship Guidance</option>
+                  <option value="Task & Submission" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Task & Submission Doubt</option>
+                  <option value="Certificate" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Certificate Request</option>
+                  <option value="Technical" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Technical Error / Issue</option>
+                  <option value="Other" className="bg-[color:var(--card-elevated)] text-[color:var(--text)]">Other</option>
                 </select>
               </div>
 
