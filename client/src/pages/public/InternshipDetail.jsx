@@ -296,38 +296,38 @@ export default function InternshipDetail() {
   const is6M = selectedKey === "6-months";
 
   return (
-    <section className="relative min-h-screen bg-[color:var(--bg)] pb-24 text-[color:var(--text)]">
+    <section className="relative min-h-screen bg-[color:var(--bg)] pb-28 lg:pb-24 text-[color:var(--text)]">
       {/* Hero Header */}
-      <div className="border-b border-[color:var(--border)] bg-[color:var(--bg-secondary)]/50 py-12 md:py-20">
+      <div className="border-b border-[color:var(--border)] bg-[color:var(--bg-secondary)]/50 py-8 sm:py-12 md:py-16">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="grid gap-8 lg:grid-cols-12 items-center">
-            <div className="lg:col-span-7 space-y-6">
+          <div className="grid gap-6 lg:gap-8 lg:grid-cols-12 items-center">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6">
               <div className="inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary uppercase tracking-wider">
-                <Sparkles className="h-3.5 w-3.5" />
-                Live Application Window Open
+                <Sparkles className="h-3.5 w-3.5 flex-shrink-0" />
+                <span>Live Application Window Open</span>
               </div>
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] text-textPrimary leading-tight">
+              <h1 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] text-textPrimary leading-tight break-words">
                 {internship.title}
               </h1>
-              <p className="text-base md:text-lg leading-relaxed text-textSecondary max-w-2xl">
+              <p className="text-sm sm:text-base md:text-lg leading-relaxed text-textSecondary max-w-2xl">
                 {internship.shortDescription}
               </p>
 
               {/* Dynamic Badges */}
               <div className="flex flex-wrap gap-2 pt-2">
-                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-3 py-1.5 text-xs text-textSecondary">
-                  <Clock className="h-3.5 w-3.5 text-primary" />
-                  <span>Duration: {selectedDuration?.label || selectedKey}</span>
+                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-2.5 py-1.5 text-xs text-textSecondary max-w-full">
+                  <Clock className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  <span className="truncate">Duration: {selectedDuration?.label || selectedKey}</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-3 py-1.5 text-xs text-textSecondary">
-                  <Laptop className="h-3.5 w-3.5 text-primary" />
+                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-2.5 py-1.5 text-xs text-textSecondary max-w-full">
+                  <Laptop className="h-3.5 w-3.5 text-primary flex-shrink-0" />
                   <span>Mode: {internship.mode?.toUpperCase() || "REMOTE"}</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-3 py-1.5 text-xs text-textSecondary">
-                  <MapPin className="h-3.5 w-3.5 text-primary" />
+                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-[color:var(--card-elevated)] border border-[color:var(--border)] px-2.5 py-1.5 text-xs text-textSecondary max-w-full">
+                  <MapPin className="h-3.5 w-3.5 text-primary flex-shrink-0" />
                   <span>Openings: {internship.openings || "Open Track"}</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
+                <div className="inline-flex items-center gap-1.5 rounded-[8px] bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
                   {isPaid ? "Paid Cohort" : "Unpaid Track"}
                 </div>
               </div>
@@ -353,20 +353,20 @@ export default function InternshipDetail() {
       </div>
 
       {/* Main Content & Sidebar Grid */}
-      <div className="mx-auto max-w-7xl px-4 md:px-6 py-12">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 py-8 sm:py-12">
         <div className="grid gap-8 lg:grid-cols-12">
           
           {/* Main Info Column */}
-          <div className="lg:col-span-8 space-y-12">
+          <div className="lg:col-span-8 space-y-8 sm:space-y-12 min-w-0">
             
             {/* Cohort Selector Section */}
-            <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 space-y-6">
+            <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div>
-                <h2 className="font-display text-2xl font-bold text-textPrimary">Select Your Cohort Plan</h2>
-                <p className="text-textSecondary text-sm mt-1">Different plan durations are designed for different experience levels and goals.</p>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Select Your Cohort Plan</h2>
+                <p className="text-textSecondary text-xs sm:text-sm mt-1">Different plan durations are designed for different experience levels and goals.</p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                 {(internship.durations || []).map((duration) => {
                   const isSelected = selectedKey === duration.key;
                   return (
@@ -374,7 +374,7 @@ export default function InternshipDetail() {
                       key={duration.key}
                       onClick={() => handleKeySelect(duration.key)}
                       type="button"
-                      className={`relative flex flex-col items-start p-4 text-left rounded-[12px] border transition-all ${
+                      className={`relative flex flex-col items-start p-3.5 sm:p-4 text-left rounded-[12px] border transition-all ${
                         isSelected
                           ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/20"
                           : "border-[color:var(--border)] bg-[color:var(--card-elevated)] hover:border-[color:var(--border-strong)]"
@@ -385,13 +385,13 @@ export default function InternshipDetail() {
                           <CheckCircle2 className="h-5 w-5 text-primary" />
                         </div>
                       )}
-                      <span className="text-xs uppercase font-bold tracking-wider text-[color:var(--text-muted)]">
+                      <span className="text-[10px] sm:text-xs uppercase font-bold tracking-wider text-[color:var(--text-muted)]">
                         {duration.isPaid || getEffectiveDurationPrice(duration) > 0 ? "Paid Track" : "Unpaid"}
                       </span>
-                      <span className="text-lg font-bold text-textPrimary mt-1">
+                      <span className="text-base sm:text-lg font-bold text-textPrimary mt-1">
                         {duration.label || duration.key}
                       </span>
-                      <span className="text-sm font-semibold text-primary mt-2">
+                      <span className="text-xs sm:text-sm font-semibold text-primary mt-2">
                         {getDurationPriceLabel(duration)}
                       </span>
                     </button>
@@ -401,11 +401,11 @@ export default function InternshipDetail() {
 
               {selectedDuration && (
                 <div className="bg-[color:var(--bg-secondary)] p-4 rounded-[12px] border border-[color:var(--border)] space-y-3">
-                  <div className="flex items-center gap-2 text-textPrimary font-semibold text-sm">
-                    <Sparkles className="h-4 w-4 text-primary" />
+                  <div className="flex items-center gap-2 text-textPrimary font-semibold text-xs sm:text-sm">
+                    <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
                     <span>Included in the {selectedDuration.label || selectedKey} Plan:</span>
                   </div>
-                  <ul className="grid gap-2 sm:grid-cols-2 text-xs text-textSecondary">
+                  <ul className="grid gap-2 grid-cols-1 sm:grid-cols-2 text-xs text-textSecondary">
                     {(selectedDuration.benefits && selectedDuration.benefits.length > 0
                       ? selectedDuration.benefits
                       : ["Workspace Access", "3 Real-world Projects", "Verifiable Certificate", "Weekly Q&A"]
@@ -417,7 +417,7 @@ export default function InternshipDetail() {
                     ))}
                     {getRewardsText(selectedDuration) && (
                       <li className="flex items-center gap-2 font-semibold text-amber-600 dark:text-amber-400 sm:col-span-2 mt-1">
-                        <Gift className="h-4 w-4 text-amber-500" />
+                        <Gift className="h-4 w-4 text-amber-500 flex-shrink-0" />
                         <span>{getRewardsText(selectedDuration)}</span>
                       </li>
                     )}
@@ -427,52 +427,52 @@ export default function InternshipDetail() {
             </div>
 
             {/* Overview / Description */}
-            <div className="space-y-4">
-              <h2 className="font-display text-2xl font-bold text-textPrimary">Role Overview & Learning Path</h2>
-              <div className="text-sm leading-relaxed text-textSecondary whitespace-pre-line bg-[color:var(--card-elevated)] p-6 rounded-[16px] border border-[color:var(--border)]">
+            <div className="space-y-3 sm:space-y-4">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Role Overview & Learning Path</h2>
+              <div className="text-xs sm:text-sm leading-relaxed text-textSecondary whitespace-pre-line bg-[color:var(--card-elevated)] p-4 sm:p-6 rounded-[16px] border border-[color:var(--border)] break-words">
                 {internship.description || "No full description configured."}
               </div>
             </div>
 
             {/* What you get - concrete value */}
-            <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold text-textPrimary">What You Get & Professional Deliverables</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5 space-y-3">
-                  <div className="p-3 bg-primary/10 rounded-[10px] w-fit">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">What You Get & Professional Deliverables</h2>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-5 space-y-3">
+                  <div className="p-2.5 bg-primary/10 rounded-[10px] w-fit">
                     <Award className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-textPrimary text-base">Verified Navyan Internship Certificate</h3>
+                  <h3 className="font-semibold text-textPrimary text-sm sm:text-base">Verified Navyan Internship Certificate</h3>
                   <p className="text-textSecondary text-xs leading-relaxed">
                     Earn a verifiable, industry-standard completion certificate linked to your portfolio, directly queryable on Navyan verification portal.
                   </p>
                 </div>
 
-                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5 space-y-3">
-                  <div className="p-3 bg-amber-500/10 rounded-[10px] w-fit">
+                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-5 space-y-3">
+                  <div className="p-2.5 bg-amber-500/10 rounded-[10px] w-fit">
                     <Gift className="h-5 w-5 text-amber-500" />
                   </div>
-                  <h3 className="font-semibold text-textPrimary text-base">Navyan Swag Box & Elite Rewards</h3>
+                  <h3 className="font-semibold text-textPrimary text-sm sm:text-base">Navyan Swag Box & Elite Rewards</h3>
                   <p className="text-textSecondary text-xs leading-relaxed">
                     Top performers in the 3 Months and 6 Months programs get physical swag kits (T-shirts, hoodies, and desk accessories) shipped directly.
                   </p>
                 </div>
 
-                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5 space-y-3">
-                  <div className="p-3 bg-blue-500/10 rounded-[10px] w-fit">
+                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-5 space-y-3">
+                  <div className="p-2.5 bg-blue-500/10 rounded-[10px] w-fit">
                     <Users className="h-5 w-5 text-blue-500" />
                   </div>
-                  <h3 className="font-semibold text-textPrimary text-base">Continuous Expert Mentorship</h3>
+                  <h3 className="font-semibold text-textPrimary text-sm sm:text-base">Continuous Expert Mentorship</h3>
                   <p className="text-textSecondary text-xs leading-relaxed">
                     Interact directly with team leads, join weekend code reviews, and schedule live doubts sessions to resolve real-world project roadblocks.
                   </p>
                 </div>
 
-                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5 space-y-3">
-                  <div className="p-3 bg-indigo-500/10 rounded-[10px] w-fit">
+                <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-5 space-y-3">
+                  <div className="p-2.5 bg-indigo-500/10 rounded-[10px] w-fit">
                     <BookOpen className="h-5 w-5 text-indigo-500" />
                   </div>
-                  <h3 className="font-semibold text-textPrimary text-base">Practical, Production-Ready Portfolio</h3>
+                  <h3 className="font-semibold text-textPrimary text-sm sm:text-base">Practical, Production-Ready Portfolio</h3>
                   <p className="text-textSecondary text-xs leading-relaxed">
                     Write clean code, execute micro-services, and design full-stack architectures. Deploy products live to show actual recruiters.
                   </p>
@@ -482,12 +482,12 @@ export default function InternshipDetail() {
 
             {/* Special Section: "Why ₹49?" for 4-weeks */}
             {is4W && (
-              <div className="rounded-[16px] border border-blue-500/20 bg-blue-500/5 p-6 space-y-4">
-                <div className="flex items-center gap-2 text-primary font-bold text-lg">
-                  <HelpCircle className="h-5 w-5" />
+              <div className="rounded-[16px] border border-blue-500/20 bg-blue-500/5 p-4 sm:p-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-2 text-primary font-bold text-base sm:text-lg">
+                  <HelpCircle className="h-5 w-5 flex-shrink-0" />
                   <span>Why is the 4-Weeks Starter Plan ₹49?</span>
                 </div>
-                <p className="text-textSecondary text-sm leading-relaxed">
+                <p className="text-textSecondary text-xs sm:text-sm leading-relaxed">
                   Navyan is committed to democratization. The ₹49 fee is not tuition. It is a commitment-filter to cover costs of server provisioning, structured dashboards, progress trackers, auto-grading services, and hosting of your evaluation workspace, ensuring we filter out spam registrations and dedicate resources to genuine students.
                 </p>
               </div>
@@ -495,12 +495,12 @@ export default function InternshipDetail() {
 
             {/* Special Section: 3-months weekend schedule */}
             {is3M && (
-              <div className="rounded-[16px] border border-amber-500/20 bg-amber-500/5 p-6 space-y-4">
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-lg">
-                  <Users className="h-5 w-5 text-amber-500" />
+              <div className="rounded-[16px] border border-amber-500/20 bg-amber-500/5 p-4 sm:p-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-base sm:text-lg">
+                  <Users className="h-5 w-5 text-amber-500 flex-shrink-0" />
                   <span>Weekend Live Classes & Top 3 Performers (₹5,000)</span>
                 </div>
-                <p className="text-textSecondary text-sm leading-relaxed">
+                <p className="text-textSecondary text-xs sm:text-sm leading-relaxed">
                   The 3 Months cohort is built for depth. Every weekend, join live masterclasses detailing state management, performance optimization, and database operations. At the end of the cohort, the top 3 performers are selected based on task grading, code reviews, and project presentations to receive a cash prize of ₹5,000 each!
                 </p>
               </div>
@@ -508,36 +508,36 @@ export default function InternshipDetail() {
 
             {/* Special Section: 6-months roadmaps */}
             {is6M && (
-              <div className="rounded-[16px] border border-indigo-500/20 bg-indigo-500/5 p-6 space-y-4">
-                <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-lg">
-                  <Laptop className="h-5 w-5 text-indigo-500" />
+              <div className="rounded-[16px] border border-indigo-500/20 bg-indigo-500/5 p-4 sm:p-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-base sm:text-lg">
+                  <Laptop className="h-5 w-5 text-indigo-500 flex-shrink-0" />
                   <span>Build. Work. Learn. Ship. (₹8,000 Reward)</span>
                 </div>
-                <p className="text-textSecondary text-sm leading-relaxed">
+                <p className="text-textSecondary text-xs sm:text-sm leading-relaxed">
                   Our most intensive cohort. In the 6 Months track, you operate as an actual junior developer in a simulated squad. Learn system architectures, deploy CI/CD pipelines, and contribute to scale systems. The top performer is awarded a direct stipend reward of ₹8,000 and gets referred to Navyan's partner network.
                 </p>
               </div>
             )}
 
             {/* Program Timeline */}
-            <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold text-textPrimary">Program Timeline & Milestones</h2>
-              <div className="relative border-l-2 border-[color:var(--border)] ml-4 pl-6 space-y-8">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Program Timeline & Milestones</h2>
+              <div className="relative border-l-2 border-[color:var(--border)] ml-2 sm:ml-4 pl-4 sm:pl-6 space-y-6 sm:space-y-8">
                 <div className="relative">
-                  <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
+                  <div className="absolute -left-[5px] sm:-left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                    <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
                   </div>
-                  <h4 className="font-bold text-textPrimary text-base">Week 1: Foundations & Architecture Setup</h4>
+                  <h4 className="font-bold text-textPrimary text-sm sm:text-base">Week 1: Foundations & Architecture Setup</h4>
                   <p className="text-textSecondary text-xs mt-1 leading-relaxed">
                     Set up your workspace repositories, clone boilerplates, understand design guidelines, and align with your mentors on deliverables.
                   </p>
                 </div>
 
                 <div className="relative">
-                  <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
+                  <div className="absolute -left-[5px] sm:-left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                    <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
                   </div>
-                  <h4 className="font-bold text-textPrimary text-base">Week 2-4: Core Development & Mid-term Evaluations</h4>
+                  <h4 className="font-bold text-textPrimary text-sm sm:text-base">Week 2-4: Core Development & Mid-term Evaluations</h4>
                   <p className="text-textSecondary text-xs mt-1 leading-relaxed">
                     Implement user stories, code key logic blocks, and submit tasks to Navyan dashboards. Receive structural code reviews and grades.
                   </p>
@@ -546,10 +546,10 @@ export default function InternshipDetail() {
                 {!is4W && (
                   <>
                     <div className="relative">
-                      <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
+                      <div className="absolute -left-[5px] sm:-left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                        <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
                       </div>
-                      <h4 className="font-bold text-textPrimary text-base">Month 2-3: Advanced Features, Integrations & Live Classes</h4>
+                      <h4 className="font-bold text-textPrimary text-sm sm:text-base">Month 2-3: Advanced Features, Integrations & Live Classes</h4>
                       <p className="text-textSecondary text-xs mt-1 leading-relaxed">
                         Integrate APIs, payment gateways, and perform optimization. Attend weekend live workshops to address industry-level system designs.
                       </p>
@@ -557,10 +557,10 @@ export default function InternshipDetail() {
 
                     {is6M && (
                       <div className="relative">
-                        <div className="absolute -left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
-                          <div className="h-2 w-2 rounded-full bg-primary" />
+                        <div className="absolute -left-[5px] sm:-left-[9px] top-1.5 rounded-full border border-primary bg-[color:var(--bg)] p-1">
+                          <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
                         </div>
-                        <h4 className="font-bold text-textPrimary text-base">Month 4-6: Production Capstones & Direct Placement referrals</h4>
+                        <h4 className="font-bold text-textPrimary text-sm sm:text-base">Month 4-6: Production Capstones & Direct Placement referrals</h4>
                         <p className="text-textSecondary text-xs mt-1 leading-relaxed">
                           Assemble complete production suites, configure CI/CD deployments, present your work to panels, and gain certificate clearance.
                         </p>
@@ -572,12 +572,15 @@ export default function InternshipDetail() {
             </div>
 
             {/* Side-by-Side Comparison Section */}
-            <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold text-textPrimary">Compare Duration Plans</h2>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Compare Duration Plans</h2>
+                <span className="lg:hidden text-[11px] text-[color:var(--text-muted)] font-medium">Swipe cards →</span>
+              </div>
               
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-hidden rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)]">
-                <table className="w-full border-collapse text-left text-xs">
+              {/* Desktop / Large Screen Table View */}
+              <div className="hidden lg:block overflow-x-auto rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)]">
+                <table className="w-full border-collapse text-left text-xs min-w-[600px]">
                   <thead>
                     <tr className="border-b border-[color:var(--border)] bg-[color:var(--bg-secondary)]">
                       <th className="p-4 font-bold text-textPrimary">Features</th>
@@ -649,42 +652,42 @@ export default function InternshipDetail() {
                 </table>
               </div>
 
-              {/* Mobile Carousel / Cards scroll */}
-              <div className="md:hidden flex gap-4 overflow-x-auto pb-4 px-4 -mx-4 scrollbar-thin snap-x snap-mandatory">
+              {/* Mobile / Tablet Cards View */}
+              <div className="lg:hidden flex gap-3 sm:gap-4 overflow-x-auto pb-4 px-4 -mx-4 scrollbar-thin snap-x snap-mandatory">
                 {plans.map((p) => (
                   <div
                     key={p.key}
                     onClick={() => handleKeySelect(p.key)}
-                    className={`flex-shrink-0 w-[270px] rounded-[16px] border p-5 space-y-4 bg-[color:var(--card)] snap-center ${
+                    className={`flex-shrink-0 w-[80vw] max-w-[280px] sm:w-[260px] rounded-[16px] border p-4 sm:p-5 space-y-3 sm:space-y-4 bg-[color:var(--card)] snap-center cursor-pointer ${
                       selectedKey === p.key
                         ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/20"
                         : "border-[color:var(--border)] bg-[color:var(--card-elevated)]"
                     }`}
                   >
                     <div>
-                      <h4 className="font-bold text-textPrimary text-base">{p.name}</h4>
-                      <p className="text-primary font-extrabold text-lg mt-1">{p.price}</p>
+                      <h4 className="font-bold text-textPrimary text-sm sm:text-base">{p.name}</h4>
+                      <p className="text-primary font-extrabold text-base sm:text-lg mt-1">{p.price}</p>
                     </div>
                     <div className="space-y-2 text-[11px] text-textSecondary border-t border-[color:var(--border)] pt-3">
                       <div className="flex justify-between">
                         <span className="text-[color:var(--text-muted)] font-semibold">Type:</span>
                         <span>{p.type}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[color:var(--text-muted)] font-semibold">Classes:</span>
-                        <span className="text-right">{p.liveClasses}</span>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-[color:var(--text-muted)] font-semibold flex-shrink-0">Classes:</span>
+                        <span className="text-right truncate">{p.liveClasses}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[color:var(--text-muted)] font-semibold">Mentorship:</span>
-                        <span className="text-right">{p.mentorship}</span>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-[color:var(--text-muted)] font-semibold flex-shrink-0">Mentorship:</span>
+                        <span className="text-right truncate">{p.mentorship}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[color:var(--text-muted)] font-semibold">Swag:</span>
-                        <span className="text-right">{p.swag}</span>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-[color:var(--text-muted)] font-semibold flex-shrink-0">Swag:</span>
+                        <span className="text-right truncate">{p.swag}</span>
                       </div>
-                      <div className="flex justify-between font-semibold text-amber-600 dark:text-amber-400">
-                        <span>Reward:</span>
-                        <span>{p.reward}</span>
+                      <div className="flex justify-between gap-2 font-semibold text-amber-600 dark:text-amber-400">
+                        <span className="flex-shrink-0">Reward:</span>
+                        <span className="text-right truncate">{p.reward}</span>
                       </div>
                     </div>
                   </div>
@@ -693,8 +696,8 @@ export default function InternshipDetail() {
             </div>
 
             {/* FAQs Accordion */}
-            <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold text-textPrimary">Frequently Asked Questions</h2>
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Frequently Asked Questions</h2>
               <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] overflow-hidden">
                 {[
                   {
@@ -719,13 +722,13 @@ export default function InternshipDetail() {
                     <div key={index} className="border-b border-[color:var(--border)] last:border-0">
                       <button
                         onClick={() => setOpenFaq(isOpen ? null : index)}
-                        className="w-full flex items-center justify-between p-5 text-left font-semibold text-textPrimary text-sm hover:bg-[color:var(--bg-secondary)]"
+                        className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-semibold text-textPrimary text-xs sm:text-sm hover:bg-[color:var(--bg-secondary)] gap-3"
                       >
                         <span>{faq.q}</span>
-                        <ChevronDown className={`h-4 w-4 text-[color:var(--text-muted)] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown className={`h-4 w-4 text-[color:var(--text-muted)] flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
-                        <div className="p-5 pt-0 text-xs leading-relaxed text-textSecondary border-t border-[color:var(--border)] bg-[color:var(--bg-secondary)]/30">
+                        <div className="p-4 sm:p-5 pt-0 text-xs leading-relaxed text-textSecondary border-t border-[color:var(--border)] bg-[color:var(--bg-secondary)]/30">
                           {faq.a}
                         </div>
                       )}
@@ -739,12 +742,12 @@ export default function InternshipDetail() {
 
           {/* Sticky Desktop Apply CTA column */}
           <div className="lg:col-span-4 relative">
-            <div className="sticky top-24 rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 shadow-lg space-y-6">
+            <div className="sticky top-24 rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-6 shadow-lg space-y-4 sm:space-y-6">
               <div className="space-y-2">
                 <span className="text-xs uppercase font-bold tracking-wider text-[color:var(--text-muted)]">Selected Cohort Plan</span>
-                <h3 className="font-display text-2xl font-bold text-textPrimary">{selectedDuration?.label || selectedKey}</h3>
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">{selectedDuration?.label || selectedKey}</h3>
                 <div className="flex items-baseline gap-2 pt-1">
-                  <span className="text-3xl font-extrabold text-primary">{getDurationPriceLabel(selectedDuration)}</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-primary">{getDurationPriceLabel(selectedDuration)}</span>
                   <span className="text-xs text-[color:var(--text-muted)]">{isPaid ? "one-time enrollment fee" : "fully free"}</span>
                 </div>
               </div>
@@ -793,77 +796,81 @@ export default function InternshipDetail() {
       </div>
 
       {/* Sticky Bottom CTA Bar (Mobile View) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[color:var(--border)] bg-[color:var(--card)]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between shadow-2xl">
-        <div className="space-y-0.5">
-          <span className="text-[10px] font-bold text-[color:var(--text-secondary)] uppercase">{selectedDuration?.label || selectedKey}</span>
-          <p className="font-extrabold text-primary text-lg leading-none">{getDurationPriceLabel(selectedDuration)}</p>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[color:var(--border)] bg-[color:var(--card)]/95 backdrop-blur-md px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between shadow-2xl">
+        <div className="space-y-0.5 max-w-[55%]">
+          <span className="text-[10px] font-bold text-[color:var(--text-secondary)] uppercase truncate block">
+            {selectedDuration?.label || selectedKey}
+          </span>
+          <p className="font-extrabold text-primary text-base sm:text-lg leading-none truncate">
+            {getDurationPriceLabel(selectedDuration)}
+          </p>
         </div>
 
         {blockingApplication ? (
           <Link to="/student">
-            <Button variant="outline" size="sm">
-              View Active Application
+            <Button variant="outline" size="sm" className="text-xs">
+              View Application
             </Button>
           </Link>
         ) : (
-          <Button variant="accent" size="sm" className="font-bold px-5" onClick={handleApplyClick}>
+          <Button variant="accent" size="sm" className="font-bold px-4 py-2 text-xs" onClick={handleApplyClick}>
             Apply Now
-            <ArrowRight className="ml-2 h-3.5 w-3.5" />
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
           </Button>
         )}
       </div>
 
       {/* Checkout / Enrollment Flow Modal */}
       {showApplyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-6 shadow-2xl space-y-6 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-6 my-auto">
             
             {/* Close Button */}
             {!submitting && (
               <button
                 onClick={() => setShowApplyModal(false)}
-                className="absolute right-4 top-4 p-2 text-[color:var(--text-muted)] hover:text-textPrimary transition-colors"
+                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 text-[color:var(--text-muted)] hover:text-textPrimary transition-colors rounded-full hover:bg-[color:var(--bg-secondary)]"
               >
                 <X className="h-5 w-5" />
               </button>
             )}
 
             {success ? (
-              <div className="text-center py-6 space-y-4">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                  <CheckCircle2 className="h-8 w-8" />
+              <div className="text-center py-4 sm:py-6 space-y-4">
+                <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="font-display text-2xl font-bold text-textPrimary">Application Successful 🎉</h3>
-                <p className="text-textSecondary text-sm max-w-sm mx-auto leading-relaxed">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Application Successful 🎉</h3>
+                <p className="text-textSecondary text-xs sm:text-sm max-w-sm mx-auto leading-relaxed">
                   Your application for the <strong>{internship.title} ({selectedDuration?.label || selectedKey})</strong> has been successfully received.
-                  {isPaid ? " Our coordinators will verify your payment UTR code within 24 hours to active your plan." : " You can access your workspace workspace now."}
+                  {isPaid ? " Our coordinators will verify your payment UTR code within 24 hours to activate your plan." : " You can access your workspace now."}
                 </p>
-                <div className="pt-4">
+                <div className="pt-2 sm:pt-4">
                   <Button variant="accent" onClick={() => { setShowApplyModal(false); navigate("/student"); }} className="w-full">
                     Go to Student Dashboard
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 <div>
-                  <h3 className="font-display text-xl font-bold text-textPrimary">Confirm Your Application</h3>
-                  <p className="text-textSecondary text-xs mt-1">Review the details of your selected plan below.</p>
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-textPrimary">Confirm Your Application</h3>
+                  <p className="text-textSecondary text-xs mt-0.5">Review the details of your selected plan below.</p>
                 </div>
 
                 {/* Plan detail overview card */}
-                <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-4 space-y-2">
-                  <div className="flex justify-between text-xs text-textSecondary">
-                    <span>Internship:</span>
-                    <span className="font-semibold text-textPrimary">{internship.title}</span>
+                <div className="rounded-[12px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-3 sm:p-4 space-y-2">
+                  <div className="flex justify-between text-xs text-textSecondary gap-2">
+                    <span className="flex-shrink-0">Internship:</span>
+                    <span className="font-semibold text-textPrimary text-right truncate">{internship.title}</span>
                   </div>
-                  <div className="flex justify-between text-xs text-textSecondary">
-                    <span>Cohort Duration:</span>
-                    <span className="font-semibold text-textPrimary">{selectedDuration?.label || selectedKey}</span>
+                  <div className="flex justify-between text-xs text-textSecondary gap-2">
+                    <span className="flex-shrink-0">Cohort Duration:</span>
+                    <span className="font-semibold text-textPrimary text-right">{selectedDuration?.label || selectedKey}</span>
                   </div>
-                  <div className="flex justify-between text-xs text-textSecondary border-t border-[color:var(--border)] pt-2">
+                  <div className="flex justify-between text-xs text-textSecondary border-t border-[color:var(--border)] pt-2 gap-2">
                     <span className="font-medium text-textPrimary">Enrollment Fee:</span>
-                    <span className="font-extrabold text-primary">{getDurationPriceLabel(selectedDuration)}</span>
+                    <span className="font-extrabold text-primary text-right">{getDurationPriceLabel(selectedDuration)}</span>
                   </div>
                 </div>
 
@@ -889,14 +896,14 @@ export default function InternshipDetail() {
                         variant="outline"
                         onClick={handleGeneratePaymentQr}
                         disabled={paymentLoading}
-                        className="w-full py-5 text-xs font-semibold justify-center gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
+                        className="w-full py-4 sm:py-5 text-xs font-semibold justify-center gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
                       >
                         {paymentLoading ? "Generating Session..." : "Generate UPI Payment QR Code"}
                         <QrCode className="h-4 w-4" />
                       </Button>
                     ) : (
                       <div className="space-y-4">
-                        <div className="flex flex-col sm:flex-row items-center gap-4 bg-[color:var(--bg-secondary)] p-4 rounded-[12px] border border-[color:var(--border)]">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 bg-[color:var(--bg-secondary)] p-3 sm:p-4 rounded-[12px] border border-[color:var(--border)]">
                           
                           {/* QR Code image */}
                           <div className="bg-white p-2 rounded-[8px] border border-[color:var(--border)] flex-shrink-0">
@@ -904,15 +911,15 @@ export default function InternshipDetail() {
                               <img
                                 src={paymentSession.qrCodeDataUrl}
                                 alt="UPI Payment QR Code"
-                                className="h-32 w-32 object-contain"
+                                className="h-28 w-28 sm:h-32 sm:w-32 object-contain"
                               />
                             ) : (
-                              <div className="h-32 w-32 bg-slate-100 flex items-center justify-center text-xs">QR Loading...</div>
+                              <div className="h-28 w-28 sm:h-32 sm:w-32 bg-slate-100 flex items-center justify-center text-xs">QR Loading...</div>
                             )}
                           </div>
 
                           <div className="space-y-1.5 text-xs text-textSecondary flex-1">
-                            <div className="flex justify-between items-center bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-[6px] font-semibold text-[10px] w-fit uppercase">
+                            <div className="flex justify-between items-center bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-[6px] font-semibold text-[10px] w-fit uppercase mx-auto sm:mx-0">
                               Session active: {formatTimer(timer)}
                             </div>
                             <p className="leading-relaxed text-[11px]">
@@ -938,10 +945,10 @@ export default function InternshipDetail() {
                                 value={utrNumber}
                                 onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, "").slice(0, 12))}
                                 disabled={submitting}
-                                className="w-full rounded-[10px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-3 pr-16 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                className="w-full rounded-[10px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-3 pr-16 text-xs sm:text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
                               />
-                              <div className="absolute right-3 top-3.5 text-[10px] font-bold text-[color:var(--text-muted)]">
-                                {utrNumber.length}/12 Digits
+                              <div className="absolute right-3 top-3 sm:top-3.5 text-[10px] font-bold text-[color:var(--text-muted)]">
+                                {utrNumber.length}/12
                               </div>
                             </div>
                             <p className="text-[10px] text-[color:var(--text-muted)] leading-relaxed">
@@ -949,8 +956,8 @@ export default function InternshipDetail() {
                             </p>
                           </div>
                         ) : (
-                          <div className="rounded-[12px] border border-red-500/20 bg-red-500/5 p-4 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" />
+                          <div className="rounded-[12px] border border-red-500/20 bg-red-500/5 p-3 sm:p-4 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                             <span>Payment Session expired. Please generate a new QR code to proceed.</span>
                           </div>
                         )}
@@ -965,7 +972,7 @@ export default function InternshipDetail() {
                     variant="outline"
                     onClick={() => setShowApplyModal(false)}
                     disabled={submitting}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
                     Cancel
                   </Button>
@@ -977,7 +984,7 @@ export default function InternshipDetail() {
                       paymentLoading ||
                       (isPaid && (!paymentSession || timer <= 0 || utrNumber.length !== 12))
                     }
-                    className="flex-1 justify-center"
+                    className="flex-1 justify-center text-xs sm:text-sm"
                   >
                     {submitting ? "Submitting..." : "Submit Application"}
                   </Button>
