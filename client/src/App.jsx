@@ -40,6 +40,8 @@ const ServiceInquiries = lazy(() => import("@/pages/admin/ServiceInquiries"));
 const AdminAlerts = lazy(() => import("@/pages/admin/Alerts"));
 const AdminHackathons = lazy(() => import("@/pages/admin/Hackathons"));
 const AdminAutomation = lazy(() => import("@/pages/admin/Automation"));
+const StudentSupport = lazy(() => import("@/pages/student/Support"));
+const AdminSupport = lazy(() => import("@/pages/admin/Support"));
 
 function PageLoader() {
   return (
@@ -121,6 +123,7 @@ export default function App() {
           <Route path="jobs" element={<LazyPage><StudentJobs /></LazyPage>} />
           <Route path="applications" element={<LazyPage><Applications /></LazyPage>} />
           <Route path="certificates" element={<LazyPage><Certificates /></LazyPage>} />
+          <Route path="support" element={<LazyPage><StudentSupport /></LazyPage>} />
         </Route>
 
         <Route
@@ -144,6 +147,7 @@ export default function App() {
           <Route path="alerts" element={<LazyPage><AdminAlerts /></LazyPage>} />
           <Route path="hackathons" element={<LazyPage><AdminHackathons /></LazyPage>} />
           <Route path="automation" element={<LazyPage><AdminAutomation /></LazyPage>} />
+          <Route path="support" element={<LazyPage><AdminSupport /></LazyPage>} />
         </Route>
       </Routes>
     </>

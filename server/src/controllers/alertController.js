@@ -11,7 +11,8 @@ export const broadcastAlert = async (req, res, next) => {
     const actionLabel = normalizeString(req.body.actionLabel) || "Open update";
     const actionHref = normalizeString(req.body.actionHref);
     const type = normalizeString(req.body.type) || "Announcement";
-    const sendEmail = req.body.sendEmail !== false;
+    // Bulk email disabled for alert broadcasts to preserve Resend limits. Dashboard Notification Bell is used.
+    const sendEmail = false;
 
     if (!subject || !message) {
       return res.status(400).json({
@@ -29,7 +30,7 @@ export const broadcastAlert = async (req, res, next) => {
       status: "Sending"
     });
 
-    // 2. Dispatch broadcast via NotificationService
+    // 2. Dispatch broadcast via NotificationService (In-App Dashboard Bell)
     const result = await sendBroadcast({
       broadcastId: campaign._id,
       title: subject,
@@ -48,12 +49,11 @@ export const broadcastAlert = async (req, res, next) => {
     await campaign.save();
 
     return res.status(200).json({
-      message: `Broadcast successfully dispatched to ${result.total} student account(s).`,
+      message: `Broadcast notification successfully delivered to ${result.inAppSent || result.total} student dashboard bell(s).`,
       stats: {
         total: result.total,
         sent: result.successful,
         failed: result.failed,
-        emailsSent: result.emailsSent,
         inAppSent: result.inAppSent
       }
     });

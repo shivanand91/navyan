@@ -12,8 +12,7 @@ const createEmptyForm = () => ({
   message: "",
   actionLabel: "Open update",
   actionHref: "",
-  type: "Announcement",
-  sendEmail: true
+  type: "Announcement"
 });
 
 const LinkPreview = ({ value }) => {
@@ -31,16 +30,16 @@ export default function AdminAlerts() {
   const [result, setResult] = useState(null);
 
   const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
+    const { name, value } = event.target;
     setForm((current) => ({
       ...current,
-      [name]: type === "checkbox" ? checked : value
+      [name]: value
     }));
   };
 
   const previewMessage = useMemo(() => {
     const message = form.message.trim();
-    if (!message) return "Write a message to preview the broadcast email.";
+    if (!message) return "Write a message to preview the broadcast notification.";
     return message;
   }, [form.message]);
 
@@ -61,12 +60,11 @@ export default function AdminAlerts() {
         message: form.message,
         actionLabel: form.actionLabel,
         actionHref: form.actionHref,
-        type: form.type,
-        sendEmail: form.sendEmail
+        type: form.type
       });
 
       setResult(data?.stats || null);
-      toast.success(data?.message || "Broadcast sent.");
+      toast.success(data?.message || "Broadcast sent to student notification bells.");
       setForm((current) => ({
         ...current,
         subject: "",
@@ -86,22 +84,21 @@ export default function AdminAlerts() {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             <BellRing className="h-3.5 w-3.5" />
-            Student broadcast
+            Student dashboard notification
           </div>
           <h1 className="font-display text-2xl font-semibold text-[color:var(--text)] md:text-3xl">
-            Send a message to all students
+            Send in-app alert to all students
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-[color:var(--text-secondary)]">
-            Use this page for announcements, reminders, and daily updates. Broadcasts appear in student in-app notification bells and are emailed directly to student inboxes.
+            Use this page for announcements, reminders, and daily updates. Broadcasts appear instantly in all Student Dashboard Notification Bells without consuming email limits.
           </p>
         </div>
 
         {result ? (
-          <div className="grid grid-cols-4 gap-3">
-            <Stat label="Total" value={result.total} />
-            <Stat label="Sent" value={result.sent} accent="success" />
-            <Stat label="Emails" value={result.emailsSent} accent="success" />
-            <Stat label="In-App" value={result.inAppSent} />
+          <div className="grid grid-cols-3 gap-3">
+            <Stat label="Total Students" value={result.total} />
+            <Stat label="Bell Alerts Sent" value={result.inAppSent || result.sent} accent="success" />
+            <Stat label="Failed" value={result.failed} accent="danger" />
           </div>
         ) : null}
       </div>
@@ -111,52 +108,36 @@ export default function AdminAlerts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-              Compose broadcast
+              Compose broadcast alert
             </CardTitle>
             <CardDescription>
-              Keep the tone short, actionable, and clear. The message will be sent to every student
-              account.
+              Keep the message clear and direct. It will pop up in every student's dashboard notification bell icon.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Category / Type">
-                    <select
-                      name="type"
-                      value={form.type}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--input-bg)] p-2.5 text-xs text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="Announcement">Announcement</option>
-                      <option value="General">General</option>
-                      <option value="Important">Important</option>
-                      <option value="Deadline">Deadline</option>
-                      <option value="Internship">Internship</option>
-                    </select>
-                  </Field>
+                <Field label="Category / Type">
+                  <select
+                    name="type"
+                    value={form.type}
+                    onChange={handleChange}
+                    className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--input-bg)] p-2.5 text-xs text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="Announcement">Announcement</option>
+                    <option value="General">General</option>
+                    <option value="Important">Important</option>
+                    <option value="Deadline">Deadline</option>
+                    <option value="Internship">Internship</option>
+                  </select>
+                </Field>
 
-                  <Field label="Send Email Broadcast">
-                    <label className="flex items-center gap-2 mt-2 text-xs font-semibold text-[color:var(--text)] cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="sendEmail"
-                        checked={form.sendEmail}
-                        onChange={handleChange}
-                        className="h-4 w-4 rounded border-[color:var(--border)] text-primary focus:ring-primary/20"
-                      />
-                      <span>Send Email to Student Inboxes</span>
-                    </label>
-                  </Field>
-                </div>
-
-                <Field label="Subject">
+                <Field label="Subject / Heading">
                   <Input
                     name="subject"
                     value={form.subject}
                     onChange={handleChange}
-                    placeholder="Example: Tomorrow's task submission reminder"
+                    placeholder="Example: Tomorrow's task submission deadline"
                   />
                 </Field>
 
@@ -165,13 +146,13 @@ export default function AdminAlerts() {
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    rows={10}
-                    placeholder="Write the message students should receive. Line breaks are preserved."
+                    rows={8}
+                    placeholder="Write the message students should see in their notification bell."
                   />
                 </Field>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Link button text">
+                  <Field label="Action Button Label (Optional)">
                     <Input
                       name="actionLabel"
                       value={form.actionLabel}
@@ -179,12 +160,12 @@ export default function AdminAlerts() {
                       placeholder="Open update"
                     />
                   </Field>
-                  <Field label="Link URL">
+                  <Field label="Target Action URL (Optional)">
                     <Input
                       name="actionHref"
                       value={form.actionHref}
                       onChange={handleChange}
-                      placeholder="https://navyan.online/student/applications"
+                      placeholder="/student/applications"
                     />
                   </Field>
                 </div>
@@ -192,7 +173,7 @@ export default function AdminAlerts() {
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                 <p className="text-xs leading-6 text-[color:var(--text-muted)]">
-                  Plain URLs in the message will also be clickable in the email and notification popup.
+                  Delivered to in-app student dashboard notifications without email charges.
                 </p>
                 <Button type="submit" disabled={sending} className="sm:min-w-44">
                   {sending ? "Sending..." : "Send to all students"}
@@ -205,9 +186,9 @@ export default function AdminAlerts() {
 
         <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle>Live preview</CardTitle>
+            <CardTitle>Dashboard bell preview</CardTitle>
             <CardDescription>
-              This is how the message will feel in the inbox and notification panel.
+              This is how the message will look when students open their notification bell.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -216,7 +197,7 @@ export default function AdminAlerts() {
                 Navyan {form.type || "alert"}
               </div>
               <h2 className="mt-4 font-display text-2xl font-semibold text-[color:var(--text)]">
-                {form.subject || "Your broadcast subject will appear here"}
+                {form.subject || "Broadcast heading will appear here"}
               </h2>
               <div className="mt-4 space-y-3 text-sm leading-7 text-[color:var(--text-secondary)]">
                 {previewMessage
@@ -243,12 +224,12 @@ export default function AdminAlerts() {
                 </div>
                 <div className="space-y-2">
                   <p className="font-display text-base font-semibold text-[color:var(--text)]">
-                    Good broadcast habits
+                    In-App notification benefits
                   </p>
                   <ul className="space-y-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                    <li>Keep the message short and direct.</li>
-                    <li>Use the link field for the main action.</li>
-                    <li>Use clear wording if the message is time-sensitive.</li>
+                    <li>100% free with unlimited delivery.</li>
+                    <li>Instantly lights up student notification bell icon.</li>
+                    <li>Directly opens relevant page when clicked.</li>
                   </ul>
                 </div>
               </div>
