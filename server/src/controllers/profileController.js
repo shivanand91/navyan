@@ -2,26 +2,33 @@ import { User } from "../models/User.js";
 import { getProfileCompletion } from "../utils/profileCompletion.js";
 
 const splitCsv = (value) => {
-  if (Array.isArray(value)) return value.filter(Boolean);
-  if (typeof value !== "string") return value;
-
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item ?? "").trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
 };
 
 const parseBoolean = (value) => {
   if (typeof value === "boolean") return value;
-  if (typeof value !== "string") return value;
-
-  const normalized = value.trim().toLowerCase();
-  if (["yes", "true", "1"].includes(normalized)) return true;
-  if (["no", "false", "0"].includes(normalized)) return false;
-  return value;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["yes", "true", "1"].includes(normalized)) return true;
+    if (["no", "false", "0"].includes(normalized)) return false;
+  }
+  return false;
 };
 
-const sanitizeString = (val) => (typeof val === "string" ? val.trim() : "");
+const sanitizeString = (val) => {
+  if (typeof val === "string") return val.trim();
+  if (typeof val === "number" || typeof val === "boolean") return String(val).trim();
+  return "";
+};
 
 export const getMyProfile = async (req, res, next) => {
   try {

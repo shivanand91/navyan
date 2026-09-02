@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "@/lib/axios";
+import api, { getApiErrorMessage } from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +20,12 @@ export default function Profile() {
     const load = async () => {
       try {
         const { data } = await api.get("/profile/me");
-        reset(data.profile || {});
+        const prof = data.profile || {};
+        reset({
+          ...prof,
+          skills: Array.isArray(prof.skills) ? prof.skills.join(", ") : prof.skills || "",
+          preferredRoles: Array.isArray(prof.preferredRoles) ? prof.preferredRoles.join(", ") : prof.preferredRoles || ""
+        });
         setCompletion(data.completion || null);
       } catch (e) {
         console.error(e);
@@ -38,7 +43,7 @@ export default function Profile() {
       toast.success("Profile updated. You can now apply to internships.");
     } catch (e) {
       console.error(e);
-      toast.error("Could not update profile. Please try again.");
+      toast.error(getApiErrorMessage(e, "Could not update profile. Please try again."));
     }
   };
 
