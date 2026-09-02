@@ -2,6 +2,7 @@ import { Wallet } from "../models/Wallet.js";
 import { WalletTransaction } from "../models/WalletTransaction.js";
 import { ShareAttribution } from "../models/ShareAttribution.js";
 import { ShareLink } from "../models/ShareLink.js";
+import { Application } from "../models/Application.js";
 
 const rewardByDuration = { "4-weeks": 10, "3-months": 50, "6-months": 100 };
 
@@ -11,11 +12,12 @@ export const creditShareRewardForApplication = async (application) => {
   // A UTR submission is not proof of payment. Paid applications must be verified by admin first.
   const paymentStatus = application.payment?.status || "Not Required";
   const isPaymentEligible = paymentStatus === "Not Required" || ["Verified", "Linked"].includes(paymentStatus);
-  if (!isPaymentEligible || application.status !== "Selected") return null;
+  if (!isPaymentEligible || application.status === "Rejected") return null;
 
   const attribution = application.shareAttribution
     ? await ShareAttribution.findById(application.shareAttribution)
-    : null;
+    : await ShareAttribution.findOne({ referredUser: application.user, internship: application.internship, status: "ATTRIBUTED" });
+
   if (!attribution || attribution.status !== "ATTRIBUTED" || attribution.expiresAt < new Date()) return null;
   if (String(attribution.owner) === String(application.user)) return null;
 
@@ -48,6 +50,24 @@ export const creditShareRewardForApplication = async (application) => {
   } catch (error) {
     if (error?.code === 11000) return null;
     throw error;
+  }
+};
+
+export const syncPendingShareRewards = async () => {
+  try {
+    const eligibleAttributions = await ShareAttribution.find({ status: "ATTRIBUTED" });
+    for (const attr of eligibleAttributions) {
+      const app = await Application.findOne({
+        user: attr.referredUser,
+        internship: attr.internship,
+        status: { $ne: "Rejected" }
+      });
+      if (app) {
+        await creditShareRewardForApplication(app);
+      }
+    }
+  } catch (err) {
+    console.error("Auto sync pending share rewards error:", err);
   }
 };
 

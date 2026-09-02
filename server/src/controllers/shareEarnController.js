@@ -7,6 +7,7 @@ import { WalletTransaction } from "../models/WalletTransaction.js";
 import { Withdrawal } from "../models/Withdrawal.js";
 import { ShareVisit } from "../models/ShareVisit.js";
 import { getBaseCookieOptions } from "../utils/cookies.js";
+import { syncPendingShareRewards } from "../services/shareEarnService.js";
 
 const ATTRIBUTION_DAYS = 30;
 const MIN_WITHDRAWAL = 50;
@@ -55,6 +56,7 @@ export const resolveShareLink = async (req, res, next) => {
 
 export const getWallet = async (req, res, next) => {
   try {
+    await syncPendingShareRewards();
     const [wallet, transactions, withdrawals] = await Promise.all([
       Wallet.findOne({ user: req.user._id }).lean(),
       WalletTransaction.find({ user: req.user._id }).populate("internship", "title").sort({ createdAt: -1 }).limit(20).lean(),
@@ -74,7 +76,7 @@ export const requestWithdrawal = async (req, res, next) => {
     const amount = Number(req.body.amount);
     const upiId = String(req.body.upiId || "").trim().toLowerCase();
     if (!Number.isFinite(amount) || amount < MIN_WITHDRAWAL) return res.status(400).json({ message: `Minimum withdrawal amount is ₹${MIN_WITHDRAWAL}.` });
-    if (!UPI_REGEX.test(upiId)) return res.status(400).json({ message: "Enter a valid UPI ID." });
+    if (!UPI_REGEX.test(upiId)) return res.status(400).json({ message: "Enter a valid UPI ID (e.g. name@upi)." });
     const wallet = await Wallet.findOneAndUpdate(
       { user: req.user._id, availableBalance: { $gte: amount } },
       { $inc: { availableBalance: -amount, pendingBalance: amount } },
@@ -94,6 +96,7 @@ export const requestWithdrawal = async (req, res, next) => {
 
 export const adminShareEarnOverview = async (req, res, next) => {
   try {
+    await syncPendingShareRewards();
     const [rewards, withdrawals, links, activeSharers] = await Promise.all([
       WalletTransaction.aggregate([{ $match: { category: "SHARE_EARN" } }, { $group: { _id: "$status", amount: { $sum: "$amount" } } }]),
       Withdrawal.aggregate([{ $group: { _id: "$status", amount: { $sum: "$amount" } } }]),
@@ -109,6 +112,7 @@ export const adminListWithdrawals = async (req, res, next) => {
 
 export const adminListRewards = async (req, res, next) => {
   try {
+    await syncPendingShareRewards();
     const rewards = await WalletTransaction.find({ category: "SHARE_EARN" })
       .populate("user", "fullName email")
       .populate("referredUser", "fullName email")
@@ -126,7 +130,14 @@ export const adminUpdateWithdrawal = async (req, res, next) => {
     const withdrawal = await Withdrawal.findById(req.params.id);
     if (!withdrawal) return res.status(404).json({ message: "Withdrawal not found" });
     if (["COMPLETED", "REJECTED", "FAILED"].includes(withdrawal.status)) return res.status(400).json({ message: "This withdrawal has already been finalized" });
-    withdrawal.status = status; withdrawal.transactionReference = transactionReference || withdrawal.transactionReference; withdrawal.adminNote = adminNote || withdrawal.adminNote;
+    
+    if (status === "COMPLETED" && (!transactionReference || !String(transactionReference).trim())) {
+      return res.status(400).json({ message: "UTR / Transaction reference number is required before marking payment as COMPLETED." });
+    }
+
+    withdrawal.status = status;
+    if (transactionReference) withdrawal.transactionReference = String(transactionReference).trim();
+    if (adminNote) withdrawal.adminNote = String(adminNote).trim();
     if (["COMPLETED", "REJECTED", "FAILED"].includes(status)) { withdrawal.processedAt = new Date(); withdrawal.processedBy = req.user._id; }
     await withdrawal.save();
     if (status === "COMPLETED") {

@@ -671,6 +671,10 @@ export const applyToInternship = async (req, res, next) => {
       });
     }
 
+    if (payment.status === "Not Required") {
+      await creditShareRewardForApplication(application);
+    }
+
     if (referral?.referralCode) {
       await incrementReferralUsage(referral.referralCode);
     }
@@ -991,7 +995,11 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
 
     await application.save();
 
-    if (application.status === "Selected" && prevStatus !== "Selected") {
+    if (
+      paymentDecision === "Verified" ||
+      application.status === "Selected" ||
+      (application.payment?.status === "Verified" && application.status !== "Rejected")
+    ) {
       await creditShareRewardForApplication(application);
     }
     if (application.status === "Rejected" && prevStatus !== "Rejected") {
