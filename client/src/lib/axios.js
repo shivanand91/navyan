@@ -15,11 +15,15 @@ const resolveApiBaseUrl = () => {
     return configuredUrl.replace(/\/$/, "");
   }
 
-  if (!import.meta.env.DEV && typeof window !== "undefined") {
+  if (import.meta.env.DEV) {
     return PRODUCTION_API_BASE_URL;
   }
 
-  return "http://localhost:5000/api";
+  if (typeof window !== "undefined") {
+    return PRODUCTION_API_BASE_URL;
+  }
+
+  return "http://127.0.0.1:5000/api";
 };
 
 const readStoredAccessToken = () => {

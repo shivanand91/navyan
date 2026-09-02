@@ -32,6 +32,8 @@ import supportRoutes from "./routes/supportRoutes.js";
 import shareEarnRoutes from "./routes/shareEarnRoutes.js";
 import { startAutomationWorker } from "./services/automationWorker.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
+import { seedCatalogIfEmpty } from "./services/catalogSeedService.js";
+import { upsertAdminAccount } from "./services/adminSeedService.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
 
 const app = express();
@@ -158,9 +160,13 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || (isProduction ? "0.0.0.0" : "127.0.0.1");
 
-connectDB() // trigger restart
+connectDB()
   .then(async () => {
     await runDatabaseMaintenance();
+    await seedCatalogIfEmpty();
+    if (process.env.NODE_ENV !== "production") {
+      await upsertAdminAccount();
+    }
     startAutomationWorker();
 
     app.listen(PORT, HOST, () => {
