@@ -1,8 +1,6 @@
 import { Application } from "../models/Application.js";
-import { ShareLink } from "../models/ShareLink.js";
 
 const LEGACY_APPLICATION_UNIQUE_INDEX = "user_1_internship_1_durationKey_1";
-const LEGACY_SHARE_LINK_UNIQUE_INDEX = "owner_1_internship_1";
 
 const dropLegacyApplicationIndex = async () => {
   const collection = Application.collection;
@@ -36,18 +34,4 @@ const dropLegacyApplicationIndex = async () => {
 
 export const runDatabaseMaintenance = async () => {
   await dropLegacyApplicationIndex();
-  try {
-    const indexes = await ShareLink.collection.indexes().catch((error) => {
-      if (error?.code === 26 || error?.codeName === "NamespaceNotFound") return [];
-      throw error;
-    });
-    if (indexes.some((index) => index.name === LEGACY_SHARE_LINK_UNIQUE_INDEX && index.unique)) {
-      await ShareLink.collection.dropIndex(LEGACY_SHARE_LINK_UNIQUE_INDEX);
-      console.log(`Dropped legacy unique index: ${LEGACY_SHARE_LINK_UNIQUE_INDEX}`);
-    }
-    await ShareLink.createIndexes();
-  } catch (error) {
-    // Share & Earn indexes must never prevent the core internship API from starting.
-    console.error("Share & Earn index maintenance failed", error);
-  }
 };

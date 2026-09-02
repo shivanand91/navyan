@@ -640,13 +640,7 @@ export const applyToInternship = async (req, res, next) => {
 
     let shareAttribution = null;
     if (shareToken) {
-      const shareLink = await ShareLink.findOne({
-        token: String(shareToken),
-        internship: internshipId,
-        isActive: true,
-        // Older links were internship-level only; retain their attribution while new links stay duration-bound.
-        $or: [{ durationKey }, { durationKey: { $exists: false } }]
-      });
+      const shareLink = await ShareLink.findOne({ token: String(shareToken), internship: internshipId, isActive: true });
       const shareVisit = shareLink && req.cookies?.navyan_share_visitor
         ? await ShareVisit.findOne({ visitorToken: req.cookies.navyan_share_visitor, shareLink: shareLink._id, expiresAt: { $gt: new Date() } })
         : null;
