@@ -24,9 +24,19 @@ const parseBoolean = (value) => {
 export const getMyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select("profile fullName email role");
-    const completion = getProfileCompletion(user.profile);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const mergedProfile = {
+      fullName: user.fullName || "",
+      email: user.email || "",
+      ...(user.profile?.toObject?.() || {})
+    };
+
+    const completion = getProfileCompletion(mergedProfile);
     res.json({
-      profile: user.profile,
+      profile: mergedProfile,
       basic: { fullName: user.fullName, email: user.email, role: user.role },
       completion
     });
@@ -52,8 +62,17 @@ export const updateMyProfile = async (req, res, next) => {
       updates.preferredRoles = splitCsv(updates.preferredRoles);
     }
 
-    if (updates.dailyHours !== undefined && updates.dailyHours !== "") {
-      updates.dailyHours = Number(updates.dailyHours);
+    if (updates.dailyHours !== undefined) {
+      if (updates.dailyHours === "" || updates.dailyHours === null) {
+        delete updates.dailyHours;
+      } else {
+        const num = Number(updates.dailyHours);
+        if (!Number.isNaN(num)) {
+          updates.dailyHours = num;
+        } else {
+          delete updates.dailyHours;
+        }
+      }
     }
 
     if (updates.hasLaptop !== undefined) {
@@ -64,18 +83,24 @@ export const updateMyProfile = async (req, res, next) => {
       updates.allowJobEmails = parseBoolean(updates.allowJobEmails);
     }
 
-    if (typeof updates.fullName === "string" && updates.fullName.trim()) {
-      user.fullName = updates.fullName.trim();
-    }
+    const fullName =
+      typeof updates.fullName === "string" && updates.fullName.trim()
+        ? updates.fullName.trim()
+        : user.fullName || user.profile?.fullName || "Student";
 
-    if (typeof updates.email === "string" && updates.email.trim()) {
-      user.email = updates.email.trim().toLowerCase();
-      updates.email = user.email;
-    }
+    const email =
+      typeof updates.email === "string" && updates.email.trim()
+        ? updates.email.trim().toLowerCase()
+        : user.email || user.profile?.email || "";
+
+    user.fullName = fullName;
+    user.email = email;
 
     user.profile = {
-      ...user.profile?.toObject?.(),
+      ...(user.profile?.toObject?.() || {}),
       ...updates,
+      fullName,
+      email,
       isCompleted: true
     };
 

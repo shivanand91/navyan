@@ -20,25 +20,28 @@ export const loadOneSignalSDK = () => {
 export const initOneSignal = async (userId) => {
   try {
     const OneSignal = await loadOneSignalSDK();
-    window.OneSignal = window.OneSignal || [];
+    if (!OneSignal) return null;
 
-    const appId = import.meta.env.VITE_ONESIGNAL_APP_ID || "c57d77b8-6fb2-4bf1-a4b7-0d927a4d538e"; // Default fallback ID
+    const appId = import.meta.env.VITE_ONESIGNAL_APP_ID || "c57d77b8-6fb2-4bf1-a4b7-0d927a4d538e";
 
-    await OneSignal.init({
-      appId,
-      allowLocalhostAsSecureOrigin: true,
-      notifyButton: {
-        enable: false
-      }
-    });
+    if (typeof OneSignal.init === "function" && !window._oneSignalInitialized) {
+      await OneSignal.init({
+        appId,
+        allowLocalhostAsSecureOrigin: true,
+        notifyButton: {
+          enable: false
+        }
+      });
+      window._oneSignalInitialized = true;
+    }
 
-    if (userId) {
+    if (userId && typeof OneSignal.login === "function") {
       await OneSignal.login(String(userId));
     }
 
     return OneSignal;
   } catch (error) {
-    console.warn("[OneSignal] Initialization error:", error.message);
+    console.warn("[OneSignal] Initialization error:", error?.message || error);
     return null;
   }
 };

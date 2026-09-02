@@ -6,6 +6,7 @@ import { Wallet } from "../models/Wallet.js";
 import { WalletTransaction } from "../models/WalletTransaction.js";
 import { Withdrawal } from "../models/Withdrawal.js";
 import { ShareVisit } from "../models/ShareVisit.js";
+import { getBaseCookieOptions } from "../utils/cookies.js";
 
 const ATTRIBUTION_DAYS = 30;
 const MIN_WITHDRAWAL = 50;
@@ -44,9 +45,7 @@ export const resolveShareLink = async (req, res, next) => {
       { upsert: true }
     );
     res.cookie("navyan_share_visitor", visitorToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      ...getBaseCookieOptions(),
       maxAge: ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000
     });
     const durationKey = link.internship.durations?.[0]?.key;

@@ -24,19 +24,19 @@ export default function PushPermissionBanner({ user }) {
   const handleEnable = async () => {
     try {
       const OneSignal = await initOneSignal(user._id || user.id);
-      if (OneSignal) {
+      if (OneSignal?.Notifications?.requestPermission) {
         // Prompt for notification permission
         const permission = await OneSignal.Notifications.requestPermission();
         localStorage.setItem("navyan_notifications_preference", permission);
 
         if (permission === "granted") {
-          const subscriptionId = OneSignal.User.PushSubscription.id;
+          const subscriptionId = OneSignal.User?.PushSubscription?.id;
           if (subscriptionId) {
             await registerSubscriptionWithBackend(subscriptionId);
           }
         }
       } else {
-        // Fallback for mock mode
+        // Fallback for mock mode or standard web Notifications
         if ("Notification" in window) {
           const permission = await Notification.requestPermission();
           localStorage.setItem("navyan_notifications_preference", permission);

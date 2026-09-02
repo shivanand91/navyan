@@ -1,4 +1,4 @@
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 
 const parseBoolean = (value, fallback) => {
   if (typeof value !== "string") return fallback;
@@ -18,7 +18,7 @@ const normalizeSameSite = (value, fallback) => {
   return fallback;
 };
 
-const getBaseCookieOptions = () => {
+export const getBaseCookieOptions = () => {
   const secure = parseBoolean(process.env.COOKIE_SECURE, isProduction);
   const sameSite = normalizeSameSite(
     process.env.COOKIE_SAME_SITE,
