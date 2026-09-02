@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/axios";
 import halfLogo from "@/assests/half_logo.png"; // Make sure this is your 'N' icon
+import founderSignature from "@/assests/founder.png";
+import coFounderSignature from "@/assests/cofounder.png";
 
 export default function OfferLetterPreview() {
   const { accessToken } = useParams();
@@ -152,7 +154,11 @@ export default function OfferLetterPreview() {
         {/* SIGNATURES SECTION */}
         <div className="px-16 mt-10 flex justify-between items-center relative z-10">
           <div className="text-center">
-            <p className="font-serif italic text-2xl text-slate-700">Shivanand</p>
+            <img
+              src={founderSignature}
+              alt="Shivanand Kumar signature"
+              className="h-14 w-40 object-contain mx-auto"
+            />
             <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
             <p className="font-bold text-[#0b2347]">Shivanand Kumar</p>
             <p className="text-xs text-slate-500">Founder</p>
@@ -172,7 +178,11 @@ export default function OfferLetterPreview() {
           </div>
 
           <div className="text-center">
-            <p className="font-serif italic text-2xl text-slate-700">Anamika</p>
+            <img
+              src={coFounderSignature}
+              alt="Anamika Pandey signature"
+              className="h-14 w-40 object-contain mx-auto"
+            />
             <div className="w-32 h-[1px] border-b border-[#d4a017] mx-auto my-1"></div>
             <p className="font-bold text-[#0b2347]">Anamika Pandey</p>
             <p className="text-xs text-slate-500">Co-Founder</p>

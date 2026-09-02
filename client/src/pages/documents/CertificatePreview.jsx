@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/axios";
 import halfLogo from "@/assests/half_logo.png";
+import founderSignature from "@/assests/founder.png";
+import coFounderSignature from "@/assests/cofounder.png";
 
 const formatCertificateDate = (value) => {
   if (!value) return "";
@@ -131,7 +133,11 @@ export default function CertificatePreview() {
             <div className="absolute bottom-[80px] w-full flex justify-between items-end px-36">
               {/* Left Sign */}
               <div className="text-center">
-                <p className="font-serif italic text-2xl text-slate-800 mb-2">Shivanand</p>
+                <img
+                  src={founderSignature}
+                  alt="Shivanand Kumar signature"
+                  className="h-16 w-44 object-contain mx-auto mb-2"
+                />
                 <div className="w-48 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-lg font-bold text-[#061a35] uppercase tracking-wide">Shivanand Kumar</h4>
                 <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase opacity-70">Founder</p>
@@ -157,7 +163,11 @@ export default function CertificatePreview() {
 
               {/* Right Sign */}
               <div className="text-center">
-                <p className="font-serif italic text-2xl text-slate-800 mb-2">Anamika</p>
+                <img
+                  src={coFounderSignature}
+                  alt="Anamika Pandey signature"
+                  className="h-16 w-44 object-contain mx-auto mb-2"
+                />
                 <div className="w-48 h-[1.5px] bg-[#d4af37] mx-auto" />
                 <h4 className="mt-2 text-lg font-bold text-[#061a35] uppercase tracking-wide">Anamika Pandey</h4>
                 <p className="text-[10px] font-bold tracking-[3px] text-slate-500 uppercase opacity-70">Co-Founder</p>

@@ -4,6 +4,8 @@ import { generatePdfBufferFromHtml } from "../utils/pdf.js";
 
 let cachedFullLogoDataUri = null;
 let cachedHalfLogoDataUri = null;
+let cachedFounderSignatureDataUri = null;
+let cachedCoFounderSignatureDataUri = null;
 
 const createSvgDataUri = (markup) =>
   `data:image/svg+xml;base64,${Buffer.from(markup).toString("base64")}`;
@@ -118,24 +120,89 @@ const getHalfLogoDataUri = async () => {
   return cachedHalfLogoDataUri;
 };
 
-const getSignatureDataUri = (name, text, tone = "#061432") =>
-  createSvgDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="430" height="120" viewBox="0 0 430 120">
-      <path d="M28 92 C95 80, 164 78, 244 79 C302 79, 356 76, 402 67" fill="none" stroke="#061432" stroke-width="3" stroke-linecap="round"/>
-      <text
-        x="34"
-        y="76"
-        fill="${tone}"
-        font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
-        font-size="46"
-        font-weight="500"
-        letter-spacing="0"
-      >${escapeHtml(text || name)}</text>
-    </svg>
-  `);
+const fallbackFounderSignatureDataUri = createSvgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="430" height="120" viewBox="0 0 430 120">
+    <path d="M28 92 C95 80, 164 78, 244 79 C302 79, 356 76, 402 67" fill="none" stroke="#061432" stroke-width="3" stroke-linecap="round"/>
+    <text
+      x="34"
+      y="76"
+      fill="#071533"
+      font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
+      font-size="46"
+      font-weight="500"
+      letter-spacing="0"
+    >Shivanand</text>
+  </svg>
+`);
 
-const founderSignatureDataUri = getSignatureDataUri("Shivanand Kumar", "Shivanand", "#071533");
-const coFounderSignatureDataUri = getSignatureDataUri("Anamika Pandey", "Anamika", "#071533");
+const fallbackCoFounderSignatureDataUri = createSvgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="430" height="120" viewBox="0 0 430 120">
+    <path d="M28 92 C95 80, 164 78, 244 79 C302 79, 356 76, 402 67" fill="none" stroke="#061432" stroke-width="3" stroke-linecap="round"/>
+    <text
+      x="34"
+      y="76"
+      fill="#071533"
+      font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
+      font-size="46"
+      font-weight="500"
+      letter-spacing="0"
+    >Anamika</text>
+  </svg>
+`);
+
+const getFounderSignatureDataUri = async () => {
+  if (cachedFounderSignatureDataUri) return cachedFounderSignatureDataUri;
+
+  const remoteSignatureUrl = process.env.DOCUMENT_FOUNDER_SIGNATURE_URL?.trim();
+  if (remoteSignatureUrl) {
+    cachedFounderSignatureDataUri = remoteSignatureUrl;
+    return cachedFounderSignatureDataUri;
+  }
+
+  const candidates = [
+    process.env.DOCUMENT_FOUNDER_SIGNATURE_PATH,
+    new URL("../../../client/src/assests/founder.png", import.meta.url)
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      cachedFounderSignatureDataUri = await readAssetAsDataUri(candidate);
+      return cachedFounderSignatureDataUri;
+    } catch {
+      // Keep trying known local asset locations.
+    }
+  }
+
+  cachedFounderSignatureDataUri = fallbackFounderSignatureDataUri;
+  return cachedFounderSignatureDataUri;
+};
+
+const getCoFounderSignatureDataUri = async () => {
+  if (cachedCoFounderSignatureDataUri) return cachedCoFounderSignatureDataUri;
+
+  const remoteSignatureUrl = process.env.DOCUMENT_COFOUNDER_SIGNATURE_URL?.trim();
+  if (remoteSignatureUrl) {
+    cachedCoFounderSignatureDataUri = remoteSignatureUrl;
+    return cachedCoFounderSignatureDataUri;
+  }
+
+  const candidates = [
+    process.env.DOCUMENT_COFOUNDER_SIGNATURE_PATH,
+    new URL("../../../client/src/assests/cofounder.png", import.meta.url)
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      cachedCoFounderSignatureDataUri = await readAssetAsDataUri(candidate);
+      return cachedCoFounderSignatureDataUri;
+    } catch {
+      // Keep trying known local asset locations.
+    }
+  }
+
+  cachedCoFounderSignatureDataUri = fallbackCoFounderSignatureDataUri;
+  return cachedCoFounderSignatureDataUri;
+};
 
 const formatMode = (mode) => {
   const normalized = String(mode || "Remote").trim();
@@ -208,6 +275,8 @@ export const createOfferLetterHtml = async ({
 }) => {
   const fullLogoDataUri = await getFullLogoDataUri();
   const halfLogoDataUri = await getHalfLogoDataUri();
+  const founderSignatureDataUri = await getFounderSignatureDataUri();
+  const coFounderSignatureDataUri = await getCoFounderSignatureDataUri();
   const resolvedRole = role || internshipTitle;
 
   return `<!doctype html>
@@ -602,6 +671,8 @@ export const createCertificateHtml = async ({
 }) => {
   const fullLogoDataUri = await getFullLogoDataUri();
   const halfLogoDataUri = await getHalfLogoDataUri();
+  const founderSignatureDataUri = await getFounderSignatureDataUri();
+  const coFounderSignatureDataUri = await getCoFounderSignatureDataUri();
   const resolvedRole = role || internshipTitle || "Internship";
   const periodText =
     startDateStr && endDateStr
