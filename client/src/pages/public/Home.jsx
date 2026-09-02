@@ -840,6 +840,15 @@ export default function Home() {
       </section>
 
       <section className="navyan-section px-4 md:px-6">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-[24px] border border-primary/20 bg-gradient-to-br from-primary/15 via-[color:var(--card)] to-amber-400/15 p-6 md:p-10">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.25fr_1fr]">
+            <div><span className="navyan-pill">Share & Earn</span><h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-textPrimary md:text-4xl">Share internships. Earn money.</h2><p className="mt-3 max-w-xl text-sm leading-7 text-textSecondary">Help your friends discover Navyan internships and earn rewards when they successfully join through your unique link.</p><Link to="/student/share-and-earn" className="mt-6 inline-flex"><Button variant="accent">Start sharing <ArrowRight className="ml-2 h-4 w-4" /></Button></Link></div>
+            <div className="grid grid-cols-3 gap-3">{[["₹10", "4 Weeks"], ["₹50", "3 Months"], ["₹100", "6 Months"]].map(([amount, duration]) => <div key={duration} className="rounded-2xl border border-primary/15 bg-[color:var(--card)] p-4 text-center shadow-sm"><p className="font-display text-2xl font-bold text-primary">{amount}</p><p className="mt-2 text-xs font-semibold text-textSecondary">{duration}</p></div>)}</div>
+          </div><p className="mt-6 text-xs text-textMuted">Rewards are credited only for eligible successful enrollments and are subject to Navyan's Share & Earn terms.</p>
+        </div>
+      </section>
+
+      <section className="navyan-section px-4 md:px-6">
         <div className="mx-auto max-w-7xl space-y-8">
           <SectionHeading
             eyebrow="Live Internships"

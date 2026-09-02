@@ -9,6 +9,7 @@ const Home = lazy(() => import("@/pages/public/Home"));
 const Courses = lazy(() => import("@/pages/public/Courses"));
 const Internships = lazy(() => import("@/pages/public/Internships"));
 const InternshipDetail = lazy(() => import("@/pages/public/InternshipDetail"));
+const ShareLinkRedirect = lazy(() => import("@/pages/public/ShareLinkRedirect"));
 const Services = lazy(() => import("@/pages/public/Services"));
 const Jobs = lazy(() => import("@/pages/public/Jobs"));
 const About = lazy(() => import("@/pages/public/About"));
@@ -41,7 +42,9 @@ const AdminAlerts = lazy(() => import("@/pages/admin/Alerts"));
 const AdminHackathons = lazy(() => import("@/pages/admin/Hackathons"));
 const AdminAutomation = lazy(() => import("@/pages/admin/Automation"));
 const StudentSupport = lazy(() => import("@/pages/student/Support"));
+const ShareEarn = lazy(() => import("@/pages/student/ShareEarn"));
 const AdminSupport = lazy(() => import("@/pages/admin/Support"));
+const AdminShareEarn = lazy(() => import("@/pages/admin/ShareEarn"));
 
 function PageLoader() {
   return (
@@ -93,6 +96,7 @@ export default function App() {
           <Route path="/" element={<LazyPage><Home /></LazyPage>} />
           <Route path="/courses" element={<LazyPage><Courses /></LazyPage>} />
           <Route path="/internships" element={<LazyPage><Internships /></LazyPage>} />
+          <Route path="/s/:token" element={<LazyPage><ShareLinkRedirect /></LazyPage>} />
           <Route path="/internships/:slug" element={<LazyPage><InternshipDetail /></LazyPage>} />
           <Route path="/internships/:slug/:duration" element={<LazyPage><InternshipDetail /></LazyPage>} />
           <Route path="/internship/:slug/:duration" element={<LazyPage><InternshipDetail /></LazyPage>} />
@@ -124,6 +128,7 @@ export default function App() {
           <Route path="applications" element={<LazyPage><Applications /></LazyPage>} />
           <Route path="certificates" element={<LazyPage><Certificates /></LazyPage>} />
           <Route path="support" element={<LazyPage><StudentSupport /></LazyPage>} />
+          <Route path="share-and-earn" element={<LazyPage><ShareEarn /></LazyPage>} />
         </Route>
 
         <Route
@@ -148,6 +153,7 @@ export default function App() {
           <Route path="hackathons" element={<LazyPage><AdminHackathons /></LazyPage>} />
           <Route path="automation" element={<LazyPage><AdminAutomation /></LazyPage>} />
           <Route path="support" element={<LazyPage><AdminSupport /></LazyPage>} />
+          <Route path="share-and-earn" element={<LazyPage><AdminShareEarn /></LazyPage>} />
         </Route>
       </Routes>
     </>

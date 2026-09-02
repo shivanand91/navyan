@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Search,
   Settings,
+  Share2,
   UserRound
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -26,6 +27,7 @@ const links = [
   { to: "/student/jobs", label: "Projects", icon: BriefcaseBusiness, caption: "Career" },
   { to: "/student/applications", label: "Tasks & Progress", icon: FolderKanban, caption: "Track" },
   { to: "/student/certificates", label: "Certificates", icon: FileBadge2, caption: "Registry" },
+  { to: "/student/share-and-earn", label: "Share & Earn", icon: Share2, caption: "Earnings" },
   { to: "/student/support", label: "Ask Doubts", icon: HelpCircle, caption: "Help" },
   { to: "/student/profile", label: "Profile", icon: UserRound, caption: "Identity" },
   { to: "/student/profile/edit", label: "Settings", icon: Settings, caption: "Account" }

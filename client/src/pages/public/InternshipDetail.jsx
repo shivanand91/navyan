@@ -28,7 +28,9 @@ import {
   AlertTriangle,
   ChevronRight,
   FileText,
-  X
+  X,
+  Share2,
+  Copy
 } from "lucide-react";
 
 export default function InternshipDetail() {
@@ -52,6 +54,8 @@ export default function InternshipDetail() {
   const [utrNumber, setUtrNumber] = useState("");
   const [timer, setTimer] = useState(0);
   const [success, setSuccess] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+  const [shareLoading, setShareLoading] = useState(false);
 
   // Fetch Internship Details
   useEffect(() => {
@@ -177,6 +181,17 @@ export default function InternshipDetail() {
     setUtrNumber("");
   };
 
+  const handleGenerateShareLink = async () => {
+    if (!user) { toast.info("Log in to generate your unique share link."); navigate(`/login?redirect=/internship/${slug}/${selectedKey}`); return; }
+    if (user.role !== "student") { toast.error("Only student accounts can generate share links."); return; }
+    setShareLoading(true);
+    try { const { data } = await api.post("/share-earn/links", { internshipId: internship._id }); setShareLink(data.shareUrl); }
+    catch (error) { toast.error(error?.response?.data?.message || "Could not generate the share link."); }
+    finally { setShareLoading(false); }
+  };
+  const copyShareLink = async () => { await navigator.clipboard?.writeText(shareLink); toast.success("Share link copied."); };
+  const nativeShare = async () => { if (navigator.share) { await navigator.share({ title: `Join ${internship.title} on Navyan`, text: "Check out this internship on Navyan.", url: shareLink }); } else copyShareLink(); };
+
   // Generate QR code call
   const handleGeneratePaymentQr = async () => {
     setPaymentLoading(true);
@@ -210,7 +225,8 @@ export default function InternshipDetail() {
       const payload = {
         internshipId: internship._id,
         durationKey: selectedKey,
-        motivation
+        motivation,
+        shareToken: localStorage.getItem("navyan_share_token") || undefined
       };
 
       const isPaid = selectedDuration.isPaid || getEffectiveDurationPrice(selectedDuration) > 0;
@@ -236,6 +252,7 @@ export default function InternshipDetail() {
       }
 
       await api.post("/applications", payload);
+      localStorage.removeItem("navyan_share_token");
       setSuccess(true);
       toast.success("Application submitted successfully!");
     } catch (error) {
@@ -785,6 +802,13 @@ export default function InternshipDetail() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
+
+              <div className="border-t border-[color:var(--border)] pt-4">
+                <p className="text-sm font-semibold text-textPrimary">Want to earn money?</p>
+                <p className="mt-1 text-xs leading-5 text-textSecondary">Share this internship. Earn {selectedKey === "6-months" ? "₹100" : selectedKey === "3-months" ? "₹50" : "₹10"} when someone successfully joins.</p>
+                <Button variant="outline" size="sm" className="mt-3 w-full" onClick={handleGenerateShareLink} disabled={shareLoading}><Share2 className="mr-2 h-4 w-4" />{shareLoading ? "Generating..." : "Generate Share Link"}</Button>
+                {shareLink ? <div className="mt-3 space-y-2 rounded-xl bg-primary/5 p-3"><p className="break-all text-[11px] text-textSecondary">{shareLink}</p><div className="grid grid-cols-2 gap-2"><Button size="sm" variant="outline" onClick={copyShareLink}><Copy className="mr-1.5 h-3.5 w-3.5" />Copy</Button><Button size="sm" onClick={nativeShare}><Share2 className="mr-1.5 h-3.5 w-3.5" />Share</Button></div></div> : null}
+              </div>
 
               <p className="text-[10px] text-center text-[color:var(--text-muted)] leading-relaxed">
                 Applying takes less than 2 minutes. Get instant portal access and cohort review dates after step verification.

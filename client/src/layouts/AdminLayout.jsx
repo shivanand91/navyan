@@ -38,7 +38,8 @@ const links = [
   { to: "/admin/service-inquiries", label: "Service Leads", icon: Layers3, caption: "Pipeline" },
   { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" },
   { to: "/admin/hackathons", label: "Hackathons", icon: Trophy, caption: "Events" },
-  { to: "/admin/automation", label: "Automation", icon: Clock, caption: "Lifecycle" }
+  { to: "/admin/automation", label: "Automation", icon: Clock, caption: "Lifecycle" },
+  { to: "/admin/share-and-earn", label: "Share & Earn", icon: Share2, caption: "Payouts" }
 ];
 
 export function AdminLayout() {

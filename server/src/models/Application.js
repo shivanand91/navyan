@@ -65,6 +65,7 @@ const applicationSchema = new mongoose.Schema(
       code: String,
       ownerName: String
     },
+    shareAttribution: { type: mongoose.Schema.Types.ObjectId, ref: "ShareAttribution" },
     offerLetter: {
       id: String,
       accessToken: String,

@@ -29,6 +29,7 @@ import hackathonRoutes from "./routes/hackathonRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import automationRoutes from "./routes/automationRoutes.js";
 import supportRoutes from "./routes/supportRoutes.js";
+import shareEarnRoutes from "./routes/shareEarnRoutes.js";
 import { startAutomationWorker } from "./services/automationWorker.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
 import { normalizeAbsoluteUrl } from "./utils/origin.js";
@@ -148,6 +149,7 @@ app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/automation", automationRoutes);
 app.use("/api/support", supportRoutes);
+app.use("/api/share-earn", shareEarnRoutes);
 
 // 404 + errors
 app.use(notFound);

@@ -38,6 +38,11 @@ import {
   shouldExposeAssignedTask
 } from "../services/taskAssignmentService.js";
 import { buildClientUrl, buildServerUrl, normalizeServerDocumentUrl } from "../utils/origin.js";
+import { ShareLink } from "../models/ShareLink.js";
+import { ShareAttribution } from "../models/ShareAttribution.js";
+import { ShareVisit } from "../models/ShareVisit.js";
+import { creditShareRewardForApplication, reverseShareRewardForApplication } from "../services/shareEarnService.js";
+import { getRequestIpHash } from "./shareEarnController.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
 const PAYMENT_INTENT_TTL_MINUTES = 5;
@@ -204,6 +209,7 @@ const APPLICATION_BASE_SELECT = [
   "internalNotes",
   "payment",
   "referral",
+  "shareAttribution",
   "offerLetter",
   "internshipMeta",
   "submission",
@@ -503,7 +509,8 @@ export const applyToInternship = async (req, res, next) => {
       motivation,
       paymentAttemptId,
       utrNumber,
-      referralCode
+      referralCode,
+      shareToken
     } = req.body;
 
     if (!internshipId || !durationKey) {
@@ -631,6 +638,22 @@ export const applyToInternship = async (req, res, next) => {
       };
     }
 
+    let shareAttribution = null;
+    if (shareToken) {
+      const shareLink = await ShareLink.findOne({ token: String(shareToken), internship: internshipId, isActive: true });
+      const shareVisit = shareLink && req.cookies?.navyan_share_visitor
+        ? await ShareVisit.findOne({ visitorToken: req.cookies.navyan_share_visitor, shareLink: shareLink._id, expiresAt: { $gt: new Date() } })
+        : null;
+      if (shareLink && shareVisit && String(shareLink.owner) !== String(userId)) {
+        const isSameNetwork = shareLink.creatorIpHash && shareLink.creatorIpHash === getRequestIpHash(req);
+        shareAttribution = await ShareAttribution.findOneAndUpdate(
+          { referredUser: userId, internship: internshipId },
+          { $setOnInsert: { shareLink: shareLink._id, owner: shareLink.owner, referredUser: userId, internship: internshipId, firstClickedAt: shareVisit.clickedAt, expiresAt: shareVisit.expiresAt, status: isSameNetwork ? "BLOCKED" : "ATTRIBUTED" } },
+          { new: true, upsert: true }
+        );
+      }
+    }
+
     const application = await Application.create({
       user: userId,
       internship: internshipId,
@@ -638,7 +661,8 @@ export const applyToInternship = async (req, res, next) => {
       motivation,
       status: "Under Review",
       payment,
-      referral
+      referral,
+      shareAttribution: shareAttribution?._id
     });
 
     if (payment.paymentAttempt) {
@@ -966,6 +990,13 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
     }
 
     await application.save();
+
+    if (application.status === "Selected" && prevStatus !== "Selected") {
+      await creditShareRewardForApplication(application);
+    }
+    if (application.status === "Rejected" && prevStatus !== "Rejected") {
+      await reverseShareRewardForApplication(application);
+    }
 
     // Trigger/Sync internship lifecycle automation events
     await scheduleInternshipLifecycleEvents(application._id);
