@@ -8,6 +8,11 @@ const rewardByDuration = { "4-weeks": 10, "3-months": 50, "6-months": 100 };
 export const getShareReward = (durationKey) => rewardByDuration[durationKey] || 0;
 
 export const creditShareRewardForApplication = async (application) => {
+  // A UTR submission is not proof of payment. Paid applications must be verified by admin first.
+  const paymentStatus = application.payment?.status || "Not Required";
+  const isPaymentEligible = paymentStatus === "Not Required" || ["Verified", "Linked"].includes(paymentStatus);
+  if (!isPaymentEligible || application.status !== "Selected") return null;
+
   const attribution = application.shareAttribution
     ? await ShareAttribution.findById(application.shareAttribution)
     : null;

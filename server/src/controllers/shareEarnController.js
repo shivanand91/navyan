@@ -11,7 +11,8 @@ const ATTRIBUTION_DAYS = 30;
 const MIN_WITHDRAWAL = 50;
 const UPI_REGEX = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/;
 const maskUpi = (upi) => `${upi.slice(0, Math.min(3, upi.length))}****${upi.slice(upi.indexOf("@"))}`;
-const buildShareUrl = (req, token) => `${process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`}/s/${token}`;
+const buildShareUrl = (req, internshipSlug, token) =>
+  `${process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`}/internship/${encodeURIComponent(internshipSlug)}?share=${encodeURIComponent(token)}`;
 export const getRequestIpHash = (req) => crypto.createHash("sha256").update(String(req.ip || "")).digest("hex");
 
 export const createShareLink = async (req, res, next) => {
@@ -20,7 +21,12 @@ export const createShareLink = async (req, res, next) => {
     if (!internship) return res.status(404).json({ message: "Internship not found" });
     let link = await ShareLink.findOne({ owner: req.user._id, internship: internship._id, isActive: true });
     if (!link) link = await ShareLink.create({ owner: req.user._id, internship: internship._id, token: crypto.randomBytes(18).toString("base64url"), creatorIpHash: getRequestIpHash(req) });
-    res.status(201).json({ success: true, token: link.token, shareUrl: buildShareUrl(req, link.token) });
+    res.status(201).json({
+      success: true,
+      token: link.token,
+      // Use the existing internship page route so shared links work even on hosts without a short-link SPA rewrite.
+      shareUrl: buildShareUrl(req, internship.slug, link.token)
+    });
   } catch (error) { next(error); }
 };
 

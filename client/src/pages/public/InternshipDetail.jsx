@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { getDurationPriceLabel, isPaidDuration, getEffectiveDurationPrice } from "@/utils/internshipPricing";
@@ -35,6 +35,7 @@ import {
 
 export default function InternshipDetail() {
   const { slug, duration: urlDurationKey } = useParams();
+  const [searchParams] = useSearchParams();
   const [internship, setInternship] = useState(null);
   const [loading, setLoading] = useState(true);
   const [blockingApplication, setBlockingApplication] = useState(null);
@@ -78,6 +79,15 @@ export default function InternshipDetail() {
     };
     fetchData();
   }, [slug, urlDurationKey]);
+
+  // Preserve server-validated share attribution when a student lands on an internship link.
+  useEffect(() => {
+    const shareToken = searchParams.get("share");
+    if (!shareToken) return;
+    api.get(`/share-earn/links/${encodeURIComponent(shareToken)}`, { cache: false })
+      .then(({ data }) => localStorage.setItem("navyan_share_token", data.token))
+      .catch(() => localStorage.removeItem("navyan_share_token"));
+  }, [searchParams]);
 
   // Fetch Blocking Application Status
   useEffect(() => {
