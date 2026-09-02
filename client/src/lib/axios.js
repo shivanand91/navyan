@@ -5,11 +5,13 @@ const PRODUCTION_API_BASE_URL = "/api";
 const LOCAL_API_URL_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?/i;
 const DEFAULT_GET_CACHE_TTL = 5 * 60 * 1000;
 
+const DEFAULT_PRODUCTION_API_URL = "https://navyan.vercel.app/api";
+
 const resolveApiBaseUrl = () => {
   const configuredUrl = import.meta.env.VITE_API_URL?.trim();
   if (configuredUrl) {
     if (!import.meta.env.DEV && LOCAL_API_URL_PATTERN.test(configuredUrl)) {
-      return PRODUCTION_API_BASE_URL;
+      return DEFAULT_PRODUCTION_API_URL;
     }
 
     return configuredUrl.replace(/\/$/, "");
@@ -20,10 +22,16 @@ const resolveApiBaseUrl = () => {
   }
 
   if (typeof window !== "undefined") {
-    return PRODUCTION_API_BASE_URL;
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    if (isLocalhost) {
+      return PRODUCTION_API_BASE_URL;
+    }
+    return DEFAULT_PRODUCTION_API_URL;
   }
 
-  return "http://127.0.0.1:5000/api";
+  return DEFAULT_PRODUCTION_API_URL;
 };
 
 const readStoredAccessToken = () => {

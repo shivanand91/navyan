@@ -7,6 +7,10 @@ export const connectDB = async () => {
 
   mongoose.set("strictQuery", true);
 
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   try {
     if (!uri) throw new Error("MONGODB_URI not set");
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
@@ -16,9 +20,7 @@ export const connectDB = async () => {
     console.warn("MongoDB connect failed. Starting in-memory MongoDB for development.");
     mongod = await MongoMemoryServer.create({
       instance: {
-        ip: "127.0.0.1",
-        port: Number(process.env.MEMORY_MONGODB_PORT || 27018),
-        portGeneration: false
+        ip: "127.0.0.1"
       }
     });
     const memUri = mongod.getUri("navyan");

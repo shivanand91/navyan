@@ -61,7 +61,11 @@ const allowedOrigins = [
   process.env.CLIENT_URL || "https://www.navyan.online",
   "https://www.navyan.online",
   "https://navyan.online",
-  "https://navyan.vercel.app"
+  "http://www.navyan.online",
+  "http://navyan.online",
+  "https://navyan.vercel.app",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
 ]
   .map(normalizeOrigin)
   .filter(Boolean);
@@ -169,11 +173,14 @@ connectDB()
     }
     startAutomationWorker();
 
-    app.listen(PORT, HOST, () => {
-      console.log(`Navyan API running on http://${HOST}:${PORT}`);
-    });
+    if (process.env.VERCEL !== "1") {
+      app.listen(PORT, HOST, () => {
+        console.log(`Navyan API running on http://${HOST}:${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error("Failed to connect DB", err);
-    process.exit(1);
   });
+
+export default app;
