@@ -30,6 +30,7 @@ export default function Internships() {
   const { user } = useAuth();
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [activeInternship, setActiveInternship] = useState(null);
   const [selectedDurations, setSelectedDurations] = useState({});
 
@@ -50,6 +51,7 @@ export default function Internships() {
         setInternships(data.internships || []);
       } catch (error) {
         console.error(error);
+        setLoadError(error?.response?.data?.message || "Could not load internships right now. Please refresh in a moment.");
       } finally {
         setLoading(false);
       }
@@ -76,6 +78,12 @@ export default function Internships() {
                   className="navyan-card h-[440px] animate-pulse bg-white/40 dark:bg-white/5"
                 />
               ))}
+            </div>
+          ) : loadError ? (
+            <div className="navyan-card px-6 py-12 text-center">
+              <p className="font-display text-2xl font-semibold text-textPrimary">Internships could not be loaded.</p>
+              <p className="mt-3 text-sm text-textSecondary">{loadError}</p>
+              <Button variant="outline" className="mt-6" onClick={() => window.location.reload()}>Try again</Button>
             </div>
           ) : internships.length === 0 ? (
             <div className="navyan-card px-6 py-12 text-center">
