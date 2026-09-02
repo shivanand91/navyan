@@ -195,7 +195,7 @@ export default function InternshipDetail() {
     if (!user) { toast.info("Log in to generate your unique share link."); navigate(`/login?redirect=/internship/${slug}/${selectedKey}`); return; }
     if (user.role !== "student") { toast.error("Only student accounts can generate share links."); return; }
     setShareLoading(true);
-    try { const { data } = await api.post("/share-earn/links", { internshipId: internship._id }); setShareLink(data.shareUrl); }
+    try { const { data } = await api.post("/share-earn/links", { internshipId: internship._id, durationKey: selectedKey }); setShareLink(data.shareUrl); }
     catch (error) { toast.error(error?.response?.data?.message || "Could not generate the share link."); }
     finally { setShareLoading(false); }
   };

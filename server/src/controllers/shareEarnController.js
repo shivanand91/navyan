@@ -11,28 +11,30 @@ const ATTRIBUTION_DAYS = 30;
 const MIN_WITHDRAWAL = 50;
 const UPI_REGEX = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/;
 const maskUpi = (upi) => `${upi.slice(0, Math.min(3, upi.length))}****${upi.slice(upi.indexOf("@"))}`;
-const buildShareUrl = (req, internshipSlug, token) =>
-  `${process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`}/internship/${encodeURIComponent(internshipSlug)}?share=${encodeURIComponent(token)}`;
+const buildShareUrl = (req, internshipSlug, durationKey, token) =>
+  `${process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`}/internship/${encodeURIComponent(internshipSlug)}/${encodeURIComponent(durationKey)}?share=${encodeURIComponent(token)}`;
 export const getRequestIpHash = (req) => crypto.createHash("sha256").update(String(req.ip || "")).digest("hex");
 
 export const createShareLink = async (req, res, next) => {
   try {
-    const internship = await Internship.findOne({ _id: req.body.internshipId, isPublished: true, isDeleted: { $ne: true } });
+    const { internshipId, durationKey } = req.body;
+    const internship = await Internship.findOne({ _id: internshipId, isPublished: true, isDeleted: { $ne: true } });
     if (!internship) return res.status(404).json({ message: "Internship not found" });
-    let link = await ShareLink.findOne({ owner: req.user._id, internship: internship._id, isActive: true });
-    if (!link) link = await ShareLink.create({ owner: req.user._id, internship: internship._id, token: crypto.randomBytes(18).toString("base64url"), creatorIpHash: getRequestIpHash(req) });
+    if (!internship.durations.some((duration) => duration.key === durationKey)) return res.status(400).json({ message: "Invalid internship duration" });
+    let link = await ShareLink.findOne({ owner: req.user._id, internship: internship._id, durationKey, isActive: true });
+    if (!link) link = await ShareLink.create({ owner: req.user._id, internship: internship._id, durationKey, token: crypto.randomBytes(18).toString("base64url"), creatorIpHash: getRequestIpHash(req) });
     res.status(201).json({
       success: true,
       token: link.token,
       // Use the existing internship page route so shared links work even on hosts without a short-link SPA rewrite.
-      shareUrl: buildShareUrl(req, internship.slug, link.token)
+      shareUrl: buildShareUrl(req, internship.slug, link.durationKey, link.token)
     });
   } catch (error) { next(error); }
 };
 
 export const resolveShareLink = async (req, res, next) => {
   try {
-    const link = await ShareLink.findOneAndUpdate({ token: req.params.token, isActive: true }, { $inc: { clicks: 1 } }, { new: true }).populate("internship", "slug");
+    const link = await ShareLink.findOneAndUpdate({ token: req.params.token, isActive: true }, { $inc: { clicks: 1 } }, { new: true }).populate("internship", "slug durations.key");
     if (!link?.internship) return res.status(404).json({ message: "This share link is no longer available" });
     const visitorToken = req.cookies?.navyan_share_visitor || crypto.randomBytes(18).toString("base64url");
     const expiresAt = new Date(Date.now() + ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000);
@@ -47,7 +49,8 @@ export const resolveShareLink = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000
     });
-    res.json({ internshipSlug: link.internship.slug, redirectPath: `/internship/${link.internship.slug}`, token: link.token });
+    const durationKey = link.durationKey || link.internship.durations?.[0]?.key;
+    res.json({ internshipSlug: link.internship.slug, durationKey, redirectPath: `/internship/${link.internship.slug}/${durationKey}`, token: link.token });
   } catch (error) { next(error); }
 };
 
