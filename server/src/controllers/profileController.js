@@ -21,6 +21,8 @@ const parseBoolean = (value) => {
   return value;
 };
 
+const sanitizeString = (val) => (typeof val === "string" ? val.trim() : "");
+
 export const getMyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select("profile fullName email role");
@@ -47,62 +49,73 @@ export const getMyProfile = async (req, res, next) => {
 
 export const updateMyProfile = async (req, res, next) => {
   try {
-    const updates = { ...req.body };
-
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (updates.skills !== undefined) {
-      updates.skills = splitCsv(updates.skills);
+    const body = req.body || {};
+
+    const fullName = sanitizeString(body.fullName) || user.fullName || user.profile?.fullName || "Student";
+    const email = (sanitizeString(body.email) || user.email || user.profile?.email || "").toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
 
-    if (updates.preferredRoles !== undefined) {
-      updates.preferredRoles = splitCsv(updates.preferredRoles);
-    }
-
-    if (updates.dailyHours !== undefined) {
-      if (updates.dailyHours === "" || updates.dailyHours === null) {
-        delete updates.dailyHours;
-      } else {
-        const num = Number(updates.dailyHours);
-        if (!Number.isNaN(num)) {
-          updates.dailyHours = num;
-        } else {
-          delete updates.dailyHours;
-        }
+    if (email !== user.email) {
+      const existing = await User.findOne({ email, _id: { $ne: user._id } });
+      if (existing) {
+        return res.status(400).json({ message: "Email is already in use by another account" });
       }
     }
 
-    if (updates.hasLaptop !== undefined) {
-      updates.hasLaptop = parseBoolean(updates.hasLaptop);
+    let dailyHours = undefined;
+    if (body.dailyHours !== undefined && body.dailyHours !== "" && body.dailyHours !== null) {
+      const num = Number(body.dailyHours);
+      if (!Number.isNaN(num) && num >= 0) {
+        dailyHours = num;
+      }
     }
 
-    if (updates.allowJobEmails !== undefined) {
-      updates.allowJobEmails = parseBoolean(updates.allowJobEmails);
+    const existingProfile = user.profile?.toObject?.() || {};
+
+    const newProfile = {
+      ...existingProfile,
+      fullName,
+      email,
+      phone: body.phone !== undefined ? sanitizeString(body.phone) : existingProfile.phone || "",
+      whatsapp: body.whatsapp !== undefined ? sanitizeString(body.whatsapp) : existingProfile.whatsapp || "",
+      city: body.city !== undefined ? sanitizeString(body.city) : existingProfile.city || "",
+      state: body.state !== undefined ? sanitizeString(body.state) : existingProfile.state || "",
+      college: body.college !== undefined ? sanitizeString(body.college) : existingProfile.college || "",
+      degree: body.degree !== undefined ? sanitizeString(body.degree) : existingProfile.degree || "",
+      branch: body.branch !== undefined ? sanitizeString(body.branch) : existingProfile.branch || "",
+      currentYear: body.currentYear !== undefined ? sanitizeString(body.currentYear) : existingProfile.currentYear || "",
+      graduationYear: body.graduationYear !== undefined ? sanitizeString(body.graduationYear) : existingProfile.graduationYear || "",
+      skills: body.skills !== undefined ? splitCsv(body.skills) : existingProfile.skills || [],
+      preferredRoles: body.preferredRoles !== undefined ? splitCsv(body.preferredRoles) : existingProfile.preferredRoles || [],
+      prevInternshipExperience: body.prevInternshipExperience !== undefined ? sanitizeString(body.prevInternshipExperience) : existingProfile.prevInternshipExperience || "",
+      englishLevel: body.englishLevel !== undefined ? sanitizeString(body.englishLevel) : existingProfile.englishLevel || "",
+      resumeUrl: body.resumeUrl !== undefined ? sanitizeString(body.resumeUrl) : existingProfile.resumeUrl || "",
+      portfolioUrl: body.portfolioUrl !== undefined ? sanitizeString(body.portfolioUrl) : existingProfile.portfolioUrl || "",
+      githubUrl: body.githubUrl !== undefined ? sanitizeString(body.githubUrl) : existingProfile.githubUrl || "",
+      linkedinUrl: body.linkedinUrl !== undefined ? sanitizeString(body.linkedinUrl) : existingProfile.linkedinUrl || "",
+      avatarUrl: body.avatarUrl !== undefined ? sanitizeString(body.avatarUrl) : existingProfile.avatarUrl || "",
+      hasLaptop: body.hasLaptop !== undefined ? parseBoolean(body.hasLaptop) : (existingProfile.hasLaptop ?? false),
+      allowJobEmails: body.allowJobEmails !== undefined ? parseBoolean(body.allowJobEmails) : (existingProfile.allowJobEmails ?? false),
+      isCompleted: true
+    };
+
+    if (dailyHours !== undefined) {
+      newProfile.dailyHours = dailyHours;
+    } else if (body.dailyHours === "" || body.dailyHours === null) {
+      delete newProfile.dailyHours;
     }
-
-    const fullName =
-      typeof updates.fullName === "string" && updates.fullName.trim()
-        ? updates.fullName.trim()
-        : user.fullName || user.profile?.fullName || "Student";
-
-    const email =
-      typeof updates.email === "string" && updates.email.trim()
-        ? updates.email.trim().toLowerCase()
-        : user.email || user.profile?.email || "";
 
     user.fullName = fullName;
     user.email = email;
-
-    user.profile = {
-      ...(user.profile?.toObject?.() || {}),
-      ...updates,
-      fullName,
-      email,
-      isCompleted: true
-    };
+    user.profile = newProfile;
 
     await user.save();
 
