@@ -137,6 +137,18 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "navyan-api woking..." });
 });
 
+// Serverless DB Connection & Catalog Seeding Middleware
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectDB();
+    await seedCatalogIfEmpty();
+    next();
+  } catch (err) {
+    console.error("Database connection middleware error:", err);
+    res.status(500).json({ message: "Database connection failed. Please check backend server configuration." });
+  }
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
