@@ -53,6 +53,8 @@ export const trackActivity = async ({ eventType, user, sessionId, internship, ap
   try {
     const definition = EVENT_DEFINITIONS[eventType];
     if (!definition) return null;
+    // The admin console is an observer of student activity, not a source of admin surveillance.
+    if (user?.role === "admin") return null;
 
     const now = new Date();
     const payload = {

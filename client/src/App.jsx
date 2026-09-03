@@ -89,6 +89,7 @@ function ActivityTracker() {
   const location = useLocation();
 
   useEffect(() => {
+    if (location.pathname.startsWith("/admin")) return;
     if (/^\/internships?\//.test(location.pathname)) return;
     void api.post("/activity/track", { eventType: "USER_VISIT", path: location.pathname }).catch(() => {});
   }, [location.pathname]);

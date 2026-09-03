@@ -179,6 +179,9 @@ export function AdminLayout() {
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
+              <div className="md:hidden">
+                <AdminNotificationBell />
+              </div>
             </div>
           </div>
 

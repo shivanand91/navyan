@@ -141,6 +141,9 @@ export function StudentLayout() {
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
+              <div className="md:hidden">
+                <NotificationBell />
+              </div>
             </div>
           </div>
 
