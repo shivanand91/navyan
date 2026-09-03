@@ -262,6 +262,13 @@
 
   * {
     @apply border-border;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   html {
@@ -379,4 +386,3 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
-

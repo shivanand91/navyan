@@ -27,9 +27,9 @@ export function MobileDrawerNav({
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-[80] bg-black/45 backdrop-blur-sm dark:bg-[#000000]/70" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto max-w-2xl rounded-t-[16px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 text-[color:var(--text)] shadow-[0_-20px_60px_rgba(20,20,15,0.06)] dark:shadow-none">
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[90] mx-auto flex max-h-[calc(100dvh-0.75rem)] max-w-2xl flex-col rounded-t-[16px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 text-[color:var(--text)] shadow-[0_-20px_60px_rgba(20,20,15,0.06)] dark:shadow-none">
           <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[color:var(--border)]" />
-          <div className="mb-4">
+          <div className="mb-4 shrink-0">
             <Drawer.Title className="font-display text-xl font-semibold">{title}</Drawer.Title>
             {subtitle ? (
               <Drawer.Description className="mt-1 text-sm text-[color:var(--text-muted)]">
@@ -37,7 +37,7 @@ export function MobileDrawerNav({
               </Drawer.Description>
             ) : null}
           </div>
-          <div className="space-y-2">
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1 [-webkit-overflow-scrolling:touch]">
             {links.map((link) => (
               <Drawer.Close asChild key={link.to}>
                 <Link
@@ -57,7 +57,7 @@ export function MobileDrawerNav({
               </Drawer.Close>
             ))}
           </div>
-          {actions ? <div className="mt-4 flex flex-wrap gap-2">{actions}</div> : null}
+          {actions ? <div className="mt-4 shrink-0 border-t border-[color:var(--border)] pt-3 flex flex-wrap gap-2">{actions}</div> : null}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
