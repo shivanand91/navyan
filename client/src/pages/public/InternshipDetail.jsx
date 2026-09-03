@@ -64,6 +64,12 @@ export default function InternshipDetail() {
       try {
         const { data } = await api.get(`/internships/slug/${slug}`);
         setInternship(data.internship);
+        void api.post("/activity/track", {
+          eventType: "INTERNSHIP_VIEW",
+          internshipId: data.internship?._id,
+          internshipTitle: data.internship?.title,
+          path: window.location.pathname
+        }).catch(() => {});
         
         // Determine starting selected key
         if (urlDurationKey) {

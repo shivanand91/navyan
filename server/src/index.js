@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import path from "path";
 import compression from "compression";
+import http from "http";
 
 import { connectDB } from "./config/db.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
@@ -30,6 +31,9 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import automationRoutes from "./routes/automationRoutes.js";
 import supportRoutes from "./routes/supportRoutes.js";
 import shareEarnRoutes from "./routes/shareEarnRoutes.js";
+import adminActivityRoutes from "./routes/adminActivityRoutes.js";
+import activityTrackingRoutes from "./routes/activityTrackingRoutes.js";
+import { initializeSocketServer } from "./socket.js";
 import { startAutomationWorker } from "./services/automationWorker.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
 import { seedCatalogIfEmpty } from "./services/catalogSeedService.js";
@@ -168,6 +172,8 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/automation", automationRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/share-earn", shareEarnRoutes);
+app.use("/api/admin", adminActivityRoutes);
+app.use("/api/activity", activityTrackingRoutes);
 
 // 404 + errors
 app.use(notFound);
@@ -186,7 +192,9 @@ connectDB()
     startAutomationWorker();
 
     if (process.env.VERCEL !== "1") {
-      app.listen(PORT, HOST, () => {
+      const httpServer = http.createServer(app);
+      initializeSocketServer(httpServer, corsOptions);
+      httpServer.listen(PORT, HOST, () => {
         console.log(`Navyan API running on http://${HOST}:${PORT}`);
       });
     }

@@ -33,3 +33,17 @@ export const requireAdmin = (req, res, next) => {
   }
   next();
 };
+
+// Public tracking can associate an activity with a signed-in user without rejecting anonymous visitors.
+export const optionalProtect = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : req.cookies?.navyan_access_token;
+    if (!token) return next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-passwordHash");
+  } catch {
+    // Anonymous activity is intentionally allowed when a stale token is present.
+  }
+  next();
+};

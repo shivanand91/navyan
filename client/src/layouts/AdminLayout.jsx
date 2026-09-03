@@ -24,6 +24,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 import BrandLogo from "@/components/BrandLogo";
 import { CommandPalette } from "@/components/premium/CommandPalette";
 import { MobileDrawerNav } from "@/components/premium/MobileDrawerNav";
+import { AdminNotificationBell } from "@/components/admin/AdminNotificationBell";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/axios";
 
 const links = [
   { to: "/admin", label: "Overview", icon: BarChart3, caption: "Analytics" },
@@ -39,12 +42,15 @@ const links = [
   { to: "/admin/alerts", label: "Alerts", icon: BellRing, caption: "Broadcast" },
   { to: "/admin/hackathons", label: "Hackathons", icon: Trophy, caption: "Events" },
   { to: "/admin/automation", label: "Automation", icon: Clock, caption: "Lifecycle" },
+  { to: "/admin/activity", label: "Live Activity", icon: BellRing, caption: "Monitor" },
   { to: "/admin/share-and-earn", label: "Share & Earn", icon: Share2, caption: "Payouts" }
 ];
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const activityCounts = useQuery({ queryKey: ["admin-activity-counts"], queryFn: async () => (await api.get("/admin/notifications/unread-count")).data, refetchInterval: 60000 });
+  const pendingWithdrawals = activityCounts.data?.pendingWithdrawals || 0;
   const dashboardHomePath = "/admin";
 
   const paletteItems = [
@@ -103,7 +109,7 @@ export function AdminLayout() {
               >
                 <link.icon className="h-4 w-4" />
                 <div>
-                  <p>{link.label}</p>
+                  <div className="flex items-center gap-2"><p>{link.label}</p>{link.to === "/admin/share-and-earn" && pendingWithdrawals > 0 && <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">{pendingWithdrawals}</span>}</div>
                   <p className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     {link.caption}
                   </p>
@@ -167,6 +173,7 @@ export function AdminLayout() {
 
               <div className="hidden items-center gap-2 md:flex">
                 <CommandPalette items={paletteItems} title="Search admin actions" />
+                <AdminNotificationBell />
                 <ThemeToggle variant="outline" />
                 <Button variant="icon" size="icon">
                   <Search className="h-4 w-4" />

@@ -2,6 +2,7 @@ import { AutomationEvent } from "../models/AutomationEvent.js";
 import { Application } from "../models/Application.js";
 import { AutomationLog } from "../models/AutomationLog.js";
 import { sendToUser } from "./notificationService.js";
+import { expireAbandonedPaymentAttempts } from "./adminActivityService.js";
 
 /**
  * Validates, executes, and logs all pending automation events that are due
@@ -166,5 +167,7 @@ export const processPendingEvents = async () => {
 export const startAutomationWorker = () => {
   // Run processPendingEvents every 5 minutes
   setInterval(processPendingEvents, 5 * 60 * 1000);
+  setInterval(expireAbandonedPaymentAttempts, 5 * 60 * 1000);
+  void expireAbandonedPaymentAttempts();
   console.log("[Automation Worker] Initialized 5-minute background polling daemon.");
 };

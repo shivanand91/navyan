@@ -4,6 +4,7 @@ import { PublicLayout } from "@/layouts/PublicLayout";
 import { StudentLayout } from "@/layouts/StudentLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/axios";
 
 const Home = lazy(() => import("@/pages/public/Home"));
 const Courses = lazy(() => import("@/pages/public/Courses"));
@@ -45,6 +46,7 @@ const StudentSupport = lazy(() => import("@/pages/student/Support"));
 const ShareEarn = lazy(() => import("@/pages/student/ShareEarn"));
 const AdminSupport = lazy(() => import("@/pages/admin/Support"));
 const AdminShareEarn = lazy(() => import("@/pages/admin/ShareEarn"));
+const AdminActivity = lazy(() => import("@/pages/admin/Activity"));
 
 function PageLoader() {
   return (
@@ -83,10 +85,22 @@ function ScrollToTop() {
   return null;
 }
 
+function ActivityTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (/^\/internships?\//.test(location.pathname)) return;
+    void api.post("/activity/track", { eventType: "USER_VISIT", path: location.pathname }).catch(() => {});
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <>
       <ScrollToTop />
+      <ActivityTracker />
 
       <Routes>
         <Route path="/documents/offer-letter/:accessToken" element={<LazyPage><OfferLetterPreview /></LazyPage>} />
@@ -154,6 +168,7 @@ export default function App() {
           <Route path="automation" element={<LazyPage><AdminAutomation /></LazyPage>} />
           <Route path="support" element={<LazyPage><AdminSupport /></LazyPage>} />
           <Route path="share-and-earn" element={<LazyPage><AdminShareEarn /></LazyPage>} />
+          <Route path="activity" element={<LazyPage><AdminActivity /></LazyPage>} />
         </Route>
       </Routes>
     </>

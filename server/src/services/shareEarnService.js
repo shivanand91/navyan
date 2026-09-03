@@ -5,6 +5,7 @@ import { ShareAttribution } from "../models/ShareAttribution.js";
 import { ShareLink } from "../models/ShareLink.js";
 import { Application } from "../models/Application.js";
 import { Internship } from "../models/Internship.js";
+import { trackActivity } from "./adminActivityService.js";
 
 const rewardByDuration = { "4-weeks": 10, "3-months": 50, "6-months": 100 };
 
@@ -56,6 +57,7 @@ export const creditShareRewardForApplication = async (application) => {
 
   try {
     let transaction = null;
+    let createdReward = false;
 
     await session.withTransaction(async () => {
       const attribution = await ShareAttribution.findOne(attributionQuery).session(session);
@@ -93,6 +95,7 @@ export const creditShareRewardForApplication = async (application) => {
         ],
         { session }
       );
+      createdReward = true;
 
       await Wallet.updateOne(
         { user: attribution.owner },
@@ -117,6 +120,19 @@ export const creditShareRewardForApplication = async (application) => {
         );
       }
     });
+
+    if (createdReward && transaction) {
+      void trackActivity({
+        eventType: "SHARE_EARN_CONVERSION",
+        user: application.user,
+        internship: application.internship,
+        application,
+        title: "Share & Earn reward created",
+        message: `A successful Share & Earn enrollment earned Rs. ${amount}.`,
+        link: "/admin/share-and-earn",
+        metadata: { rewardAmount: amount, transactionId: String(transaction._id) }
+      });
+    }
 
     return transaction;
   } catch (error) {
