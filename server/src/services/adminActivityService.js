@@ -5,7 +5,7 @@ import { emitAdminActivity } from "../socket.js";
 const EVENT_DEFINITIONS = {
   USER_VISIT: { category: "VISITOR", priority: "LOW", notify: false, retentionDays: 30 },
   USER_SIGNUP: { category: "USER", priority: "NORMAL", notify: true },
-  USER_LOGIN: { category: "USER", priority: "LOW", notify: false },
+  USER_LOGIN: { category: "USER", priority: "NORMAL", notify: true },
   INTERNSHIP_VIEW: { category: "INTERNSHIP", priority: "LOW", notify: false, retentionDays: 30 },
   INTERNSHIP_QR_GENERATED: { category: "PAYMENT", priority: "NORMAL", notify: true },
   PAYMENT_RECEIVED: { category: "PAYMENT", priority: "NORMAL", notify: true },
@@ -34,7 +34,7 @@ export const expireAbandonedPaymentAttempts = async () => {
     for (const attempt of attempts) {
       const result = await PaymentAttempt.updateOne({ _id: attempt._id, status: "Initiated" }, { $set: { status: "Expired" } });
       if (result.modifiedCount) {
-        void trackActivity({
+        await trackActivity({
           eventType: "PAYMENT_ABANDONED", user: attempt.user, internship: attempt.internship,
           title: "Payment QR expired", message: `${attempt.user?.fullName || "A student"} did not complete payment for ${attempt.internship?.title || "an internship"}.`,
           link: "/admin/applications", metadata: { paymentAttemptId: String(attempt._id), amount: attempt.amount, timeoutMinutes: paymentAbandonmentMinutes() }

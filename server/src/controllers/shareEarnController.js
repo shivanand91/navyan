@@ -28,7 +28,7 @@ export const createShareLink = async (req, res, next) => {
     if (!internship.durations.some((duration) => duration.key === durationKey)) return res.status(400).json({ message: "Invalid internship duration" });
     let link = await ShareLink.findOne({ owner: req.user._id, internship: internship._id, isActive: true });
     if (!link) link = await ShareLink.create({ owner: req.user._id, internship: internship._id, token: crypto.randomBytes(18).toString("base64url"), creatorIpHash: getRequestIpHash(req) });
-    void trackActivity({ eventType: "SHARE_LINK_GENERATED", user: req.user, internship, title: "Share & Earn link generated", message: `${req.user.fullName} generated a Share & Earn link for ${internship.title}.`, link: "/admin/share-and-earn" });
+    await trackActivity({ eventType: "SHARE_LINK_GENERATED", user: req.user, internship, title: "Share & Earn link generated", message: `${req.user.fullName} generated a Share & Earn link for ${internship.title}.`, link: "/admin/share-and-earn" });
     res.status(201).json({
       success: true,
       token: link.token,
@@ -91,7 +91,7 @@ export const requestWithdrawal = async (req, res, next) => {
     try {
       const withdrawal = await Withdrawal.create({ user: req.user._id, amount, upiId });
       await WalletTransaction.create({ user: req.user._id, type: "DEBIT", category: "WITHDRAWAL", amount, withdrawal: withdrawal._id, status: "PENDING", description: "Withdrawal request" });
-      void trackActivity({ eventType: "WITHDRAWAL_REQUESTED", user: req.user, title: "Share & Earn withdrawal requested", message: `${req.user.fullName} requested a Rs. ${amount} Share & Earn withdrawal.`, link: "/admin/share-and-earn", metadata: { withdrawalId: String(withdrawal._id), amount } });
+      await trackActivity({ eventType: "WITHDRAWAL_REQUESTED", user: req.user, title: "Share & Earn withdrawal requested", message: `${req.user.fullName} requested a Rs. ${amount} Share & Earn withdrawal.`, link: "/admin/share-and-earn", metadata: { withdrawalId: String(withdrawal._id), amount } });
       res.status(201).json({ withdrawal: { ...withdrawal.toObject(), upiId: maskUpi(upiId) } });
     } catch (error) {
       await Wallet.findOneAndUpdate({ user: req.user._id }, { $inc: { availableBalance: amount, pendingBalance: -amount } });
@@ -147,7 +147,7 @@ export const adminUpdateWithdrawal = async (req, res, next) => {
     if (["COMPLETED", "REJECTED", "FAILED"].includes(status)) { withdrawal.processedAt = new Date(); withdrawal.processedBy = req.user._id; }
     await withdrawal.save();
     if (status === "COMPLETED" || status === "REJECTED") {
-      void trackActivity({ eventType: status === "COMPLETED" ? "WITHDRAWAL_APPROVED" : "WITHDRAWAL_REJECTED", user: withdrawal.user, title: status === "COMPLETED" ? "Withdrawal completed" : "Withdrawal rejected", message: `A Share & Earn withdrawal of Rs. ${withdrawal.amount} was ${status.toLowerCase()}.`, link: "/admin/share-and-earn", metadata: { withdrawalId: String(withdrawal._id), amount: withdrawal.amount } });
+      await trackActivity({ eventType: status === "COMPLETED" ? "WITHDRAWAL_APPROVED" : "WITHDRAWAL_REJECTED", user: withdrawal.user, title: status === "COMPLETED" ? "Withdrawal completed" : "Withdrawal rejected", message: `A Share & Earn withdrawal of Rs. ${withdrawal.amount} was ${status.toLowerCase()}.`, link: "/admin/share-and-earn", metadata: { withdrawalId: String(withdrawal._id), amount: withdrawal.amount } });
     }
     if (status === "COMPLETED") {
       await Promise.all([Wallet.findOneAndUpdate({ user: withdrawal.user }, { $inc: { pendingBalance: -withdrawal.amount, totalWithdrawn: withdrawal.amount } }), WalletTransaction.findOneAndUpdate({ withdrawal: withdrawal._id }, { status: "COMPLETED" })]);

@@ -557,7 +557,7 @@ export const createPaymentIntent = async (req, res, next) => {
       paymentReference
     });
 
-    void trackActivity({
+    await trackActivity({
       eventType: "INTERNSHIP_QR_GENERATED", user: req.user, internship, title: "Payment QR generated",
       message: `${req.user.fullName} generated a payment QR for ${internship.title}.`, link: "/admin/applications",
       metadata: { paymentAttemptId: String(paymentAttempt._id), amount, status: "PENDING" }
@@ -744,12 +744,12 @@ export const applyToInternship = async (req, res, next) => {
       shareAttribution: shareAttribution?._id
     });
 
-    void trackActivity({
+    await trackActivity({
       eventType: "APPLICATION_SUBMITTED", user: req.user, internship, application, title: "Internship application submitted",
       message: `${req.user.fullName} applied for ${internship.title}.`, link: "/admin/applications"
     });
     if (payment.status === "Pending") {
-      void trackActivity({ eventType: "PAYMENT_RECEIVED", user: req.user, internship, application, title: "Payment submitted for review", message: `${req.user.fullName} submitted a payment reference for ${internship.title}.`, link: "/admin/applications" });
+      await trackActivity({ eventType: "PAYMENT_RECEIVED", user: req.user, internship, application, title: "Payment submitted for review", message: `${req.user.fullName} submitted a payment reference for ${internship.title}.`, link: "/admin/applications" });
     }
 
     if (payment.paymentAttempt) {
@@ -1092,10 +1092,10 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
       await creditShareRewardForApplication(application);
     }
     if (paymentDecision === "Verified") {
-      void trackActivity({ eventType: "PAYMENT_VERIFIED", user: application.user, internship: application.internship, application, title: "Payment verified", message: `${application.user.fullName} completed payment for ${application.internship.title}.`, link: `/admin/applications` });
+      await trackActivity({ eventType: "PAYMENT_VERIFIED", user: application.user, internship: application.internship, application, title: "Payment verified", message: `${application.user.fullName} completed payment for ${application.internship.title}.`, link: `/admin/applications` });
     }
     if (application.status === "Selected" && prevStatus !== "Selected") {
-      void trackActivity({ eventType: "ENROLLMENT_APPROVED", user: application.user, internship: application.internship, application, title: "Enrollment approved", message: `${application.user.fullName}'s enrollment for ${application.internship.title} was approved.`, link: "/admin/applications" });
+      await trackActivity({ eventType: "ENROLLMENT_APPROVED", user: application.user, internship: application.internship, application, title: "Enrollment approved", message: `${application.user.fullName}'s enrollment for ${application.internship.title} was approved.`, link: "/admin/applications" });
     }
     if (application.status === "Rejected" && prevStatus !== "Rejected") {
       await reverseShareRewardForApplication(application);

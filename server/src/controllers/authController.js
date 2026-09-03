@@ -75,7 +75,7 @@ export const registerStudent = async (req, res, next) => {
     });
 
     const accessToken = await issueAuthTokens(user, res);
-    void trackActivity({ eventType: "USER_SIGNUP", user, title: "New student registered", message: `${user.fullName} created a new account.`, link: "/admin" });
+    await trackActivity({ eventType: "USER_SIGNUP", user, title: "New student registered", message: `${user.fullName} created a new account.`, link: "/admin" });
     res.status(201).json({ accessToken, user: sanitizeUser(user) });
   } catch (err) {
     next(err);
@@ -101,7 +101,7 @@ export const login = async (req, res, next) => {
     }
 
     const accessToken = await issueAuthTokens(user, res);
-    void trackActivity({ eventType: "USER_LOGIN", user, title: "Student logged in", message: `${user.fullName} logged in.` });
+    await trackActivity({ eventType: "USER_LOGIN", user, title: "Student logged in", message: `${user.fullName} logged in.` });
     res.json({ accessToken, user: sanitizeUser(user) });
   } catch (err) {
     next(err);

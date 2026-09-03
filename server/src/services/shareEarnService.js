@@ -122,7 +122,7 @@ export const creditShareRewardForApplication = async (application) => {
     });
 
     if (createdReward && transaction) {
-      void trackActivity({
+      await trackActivity({
         eventType: "SHARE_EARN_CONVERSION",
         user: application.user,
         internship: application.internship,

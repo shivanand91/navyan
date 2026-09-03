@@ -24,7 +24,7 @@ export const trackPublicActivity = async (req, res) => {
   const userName = req.user?.fullName || req.user?.profile?.fullName;
   const location = typeof path === "string" ? path.slice(0, 250) : "/";
   const isInternshipView = eventType === "INTERNSHIP_VIEW";
-  void trackActivity({
+  await trackActivity({
     eventType,
     user: req.user,
     sessionId,
