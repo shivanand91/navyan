@@ -44,3 +44,9 @@ export const getAccessCookieOptions = () => ({
   maxAge: 1000 * 60 * 60 * 24 * 30,
   path: "/api"
 });
+
+export const getApiCookieOptions = (maxAge) => ({
+  ...getBaseCookieOptions(),
+  ...(typeof maxAge === "number" ? { maxAge } : {}),
+  path: "/api"
+});

@@ -1,12 +1,39 @@
+import mongoose from "mongoose";
 import { Wallet } from "../models/Wallet.js";
 import { WalletTransaction } from "../models/WalletTransaction.js";
 import { ShareAttribution } from "../models/ShareAttribution.js";
 import { ShareLink } from "../models/ShareLink.js";
 import { Application } from "../models/Application.js";
+import { Internship } from "../models/Internship.js";
 
 const rewardByDuration = { "4-weeks": 10, "3-months": 50, "6-months": 100 };
 
-export const getShareReward = (durationKey) => rewardByDuration[durationKey] || 0;
+const normalizeRewardKey = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+export const getShareReward = (internship, durationKey) => {
+  const duration = internship?.durations?.find((item) => item.key === durationKey);
+  if (!duration) {
+    return 0;
+  }
+
+  const candidateKeys = [
+    normalizeRewardKey(duration.key),
+    normalizeRewardKey(duration.label)
+  ].filter(Boolean);
+
+  for (const key of candidateKeys) {
+    if (rewardByDuration[key]) {
+      return rewardByDuration[key];
+    }
+  }
+
+  return 0;
+};
 
 export const creditShareRewardForApplication = async (application) => {
   // A UTR submission is not proof of payment. Paid applications must be verified by admin first.
@@ -14,42 +41,95 @@ export const creditShareRewardForApplication = async (application) => {
   const isPaymentEligible = paymentStatus === "Not Required" || ["Verified", "Linked"].includes(paymentStatus);
   if (!isPaymentEligible || application.status === "Rejected") return null;
 
-  const attribution = application.shareAttribution
-    ? await ShareAttribution.findById(application.shareAttribution)
-    : await ShareAttribution.findOne({ referredUser: application.user, internship: application.internship, status: "ATTRIBUTED" });
+  const attributionQuery = application.shareAttribution
+    ? { _id: application.shareAttribution }
+    : { referredUser: application.user, internship: application.internship, status: "ATTRIBUTED" };
 
-  if (!attribution || attribution.status !== "ATTRIBUTED" || attribution.expiresAt < new Date()) return null;
-  if (String(attribution.owner) === String(application.user)) return null;
-
-  const amount = getShareReward(application.durationKey);
+  const internship =
+    application.internship?.durations
+      ? application.internship
+      : await Internship.findById(application.internship).select("durations");
+  const amount = getShareReward(internship, application.durationKey);
   if (!amount) return null;
 
+  const session = await mongoose.startSession();
+
   try {
-    const transaction = await WalletTransaction.create({
-      user: attribution.owner,
-      type: "CREDIT",
-      category: "SHARE_EARN",
-      amount,
-      internship: application.internship,
-      shareLink: attribution.shareLink,
-      referredUser: application.user,
-      status: "AVAILABLE",
-      description: `Reward for successful ${application.durationKey.replace("-", " ")} internship enrollment`
+    let transaction = null;
+
+    await session.withTransaction(async () => {
+      const attribution = await ShareAttribution.findOne(attributionQuery).session(session);
+      if (!attribution || attribution.status !== "ATTRIBUTED" || attribution.expiresAt < new Date()) {
+        return;
+      }
+      if (String(attribution.owner) === String(application.user)) {
+        return;
+      }
+
+      const existingReward = await WalletTransaction.findOne({
+        user: attribution.owner,
+        referredUser: application.user,
+        internship: application.internship,
+        category: "SHARE_EARN"
+      }).session(session);
+      if (existingReward) {
+        transaction = existingReward;
+        return;
+      }
+
+      [transaction] = await WalletTransaction.create(
+        [
+          {
+            user: attribution.owner,
+            type: "CREDIT",
+            category: "SHARE_EARN",
+            amount,
+            internship: application.internship,
+            shareLink: attribution.shareLink,
+            referredUser: application.user,
+            status: "AVAILABLE",
+            description: `Reward for successful ${application.durationKey.replace(/-/g, " ")} internship enrollment`
+          }
+        ],
+        { session }
+      );
+
+      await Wallet.updateOne(
+        { user: attribution.owner },
+        {
+          $setOnInsert: { user: attribution.owner },
+          $inc: { availableBalance: amount, totalEarned: amount }
+        },
+        { upsert: true, session }
+      );
+
+      const attributionUpdate = await ShareAttribution.updateOne(
+        { _id: attribution._id, status: "ATTRIBUTED" },
+        { $set: { status: "CONVERTED" } },
+        { session }
+      );
+
+      if (attributionUpdate.modifiedCount > 0) {
+        await ShareLink.updateOne(
+          { _id: attribution.shareLink },
+          { $inc: { conversions: 1 } },
+          { session }
+        );
+      }
     });
 
-    await Wallet.findOneAndUpdate(
-      { user: attribution.owner },
-      { $setOnInsert: { user: attribution.owner }, $inc: { availableBalance: amount, totalEarned: amount } },
-      { upsert: true, new: true }
-    );
-    await Promise.all([
-      ShareAttribution.findByIdAndUpdate(attribution._id, { status: "CONVERTED" }),
-      ShareLink.findByIdAndUpdate(attribution.shareLink, { $inc: { conversions: 1 } })
-    ]);
     return transaction;
   } catch (error) {
-    if (error?.code === 11000) return null;
+    if (error?.code === 11000) {
+      return WalletTransaction.findOne({
+        referredUser: application.user,
+        internship: application.internship,
+        category: "SHARE_EARN"
+      });
+    }
     throw error;
+  } finally {
+    await session.endSession();
   }
 };
 

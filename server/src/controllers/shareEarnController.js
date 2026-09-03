@@ -6,16 +6,18 @@ import { Wallet } from "../models/Wallet.js";
 import { WalletTransaction } from "../models/WalletTransaction.js";
 import { Withdrawal } from "../models/Withdrawal.js";
 import { ShareVisit } from "../models/ShareVisit.js";
-import { getBaseCookieOptions } from "../utils/cookies.js";
+import { getApiCookieOptions, getBaseCookieOptions } from "../utils/cookies.js";
 import { syncPendingShareRewards } from "../services/shareEarnService.js";
 
 const ATTRIBUTION_DAYS = 30;
 const MIN_WITHDRAWAL = 50;
+const SHARE_COOKIE_MAX_AGE = ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000;
 const UPI_REGEX = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/;
 const maskUpi = (upi) => `${upi.slice(0, Math.min(3, upi.length))}****${upi.slice(upi.indexOf("@"))}`;
 const buildShareUrl = (req, internshipSlug, durationKey, token) =>
   `${process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`}/internship/${encodeURIComponent(internshipSlug)}/${encodeURIComponent(durationKey)}?share=${encodeURIComponent(token)}`;
 export const getRequestIpHash = (req) => crypto.createHash("sha256").update(String(req.ip || "")).digest("hex");
+export const getShareTrackingCookieOptions = () => getApiCookieOptions(SHARE_COOKIE_MAX_AGE);
 
 export const createShareLink = async (req, res, next) => {
   try {
@@ -39,7 +41,7 @@ export const resolveShareLink = async (req, res, next) => {
     const link = await ShareLink.findOneAndUpdate({ token: req.params.token, isActive: true }, { $inc: { clicks: 1 } }, { new: true }).populate("internship", "slug durations.key");
     if (!link?.internship) return res.status(404).json({ message: "This share link is no longer available" });
     const visitorToken = req.cookies?.navyan_share_visitor || crypto.randomBytes(18).toString("base64url");
-    const expiresAt = new Date(Date.now() + ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + SHARE_COOKIE_MAX_AGE);
     await ShareVisit.findOneAndUpdate(
       { visitorToken, shareLink: link._id },
       { $set: { clickedAt: new Date(), expiresAt, ipHash: getRequestIpHash(req) } },
@@ -47,8 +49,9 @@ export const resolveShareLink = async (req, res, next) => {
     );
     res.cookie("navyan_share_visitor", visitorToken, {
       ...getBaseCookieOptions(),
-      maxAge: ATTRIBUTION_DAYS * 24 * 60 * 60 * 1000
+      maxAge: SHARE_COOKIE_MAX_AGE
     });
+    res.cookie("navyan_share_link_token", link.token, getShareTrackingCookieOptions());
     const durationKey = link.internship.durations?.[0]?.key;
     res.json({ internshipSlug: link.internship.slug, durationKey, redirectPath: `/internship/${link.internship.slug}/${durationKey}`, token: link.token });
   } catch (error) { next(error); }

@@ -43,6 +43,7 @@ import { ShareAttribution } from "../models/ShareAttribution.js";
 import { ShareVisit } from "../models/ShareVisit.js";
 import { creditShareRewardForApplication, reverseShareRewardForApplication } from "../services/shareEarnService.js";
 import { getRequestIpHash } from "./shareEarnController.js";
+import { getApiCookieOptions } from "../utils/cookies.js";
 
 const PAYMENT_CONFIRMATION_WINDOW_SECONDS = 60;
 const PAYMENT_INTENT_TTL_MINUTES = 5;
@@ -243,6 +244,7 @@ const ADMIN_USER_SELECT = [
 ].join(" ");
 
 const STUDENT_USER_SELECT = "fullName email";
+const SHARE_TRACKING_COOKIE_CLEAR_OPTIONS = getApiCookieOptions();
 
 const INTERNSHIP_SELECT = [
   "title",
@@ -272,6 +274,85 @@ const SUBMISSION_HISTORY_SELECT = [
 ].join(" ");
 
 const normalizeView = (value) => (value === "summary" ? "summary" : "detail");
+
+const findLatestShareVisitForInternship = async ({ visitorToken, internshipId }) => {
+  if (!visitorToken) {
+    return null;
+  }
+
+  const visits = await ShareVisit.find({
+    visitorToken,
+    expiresAt: { $gt: new Date() }
+  })
+    .populate({
+      path: "shareLink",
+      match: { internship: internshipId, isActive: true },
+      select: "_id owner creatorIpHash internship"
+    })
+    .sort({ clickedAt: -1 })
+    .limit(5);
+
+  return visits.find((visit) => visit.shareLink) || null;
+};
+
+const resolveShareAttributionForApplication = async ({ req, internshipId, userId, explicitShareToken }) => {
+  const visitorToken = req.cookies?.navyan_share_visitor;
+  if (!visitorToken) {
+    return null;
+  }
+
+  let shareLink = null;
+  let shareVisit = null;
+  const resolvedShareToken =
+    typeof explicitShareToken === "string" && explicitShareToken.trim()
+      ? explicitShareToken.trim()
+      : typeof req.cookies?.navyan_share_link_token === "string"
+      ? req.cookies.navyan_share_link_token.trim()
+      : "";
+
+  if (resolvedShareToken) {
+    shareLink = await ShareLink.findOne({
+      token: resolvedShareToken,
+      internship: internshipId,
+      isActive: true
+    });
+
+    if (shareLink) {
+      shareVisit = await ShareVisit.findOne({
+        visitorToken,
+        shareLink: shareLink._id,
+        expiresAt: { $gt: new Date() }
+      }).sort({ clickedAt: -1 });
+    }
+  }
+
+  if (!shareLink || !shareVisit) {
+    shareVisit = await findLatestShareVisitForInternship({ visitorToken, internshipId });
+    shareLink = shareVisit?.shareLink || null;
+  }
+
+  if (!shareLink || !shareVisit || String(shareLink.owner) === String(userId)) {
+    return null;
+  }
+
+  const isSameNetwork = shareLink.creatorIpHash && shareLink.creatorIpHash === getRequestIpHash(req);
+
+  return ShareAttribution.findOneAndUpdate(
+    { referredUser: userId, internship: internshipId },
+    {
+      $setOnInsert: {
+        shareLink: shareLink._id,
+        owner: shareLink.owner,
+        referredUser: userId,
+        internship: internshipId,
+        firstClickedAt: shareVisit.clickedAt,
+        expiresAt: shareVisit.expiresAt,
+        status: isSameNetwork ? "BLOCKED" : "ATTRIBUTED"
+      }
+    },
+    { new: true, upsert: true }
+  );
+};
 
 const syncApplicationsForListing = async (applications) => {
   const updates = [];
@@ -638,21 +719,12 @@ export const applyToInternship = async (req, res, next) => {
       };
     }
 
-    let shareAttribution = null;
-    if (shareToken) {
-      const shareLink = await ShareLink.findOne({ token: String(shareToken), internship: internshipId, isActive: true });
-      const shareVisit = shareLink && req.cookies?.navyan_share_visitor
-        ? await ShareVisit.findOne({ visitorToken: req.cookies.navyan_share_visitor, shareLink: shareLink._id, expiresAt: { $gt: new Date() } })
-        : null;
-      if (shareLink && shareVisit && String(shareLink.owner) !== String(userId)) {
-        const isSameNetwork = shareLink.creatorIpHash && shareLink.creatorIpHash === getRequestIpHash(req);
-        shareAttribution = await ShareAttribution.findOneAndUpdate(
-          { referredUser: userId, internship: internshipId },
-          { $setOnInsert: { shareLink: shareLink._id, owner: shareLink.owner, referredUser: userId, internship: internshipId, firstClickedAt: shareVisit.clickedAt, expiresAt: shareVisit.expiresAt, status: isSameNetwork ? "BLOCKED" : "ATTRIBUTED" } },
-          { new: true, upsert: true }
-        );
-      }
-    }
+    const shareAttribution = await resolveShareAttributionForApplication({
+      req,
+      internshipId,
+      userId,
+      explicitShareToken: shareToken
+    });
 
     const application = await Application.create({
       user: userId,
@@ -684,6 +756,8 @@ export const applyToInternship = async (req, res, next) => {
       internship,
       durationKey
     });
+
+    res.clearCookie("navyan_share_link_token", SHARE_TRACKING_COOKIE_CLEAR_OPTIONS);
 
     res.status(201).json({ application });
   } catch (err) {
