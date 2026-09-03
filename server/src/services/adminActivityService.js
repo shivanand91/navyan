@@ -3,10 +3,10 @@ import { PaymentAttempt } from "../models/PaymentAttempt.js";
 import { emitAdminActivity } from "../socket.js";
 
 const EVENT_DEFINITIONS = {
-  USER_VISIT: { category: "VISITOR", priority: "LOW", notify: false, retentionDays: 30 },
+  USER_VISIT: { category: "VISITOR", priority: "LOW", notify: true, retentionDays: 30 },
   USER_SIGNUP: { category: "USER", priority: "NORMAL", notify: true },
   USER_LOGIN: { category: "USER", priority: "NORMAL", notify: true },
-  INTERNSHIP_VIEW: { category: "INTERNSHIP", priority: "LOW", notify: false, retentionDays: 30 },
+  INTERNSHIP_VIEW: { category: "INTERNSHIP", priority: "LOW", notify: true, retentionDays: 30 },
   INTERNSHIP_QR_GENERATED: { category: "PAYMENT", priority: "NORMAL", notify: true },
   PAYMENT_RECEIVED: { category: "PAYMENT", priority: "NORMAL", notify: true },
   PAYMENT_ABANDONED: { category: "PAYMENT", priority: "NORMAL", notify: true },
