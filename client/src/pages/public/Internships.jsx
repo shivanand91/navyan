@@ -10,6 +10,7 @@ import { ModalShell } from "@/components/premium/ModalShell";
 import { InternshipPreviewPanel } from "@/components/internships/InternshipPreviewPanel";
 import { InternshipImage } from "@/components/internships/InternshipImage";
 import { useAuth } from "@/context/AuthContext";
+import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
 
 export default function Internships() {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ export default function Internships() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [activeInternship, setActiveInternship] = useState(null);
+  const [selectedDurations, setSelectedDurations] = useState({});
   useEffect(() => {
     const load = async () => {
       try {
@@ -75,15 +77,13 @@ export default function Internships() {
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {internships.map((internship, index) => {
-                const durationSummary = (internship.durations || [])
-                  .map((duration) => duration.label || duration.key)
-                  .filter(Boolean)
-                  .join(" • ");
+                const selectedKey = selectedDurations[internship._id] || internship.durations?.[0]?.key;
+                const selectedDuration = internship.durations?.find((duration) => duration.key === selectedKey) || internship.durations?.[0];
                 return (
                   <RevealInView key={internship._id} delay={index * 0.03}>
-                    <article className="navyan-card flex h-[460px] flex-col overflow-hidden p-0">
-                      <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
-                        <InternshipImage src={internship.coverImageUrl} alt={internship.title} className="transition duration-500 hover:scale-[1.02]" />
+                    <article className="navyan-card flex h-[610px] flex-col overflow-hidden p-0">
+                      <div className="relative h-52 shrink-0 overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)] sm:h-56">
+                        <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="cover" className="transition duration-500 hover:scale-[1.03]" />
                         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                           <Sparkles className="h-3.5 w-3.5" />
                           Open now
@@ -120,9 +120,27 @@ export default function Internships() {
                           ))}
                         </div>
 
-                        <div className="mt-4 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3">
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Duration options</p>
-                          <p className="mt-1 truncate text-xs font-medium text-[color:var(--text-secondary)]">{durationSummary || "Flexible internship track"}</p>
+                        <div className="mt-4 rounded-[14px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Choose duration</p>
+                            <p className="text-xs font-semibold text-primary">{selectedDuration ? getDurationPriceLabel(selectedDuration) : "Flexible"}</p>
+                          </div>
+                          <div className="mt-2 grid grid-cols-3 gap-1.5">
+                            {(internship.durations || []).slice(0, 3).map((duration) => {
+                              const selected = duration.key === selectedKey;
+                              return (
+                                <button
+                                  key={duration.key}
+                                  type="button"
+                                  onClick={() => setSelectedDurations((current) => ({ ...current, [internship._id]: duration.key }))}
+                                  className={`min-w-0 rounded-lg border px-1.5 py-2 text-center text-[10px] font-semibold transition ${selected ? "border-primary bg-primary text-white shadow-sm" : "border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--text-secondary)] hover:border-primary/40"}`}
+                                >
+                                  <span className="block truncate">{duration.label || duration.key}</span>
+                                  <span className={`mt-0.5 block truncate text-[9px] ${selected ? "text-white/80" : "text-[color:var(--text-muted)]"}`}>{isPaidDuration(duration) ? getDurationPriceLabel(duration) : "Free"}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
 
                         <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4">
@@ -157,7 +175,7 @@ export default function Internships() {
                   complete payment only when the selected track requires it.
                 </p>
                 <div className="mt-5 flex flex-col gap-2">
-                  <Link to={user?.role === "student" ? `/student/internships?apply=${activeInternship._id}` : "/login"}>
+                  <Link to={user?.role === "student" ? `/student/internships?apply=${activeInternship._id}&duration=${selectedDurations[activeInternship._id] || activeInternship.durations?.[0]?.key || ""}` : "/login"}>
                     <Button className="w-full">
                       {user?.role === "student" ? "Open application workflow" : "Login to apply"}
                     </Button>

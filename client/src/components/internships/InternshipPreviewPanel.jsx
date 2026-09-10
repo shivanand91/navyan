@@ -41,7 +41,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
     <div className={cn("grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", className)}>
       <div className="space-y-5">
         <div className="aspect-video overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
-          <InternshipImage src={internship.coverImageUrl} alt={internship.title} />
+          <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" />
         </div>
 
         <div className="space-y-4">

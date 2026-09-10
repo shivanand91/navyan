@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ImageOff, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function InternshipImage({ src, alt, className }) {
+export function InternshipImage({ src, alt, className, fit = "cover" }) {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => setFailed(false), [src]);
@@ -16,5 +16,5 @@ export function InternshipImage({ src, alt, className }) {
     );
   }
 
-  return <img src={src} alt={alt} onError={() => setFailed(true)} className={cn("h-full w-full object-contain p-2", className)} />;
+  return <img src={src} alt={alt} onError={() => setFailed(true)} className={cn("h-full w-full object-center", fit === "contain" ? "object-contain p-2" : "object-cover", className)} />;
 }
