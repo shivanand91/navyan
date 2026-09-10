@@ -1,4 +1,5 @@
 import { Internship } from "../models/Internship.js";
+import mongoose from "mongoose";
 import { uploadBuffer } from "../services/cloudinaryUpload.js";
 import { normalizeHttpUrl } from "../utils/url.js";
 
@@ -79,7 +80,7 @@ const ensureDefaultDurations = (internship) => {
 export const listPublishedInternships = async (req, res, next) => {
   try {
     const internships = await Internship.find({ isPublished: true, isDeleted: { $ne: true } })
-      .sort({ createdAt: -1 })
+      .sort({ sortOrder: 1, createdAt: -1 })
       .lean();
 
     for (const internship of internships) {
@@ -113,7 +114,7 @@ export const getInternshipBySlug = async (req, res, next) => {
 export const adminListInternships = async (req, res, next) => {
   try {
     const internships = await Internship.find({ isDeleted: { $ne: true } })
-      .sort({ createdAt: -1 })
+      .sort({ sortOrder: 1, createdAt: -1 })
       .lean();
 
     for (const internship of internships) {
@@ -156,6 +157,15 @@ export const adminCreateInternship = async (req, res, next) => {
       coverImageUrl = uploaded.url;
     }
 
+    const latestOrderedInternship = await Internship.findOne({ isDeleted: { $ne: true } })
+      .sort({ sortOrder: -1 })
+      .select("sortOrder")
+      .lean();
+    const activeInternshipCount = await Internship.countDocuments({ isDeleted: { $ne: true } });
+    const sortOrder = Number.isFinite(latestOrderedInternship?.sortOrder)
+      ? latestOrderedInternship.sortOrder + 1
+      : activeInternshipCount;
+
     const internship = await Internship.create({
       title: body.title,
       slug: body.slug,
@@ -168,11 +178,53 @@ export const adminCreateInternship = async (req, res, next) => {
       lastDateToApply: body.lastDateToApply,
       isPublished: body.isPublished,
       pdfUrl: body.pdfUrl,
+      sortOrder,
       durations: body.durations,
       coverImageUrl
     });
 
     res.status(201).json({ internship });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const adminReorderInternships = async (req, res, next) => {
+  try {
+    const items = req.body?.items;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "A complete internship order is required" });
+    }
+
+    const ids = items.map((item) => item?.id);
+    if (
+      ids.some((id) => !mongoose.isValidObjectId(id)) ||
+      new Set(ids.map(String)).size !== ids.length
+    ) {
+      return res.status(400).json({ message: "The internship order contains invalid or duplicate IDs" });
+    }
+
+    const activeInternshipCount = await Internship.countDocuments({ isDeleted: { $ne: true } });
+    const matchedCount = await Internship.countDocuments({
+      _id: { $in: ids },
+      isDeleted: { $ne: true }
+    });
+    if (matchedCount !== ids.length || ids.length !== activeInternshipCount) {
+      return res.status(400).json({
+        message: "The internship list changed. Refresh the page and try again."
+      });
+    }
+
+    await Internship.bulkWrite(
+      ids.map((id, sortOrder) => ({
+        updateOne: {
+          filter: { _id: id, isDeleted: { $ne: true } },
+          update: { $set: { sortOrder } }
+        }
+      }))
+    );
+
+    res.json({ message: "Internship order updated successfully" });
   } catch (err) {
     next(err);
   }

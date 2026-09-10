@@ -7,6 +7,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { FormattedDescription } from "@/components/internships/FormattedDescription";
 import {
   ArrowRight,
   Sparkles,
@@ -462,9 +463,10 @@ export default function InternshipDetail() {
             {/* Overview / Description */}
             <div className="space-y-3 sm:space-y-4">
               <h2 className="font-display text-xl sm:text-2xl font-bold text-textPrimary">Role Overview & Learning Path</h2>
-              <div className="text-xs sm:text-sm leading-relaxed text-textSecondary whitespace-pre-line bg-[color:var(--card-elevated)] p-4 sm:p-6 rounded-[16px] border border-[color:var(--border)] break-words">
-                {internship.description || "No full description configured."}
-              </div>
+              <FormattedDescription
+                description={internship.description}
+                className="bg-[color:var(--card-elevated)] p-4 text-xs leading-relaxed text-textSecondary sm:p-6 sm:text-sm rounded-[16px] border border-[color:var(--border)] break-words"
+              />
             </div>
 
             {/* What you get - concrete value */}

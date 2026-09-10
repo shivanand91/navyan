@@ -62,7 +62,7 @@ export function ModalShell({
               <p className="max-w-2xl text-sm text-[color:var(--text-secondary)]">{description}</p>
             ) : null}
           </div>
-          <Button type="button" variant="icon" size="icon" onClick={onClose} className="shrink-0">
+          <Button type="button" variant="icon" size="icon" onClick={onClose} aria-label="Close dialog" className="shrink-0">
             <X className="h-4 w-4" />
           </Button>
         </div>

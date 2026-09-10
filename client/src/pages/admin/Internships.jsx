@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
+import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Trash2, Plus, AlertCircle } from "lucide-react";
+import { Sparkles, Trash2, Plus, GripVertical } from "lucide-react";
 
 const createEmptyForm = () => ({
   title: "",
   slug: "",
   shortDescription: "",
+  description: "",
   role: "",
   pdfUrl: "",
   mode: "remote",
@@ -77,6 +81,11 @@ export default function AdminInternships() {
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [pdfUrlError, setPdfUrlError] = useState("");
+  const [savingOrder, setSavingOrder] = useState(false);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const load = async () => {
     try {
@@ -162,6 +171,7 @@ export default function AdminInternships() {
     payload.append("title", form.title);
     payload.append("slug", form.slug);
     payload.append("shortDescription", form.shortDescription);
+    payload.append("description", form.description);
     payload.append("role", form.role);
     payload.append("pdfUrl", form.pdfUrl.trim());
     payload.append("mode", form.mode);
@@ -213,6 +223,7 @@ export default function AdminInternships() {
       title: internship.title || "",
       slug: internship.slug || "",
       shortDescription: internship.shortDescription || "",
+      description: internship.description || "",
       role: internship.role || "",
       pdfUrl: internship.pdfUrl || "",
       mode: internship.mode || "remote",
@@ -249,6 +260,31 @@ export default function AdminInternships() {
       toast.error(error?.response?.data?.message || "Could not delete internship.");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleDragEnd = async ({ active, over }) => {
+    if (!over || active.id === over.id || savingOrder) return;
+
+    const previousInternships = internships;
+    const oldIndex = internships.findIndex((internship) => internship._id === active.id);
+    const newIndex = internships.findIndex((internship) => internship._id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const reorderedInternships = arrayMove(internships, oldIndex, newIndex);
+    setInternships(reorderedInternships);
+    setSavingOrder(true);
+    try {
+      await api.patch("/internships/admin/reorder", {
+        items: reorderedInternships.map((internship) => ({ id: internship._id }))
+      });
+      toast.success("Internship order updated successfully.");
+    } catch (error) {
+      console.error(error);
+      setInternships(previousInternships);
+      toast.error(error?.response?.data?.message || "Unable to save internship order. Please try again.");
+    } finally {
+      setSavingOrder(false);
     }
   };
 
@@ -290,6 +326,19 @@ export default function AdminInternships() {
                 required
               />
             </Field>
+          </div>
+          <div className="md:col-span-4">
+            <Field label="Full description">
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                rows={7}
+                className="w-full resize-y rounded-md border border-input bg-white px-3 py-2 text-sm leading-6 outline-none focus:ring-1 focus:ring-primary dark:bg-slate-900"
+                placeholder={'## About the Internship\n\nUse separate paragraphs and bullet points for better readability.\n\n### Responsibilities\n- Work on real projects'}
+              />
+            </Field>
+            <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Line breaks, Markdown-style headings, bullet lists, numbered lists, and HTTPS links display cleanly in internship details.</p>
           </div>
           <div className="md:col-span-3">
             <Field label="Internship PDF / Task Document Link">
@@ -594,75 +643,66 @@ export default function AdminInternships() {
       {/* List Existing internships */}
       <Card className="rounded-2xl border border-slate-200 dark:border-[#2a2a36]">
         <CardHeader className="border-b border-slate-100 dark:border-[#2a2a36] bg-slate-50/50 dark:bg-slate-900/50 py-4">
-          <CardTitle className="text-sm font-bold text-slate-800 dark:text-slate-100">
-            Live listings
-          </CardTitle>
+          <div className="flex items-center justify-between gap-4">
+            <CardTitle className="text-sm font-bold text-slate-800 dark:text-slate-100">Live listings</CardTitle>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">{savingOrder ? "Saving order..." : "Drag the handle to set the public order"}</span>
+          </div>
         </CardHeader>
         <CardContent className="p-4 space-y-3 text-xs">
           {internships.length === 0 ? (
             <p className="text-slate-500 dark:text-slate-400 italic">No internships published yet. Create one above.</p>
           ) : (
-            internships.map((i) => (
-              <div
-                key={i._id}
-                className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-4 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between hover:bg-slate-100/50 dark:hover:bg-[#1d1d29] transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="aspect-video w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-[#2a2a36] dark:bg-[#16161f]">
-                    {i.coverImageUrl ? (
-                      <img
-                        src={i.coverImageUrl}
-                        alt={i.title}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-[10px] text-slate-500 dark:text-slate-400">
-                        No image
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-100 text-sm">{i.title}</p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      Role: <span className="font-semibold text-slate-700 dark:text-slate-300">{i.role}</span> · Mode: <span className="font-semibold text-slate-700 dark:text-slate-300">{i.mode?.toUpperCase()}</span> · Slug: <span className="font-mono text-slate-500">{i.slug}</span>
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {(i.durations || []).map((d) => (
-                        <span key={d.key} className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-400">
-                          {d.label || d.key} (₹{d.price})
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={internships.map((internship) => internship._id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3">
+                  {internships.map((internship) => (
+                    <SortableInternshipRow
+                      key={internship._id}
+                      internship={internship}
+                      deleting={deletingId === internship._id}
+                      disabled={savingOrder}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  ))}
                 </div>
-
-                <div className="flex items-center gap-2 self-end md:self-auto">
-                  <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
-                    {i.isPublished ? "Published" : "Draft"}
-                  </span>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(i)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="danger"
-                    disabled={deletingId === i._id}
-                    onClick={() => handleDelete(i)}
-                  >
-                    {deletingId === i._id ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
-            ))
+              </SortableContext>
+            </DndContext>
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function SortableInternshipRow({ internship, deleting, disabled, onEdit, onDelete }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: internship._id, disabled });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex flex-col gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-4 dark:border-[#2a2a36] dark:bg-[#1d1d29]/70 md:flex-row md:items-center md:justify-between ${isDragging ? "opacity-50 shadow-lg" : "hover:bg-slate-100/50 dark:hover:bg-[#1d1d29]"}`}
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <button type="button" className="cursor-grab touch-none rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 active:cursor-grabbing dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label={`Reorder ${internship.title}`} title="Drag to reorder" {...attributes} {...listeners}>
+          <GripVertical className="h-5 w-5" />
+        </button>
+        <div className="aspect-video w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-[#2a2a36] dark:bg-[#16161f]">
+          {internship.coverImageUrl ? <img src={internship.coverImageUrl} alt="" className="h-full w-full object-contain p-1" /> : <div className="flex h-full items-center justify-center text-[10px] text-slate-500 dark:text-slate-400">No image</div>}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-bold text-slate-800 dark:text-slate-100 text-sm">{internship.title}</p>
+          <p className="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400">Role: <span className="font-semibold text-slate-700 dark:text-slate-300">{internship.role}</span> · Mode: <span className="font-semibold text-slate-700 dark:text-slate-300">{internship.mode?.toUpperCase()}</span> · Slug: <span className="font-mono text-slate-500">{internship.slug}</span></p>
+          <div className="mt-2 flex flex-wrap gap-1.5">{(internship.durations || []).map((duration) => <span key={duration.key} className="rounded bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">{duration.label || duration.key} (₹{duration.price})</span>)}</div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 self-end md:self-auto">
+        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">{internship.isPublished ? "Published" : "Draft"}</span>
+        <Button type="button" size="sm" variant="outline" onClick={() => onEdit(internship)}>Edit</Button>
+        <Button type="button" size="sm" variant="danger" disabled={deleting} onClick={() => onDelete(internship)}>{deleting ? "Deleting..." : "Delete"}</Button>
+      </div>
     </div>
   );
 }

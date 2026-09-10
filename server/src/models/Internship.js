@@ -37,6 +37,9 @@ const internshipSchema = new mongoose.Schema(
     archivedSlug: String,
     coverImageUrl: String,
     pdfUrl: { type: String, trim: true, default: "" },
+    // Undefined is intentional for legacy records. It preserves the prior createdAt order
+    // until an admin saves an explicit ordering through the reorder endpoint.
+    sortOrder: { type: Number, index: true },
     shortDescription: { type: String, required: true },
     description: String,
     role: String,

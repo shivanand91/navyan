@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { InternshipPreviewPanel } from "@/components/internships/InternshipPreviewPanel";
+import { InternshipImage } from "@/components/internships/InternshipImage";
 import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
 import { toast } from "sonner";
 
@@ -372,24 +373,14 @@ export default function StudentInternships() {
             ) : (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {internships.map((internship) => (
-                  <div
+                  <article
                     key={internship._id}
-                    className={`navyan-card flex h-full flex-col overflow-hidden p-0 ${
+                    className={`navyan-card flex h-[460px] flex-col overflow-hidden p-0 ${
                       applyId === internship._id ? "ring-2 ring-primary/30" : ""
                     }`}
                   >
                     <div className="relative aspect-video overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03]">
-                      {internship.coverImageUrl ? (
-                        <img
-                          src={internship.coverImageUrl}
-                          alt={internship.title}
-                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-[#7e8794]">
-                          Navyan internship preview
-                        </div>
-                      )}
+                      <InternshipImage src={internship.coverImageUrl} alt={internship.title} className="transition duration-500 hover:scale-[1.02]" />
                       <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
                         {internship.mode?.toUpperCase() || "REMOTE"}
                       </div>
@@ -403,16 +394,16 @@ export default function StudentInternships() {
                       </div>
 
                       <div className="mt-4">
-                        <h2 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+                        <h2 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                           {internship.title}
                         </h2>
-                        <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-[#b7c0cc]">
-                          {internship.shortDescription}
+                        <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-[#b7c0cc] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+                          {internship.shortDescription || internship.description || "Explore this Navyan internship opportunity."}
                         </p>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
+                      <div className="mt-4 flex min-h-7 flex-wrap gap-2 overflow-hidden">
+                        {(internship.skillsRequired || []).slice(0, 3).map((skill) => (
                           <span
                             key={skill}
                             className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]"
@@ -422,20 +413,11 @@ export default function StudentInternships() {
                         ))}
                       </div>
 
-                      <div className="mt-4 grid gap-2">
-                        {(internship.durations || []).map((duration) => (
-                          <div
-                            key={duration.key}
-                            className="rounded-[18px] border border-black/8 bg-black/[0.03] px-4 py-3 dark:border-white/8 dark:bg-[#101419]/94"
-                          >
-                            <p className="text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
-                              {getDurationLabel(duration)}
-                            </p>
-                            <p className="mt-1 text-[11px] text-slate-500 dark:text-[#7e8794]">
-                              {getPriceLabel(duration)}
-                            </p>
-                          </div>
-                        ))}
+                      <div className="mt-4 rounded-[18px] border border-black/8 bg-black/[0.03] px-4 py-3 dark:border-white/8 dark:bg-[#101419]/94">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-[#7e8794]">Duration options</p>
+                        <p className="mt-1 truncate text-xs font-semibold text-slate-900 dark:text-[#f5f7fa]">
+                          {(internship.durations || []).map(getDurationLabel).join(" • ") || "Flexible internship track"}
+                        </p>
                       </div>
 
                       <div className="mt-auto border-t border-black/8 pt-4 dark:border-white/8">
@@ -448,7 +430,7 @@ export default function StudentInternships() {
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}

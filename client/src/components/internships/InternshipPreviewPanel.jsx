@@ -8,6 +8,8 @@ import {
   Users2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FormattedDescription } from "@/components/internships/FormattedDescription";
+import { InternshipImage } from "@/components/internships/InternshipImage";
 import {
   getDurationPriceLabel,
   isPaidDuration
@@ -39,17 +41,7 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
     <div className={cn("grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", className)}>
       <div className="space-y-5">
         <div className="aspect-video overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
-          {internship.coverImageUrl ? (
-            <img
-              src={internship.coverImageUrl}
-              alt={internship.title}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center bg-primary/10 text-sm text-[color:var(--text-secondary)]">
-              Navyan internship preview
-            </div>
-          )}
+          <InternshipImage src={internship.coverImageUrl} alt={internship.title} />
         </div>
 
         <div className="space-y-4">
@@ -111,9 +103,10 @@ export function InternshipPreviewPanel({ internship, aside, className }) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
               What you will work on
             </p>
-            <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[color:var(--text-secondary)]">
-              {internship.description || internship.shortDescription}
-            </p>
+            <FormattedDescription
+              description={internship.description || internship.shortDescription}
+              className="mt-4 text-sm leading-8 text-[color:var(--text-secondary)]"
+            />
           </div>
 
           <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">

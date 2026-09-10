@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  BadgeCheck,
-  FileText,
-  ShieldCheck,
-  Sparkles,
-  WalletCards
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import api from "@/lib/axios";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,16 +8,8 @@ import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { InternshipPreviewPanel } from "@/components/internships/InternshipPreviewPanel";
+import { InternshipImage } from "@/components/internships/InternshipImage";
 import { useAuth } from "@/context/AuthContext";
-import { getDurationPriceLabel, isPaidDuration } from "@/utils/internshipPricing";
-
-const durationFallbackLabels = {
-  "4-weeks": "4 weeks",
-  "3-months": "3 months",
-  "6-months": "6 months"
-};
-
-const getDurationLabel = (duration) => duration?.label || durationFallbackLabels[duration?.key] || duration?.key;
 
 export default function Internships() {
   const { user } = useAuth();
@@ -32,18 +17,6 @@ export default function Internships() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [activeInternship, setActiveInternship] = useState(null);
-  const [selectedDurations, setSelectedDurations] = useState({});
-
-  const getRewardsText = (duration) => {
-    if (duration.rewards && duration.rewards.length > 0) {
-      return duration.rewards.join(", ");
-    }
-    if (duration.key === "3-months") return "Top Performer Reward: ₹5,000";
-    if (duration.key === "6-months") return "Top Performer Reward: ₹8,000";
-    if (duration.key === "4-weeks") return "Swag & Performance Recognition";
-    return null;
-  };
-
   useEffect(() => {
     const load = async () => {
       try {
@@ -102,23 +75,15 @@ export default function Internships() {
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {internships.map((internship, index) => {
-                const selectedKey = selectedDurations[internship._id] || internship.durations?.[0]?.key || "4-weeks";
-                const selectedDuration = internship.durations?.find(d => d.key === selectedKey) || internship.durations?.[0];
+                const durationSummary = (internship.durations || [])
+                  .map((duration) => duration.label || duration.key)
+                  .filter(Boolean)
+                  .join(" • ");
                 return (
                   <RevealInView key={internship._id} delay={index * 0.03}>
-                    <div className="navyan-card flex h-full flex-col overflow-hidden p-0">
+                    <article className="navyan-card flex h-[460px] flex-col overflow-hidden p-0">
                       <div className="relative aspect-video overflow-hidden border-b border-[color:var(--border)] bg-[color:var(--card)]">
-                        {internship.coverImageUrl ? (
-                          <img
-                            src={internship.coverImageUrl}
-                            alt={internship.title}
-                            className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
-                            Navyan internship live
-                          </div>
-                        )}
+                        <InternshipImage src={internship.coverImageUrl} alt={internship.title} className="transition duration-500 hover:scale-[1.02]" />
                         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
                           <Sparkles className="h-3.5 w-3.5" />
                           Open now
@@ -136,16 +101,16 @@ export default function Internships() {
                         </div>
 
                         <div className="mt-4">
-                          <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
+                          <h3 className="font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                             {internship.title}
                           </h3>
-                          <p className="mt-2 text-sm leading-7 text-textSecondary">
-                            {internship.shortDescription}
+                          <p className="mt-2 text-sm leading-6 text-textSecondary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+                            {internship.shortDescription || internship.description || "Explore this Navyan internship opportunity."}
                           </p>
                         </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {(internship.skillsRequired || []).slice(0, 4).map((skill) => (
+                        <div className="mt-4 flex min-h-7 flex-wrap gap-2 overflow-hidden">
+                          {(internship.skillsRequired || []).slice(0, 3).map((skill) => (
                             <span
                               key={skill}
                               className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]"
@@ -155,70 +120,16 @@ export default function Internships() {
                           ))}
                         </div>
 
-                        {/* Segmented Duration Selector */}
-                        <div className="mt-5 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] p-4 space-y-3">
-                          <p className="text-[11px] font-semibold uppercase tracking-wider text-[color:var(--text-secondary)]">
-                            Select Cohort Duration:
-                          </p>
-                          <div className="flex rounded-[8px] border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-0.5">
-                            {(internship.durations || []).map((duration) => {
-                              const isSelected = selectedKey === duration.key;
-                              return (
-                                <button
-                                  key={duration.key}
-                                  type="button"
-                                  onClick={() => setSelectedDurations(prev => ({ ...prev, [internship._id]: duration.key }))}
-                                  className={`flex-1 text-center py-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-[6px] transition-all ${
-                                    isSelected
-                                      ? "bg-primary text-white shadow-sm font-bold"
-                                      : "text-[color:var(--text-secondary)] hover:text-[color:var(--text)]"
-                                  }`}
-                                >
-                                  {getDurationLabel(duration)}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {selectedDuration && (
-                            <div className="flex items-center justify-between border-t border-[color:var(--border)] pt-3 text-xs">
-                              <div>
-                                <span className="text-[10px] text-[color:var(--text-muted)] uppercase tracking-wider">Type</span>
-                                <p className="font-semibold text-[color:var(--text)]">
-                                  {isPaidDuration(selectedDuration) ? "Paid Internship" : "Unpaid Track"}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <span className="text-[10px] text-[color:var(--text-muted)] uppercase tracking-wider">Price</span>
-                                <p className="font-semibold text-[color:var(--text)]">
-                                  {getDurationPriceLabel(selectedDuration)}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
-                          {selectedDuration && getRewardsText(selectedDuration) && (
-                            <div className="mt-2 rounded-[8px] bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold text-center uppercase tracking-wide">
-                              {getRewardsText(selectedDuration)}
-                            </div>
-                          )}
+                        <div className="mt-4 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-4 py-3">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Duration options</p>
+                          <p className="mt-1 truncate text-xs font-medium text-[color:var(--text-secondary)]">{durationSummary || "Flexible internship track"}</p>
                         </div>
 
                         <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4">
-                          <div className="flex flex-wrap gap-2">
-                            <Button variant="outline" onClick={() => setActiveInternship(internship)} className="flex-1">
-                              Preview role
-                            </Button>
-                            <Link to={`/internship/${internship.slug}/${selectedKey}`} className="flex-[2]">
-                              <Button variant="accent" className="w-full">
-                                View {getDurationLabel(selectedDuration)} Plan
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                              </Button>
-                            </Link>
-                          </div>
+                          <Button variant="accent" className="w-full" onClick={() => setActiveInternship(internship)}>Apply Now</Button>
                         </div>
                       </div>
-                    </div>
+                    </article>
                   </RevealInView>
                 );
               })}
