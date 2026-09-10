@@ -1,5 +1,18 @@
 import { Internship } from "../models/Internship.js";
 import { uploadBuffer } from "../services/cloudinaryUpload.js";
+import { normalizeHttpUrl } from "../utils/url.js";
+
+const normalizePdfUrl = (value) => {
+  const normalized = normalizeHttpUrl(value);
+
+  if (normalized === null) {
+    const error = new Error("PDF/task document link must be a valid HTTP(S) URL");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return normalized;
+};
 
 const ensureDefaultDurations = (internship) => {
   if (!internship) return;
@@ -129,6 +142,7 @@ export const adminCreateInternship = async (req, res, next) => {
         body.durations = [];
       }
     }
+    body.pdfUrl = normalizePdfUrl(body.pdfUrl);
 
     let coverImageUrl = body.coverImageUrl;
     if (req.file?.buffer) {
@@ -153,6 +167,7 @@ export const adminCreateInternship = async (req, res, next) => {
       openings: body.openings,
       lastDateToApply: body.lastDateToApply,
       isPublished: body.isPublished,
+      pdfUrl: body.pdfUrl,
       durations: body.durations,
       coverImageUrl
     });
@@ -180,6 +195,9 @@ export const adminUpdateInternship = async (req, res, next) => {
       } catch {
         // ignore
       }
+    }
+    if (Object.prototype.hasOwnProperty.call(updates, "pdfUrl")) {
+      updates.pdfUrl = normalizePdfUrl(updates.pdfUrl);
     }
 
     if (req.file?.buffer) {

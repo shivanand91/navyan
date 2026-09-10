@@ -36,6 +36,7 @@ const internshipSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, index: true },
     archivedSlug: String,
     coverImageUrl: String,
+    pdfUrl: { type: String, trim: true, default: "" },
     shortDescription: { type: String, required: true },
     description: String,
     role: String,

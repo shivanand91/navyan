@@ -1049,6 +1049,16 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         });
       }
 
+      if (prevStatus !== "Selected" && status === "Selected") {
+        const taskPdfUrl = resolveAssignedTaskPdfUrl({ internship: application.internship });
+        if (!taskPdfUrl) {
+          return res.status(400).json({
+            message:
+              "This internship does not have a PDF/task document configured. Please add the document link before accepting the application."
+          });
+        }
+      }
+
       application.status = status;
     }
 
@@ -1063,9 +1073,7 @@ export const adminUpdateApplicationStatus = async (req, res, next) => {
         startDate,
         endDate,
         taskPdfUrl: resolveAssignedTaskPdfUrl({
-          internship,
-          durationKey: application.durationKey,
-          existingTaskPdfUrl: application.internshipMeta?.taskPdfUrl
+          internship
         })
       };
 

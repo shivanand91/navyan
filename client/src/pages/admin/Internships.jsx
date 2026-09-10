@@ -11,6 +11,7 @@ const createEmptyForm = () => ({
   slug: "",
   shortDescription: "",
   role: "",
+  pdfUrl: "",
   mode: "remote",
   durations: [
     {
@@ -75,6 +76,7 @@ export default function AdminInternships() {
   const [editingId, setEditingId] = useState(null);
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState("");
+  const [pdfUrlError, setPdfUrlError] = useState("");
 
   const load = async () => {
     try {
@@ -90,7 +92,14 @@ export default function AdminInternships() {
   }, []);
 
   const handleChange = (e) => {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+
+    if (name === "pdfUrl") {
+      setPdfUrlError(value && !/^https?:\/\/\S+$/i.test(value.trim())
+        ? "Enter a valid HTTP(S) URL."
+        : "");
+    }
   };
 
   const handleDurationChange = (index, field, value) => {
@@ -144,6 +153,7 @@ export default function AdminInternships() {
     setEditingId(null);
     setCoverImageFile(null);
     setCoverImagePreview("");
+    setPdfUrlError("");
   };
 
   const buildPayload = () => {
@@ -153,6 +163,7 @@ export default function AdminInternships() {
     payload.append("slug", form.slug);
     payload.append("shortDescription", form.shortDescription);
     payload.append("role", form.role);
+    payload.append("pdfUrl", form.pdfUrl.trim());
     payload.append("mode", form.mode);
     payload.append("durations", JSON.stringify(form.durations));
 
@@ -165,6 +176,11 @@ export default function AdminInternships() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (form.pdfUrl && !/^https?:\/\/\S+$/i.test(form.pdfUrl.trim())) {
+      setPdfUrlError("Enter a valid HTTP(S) URL.");
+      toast.error("Enter a valid HTTP(S) PDF/task document link.");
+      return;
+    }
     setSaving(true);
     try {
       if (editingId) {
@@ -198,11 +214,13 @@ export default function AdminInternships() {
       slug: internship.slug || "",
       shortDescription: internship.shortDescription || "",
       role: internship.role || "",
+      pdfUrl: internship.pdfUrl || "",
       mode: internship.mode || "remote",
       durations: internship.durations || []
     });
     setCoverImageFile(null);
     setCoverImagePreview(internship.coverImageUrl || "");
+    setPdfUrlError("");
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -272,6 +290,21 @@ export default function AdminInternships() {
                 required
               />
             </Field>
+          </div>
+          <div className="md:col-span-3">
+            <Field label="Internship PDF / Task Document Link">
+              <Input
+                name="pdfUrl"
+                type="url"
+                value={form.pdfUrl}
+                onChange={handleChange}
+                placeholder="https://drive.google.com/file/d/..."
+                aria-invalid={Boolean(pdfUrlError)}
+              />
+            </Field>
+            <p className={`mt-1 text-[11px] ${pdfUrlError ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400"}`}>
+              {pdfUrlError || "Paste the Google Drive link of the PDF/task document for this internship."}
+            </p>
           </div>
           <div className="md:col-span-1">
             <Field label="Feature image">

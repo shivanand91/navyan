@@ -1,4 +1,4 @@
-const DRIVE_FILE_PATTERN = /drive\.google\.com\/file\/d\/([^/]+)/i;
+import { normalizeHttpUrl } from "../utils/url.js";
 
 export const TASK_ASSIGNED_STATUSES = [
   "Selected",
@@ -12,7 +12,6 @@ export const TASK_ASSIGNED_STATUSES = [
 const DOMAIN_PDF_MAPPINGS = [
   {
     label: "Full Stack Development",
-    envKey: "PDF_FULLSTACK",
     matchers: [
       "full stack",
       "fullstack",
@@ -23,7 +22,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "Mobile App Development",
-    envKey: "PDF_APP_DEV",
     matchers: [
       "mobile app development",
       "mobile development",
@@ -41,7 +39,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "Frontend Development",
-    envKey: "PDF_FRONTEND",
     matchers: [
       "frontend development",
       "front end development",
@@ -54,7 +51,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "Backend Development",
-    envKey: "PDF_BACKEND",
     matchers: [
       "back end",
       "backend",
@@ -66,7 +62,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "Data Analytics",
-    envKey: "PDF_DATA_ANALYTICS",
     matchers: [
       "data analytics",
       "data analyst",
@@ -78,7 +73,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "UI/UX Design",
-    envKey: "PDF_UI_UX",
     matchers: [
       "ui ux",
       "ui/ux",
@@ -90,7 +84,6 @@ const DOMAIN_PDF_MAPPINGS = [
   },
   {
     label: "Web Development",
-    envKey: "PDF_WEB_DEV",
     matchers: [
       "web development",
       "web dev",
@@ -100,20 +93,6 @@ const DOMAIN_PDF_MAPPINGS = [
     ]
   }
 ];
-
-const normalizeDriveLink = (value) => {
-  const trimmed = String(value || "").trim();
-  if (!trimmed) {
-    return "";
-  }
-
-  const match = trimmed.match(DRIVE_FILE_PATTERN);
-  if (!match?.[1]) {
-    return trimmed;
-  }
-
-  return `https://drive.google.com/file/d/${match[1]}/view`;
-};
 
 const toTitleCase = (value) =>
   value
@@ -150,16 +129,6 @@ const buildInternshipSearchText = (internship) =>
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
-
-export const resolveDomainTaskPdfUrl = (internship) => {
-  const match = resolveDomainMapping(internship);
-
-  if (!match) {
-    return "";
-  }
-
-  return normalizeDriveLink(process.env[match.envKey]);
-};
 
 export const resolveInternshipDomainLabel = (internship) => {
   const match = resolveDomainMapping(internship);
@@ -221,15 +190,9 @@ const resolveDomainMapping = (internship) => {
 };
 
 export const resolveAssignedTaskPdfUrl = ({
-  internship,
-  durationKey,
-  existingTaskPdfUrl
+  internship
 }) => {
-  const durationOption = internship?.durations?.find((item) => item.key === durationKey);
-
-  return normalizeDriveLink(
-    durationOption?.taskPdfUrl || existingTaskPdfUrl || resolveDomainTaskPdfUrl(internship)
-  );
+  return normalizeHttpUrl(internship?.pdfUrl) || "";
 };
 
 export const shouldExposeAssignedTask = (application) =>
