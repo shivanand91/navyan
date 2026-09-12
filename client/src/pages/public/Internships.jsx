@@ -82,8 +82,8 @@ export default function Internships() {
                 return (
                   <RevealInView key={internship._id} delay={index * 0.03} className="h-full min-w-0">
                     <article className="navyan-card flex h-full min-w-0 flex-col overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5">
-                      <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-[color:var(--border)] bg-gradient-to-br from-primary/10 via-[color:var(--card-elevated)] to-[color:var(--card)] p-3 sm:p-4">
-                        <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" className="rounded-[10px] transition duration-500 hover:scale-[1.02]" />
+                      <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-[color:var(--border)] bg-gradient-to-br from-primary/10 via-[color:var(--card-elevated)] to-[color:var(--card)]">
+                        <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" className="transition duration-500 hover:scale-[1.02]" />
                         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md"><Sparkles className="h-3.5 w-3.5" />Open now</div>
                       </div>
                       <div className="flex min-h-0 flex-1 flex-col px-5 py-5">
@@ -152,9 +152,11 @@ export default function Internships() {
         onClose={() => setActiveInternship(null)}
         title={activeInternship?.title}
         description="Inspect the role deeply before moving into the application workspace."
+        contentClassName="flex min-h-0 flex-1 overflow-y-auto px-5 py-5 xl:overflow-hidden md:px-6 md:py-6"
       >
         <InternshipPreviewPanel
           internship={activeInternship}
+          scrollDescription
           aside={
             activeInternship ? (
               <div className="rounded-[16px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">

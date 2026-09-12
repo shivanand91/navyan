@@ -16,5 +16,5 @@ export function InternshipImage({ src, alt, className, fit = "cover" }) {
     );
   }
 
-  return <img src={src} alt={alt} onError={() => setFailed(true)} className={cn("h-full w-full object-center", fit === "contain" ? "object-contain p-2" : "object-cover", className)} />;
+  return <img src={src} alt={alt} onError={() => setFailed(true)} className={cn("h-full w-full object-center", fit === "contain" ? "object-contain" : "object-cover", className)} />;
 }

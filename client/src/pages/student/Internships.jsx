@@ -387,8 +387,8 @@ export default function StudentInternships() {
                       applyId === internship._id ? "ring-2 ring-primary/30" : ""
                     }`}
                   >
-                    <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-black/8 bg-gradient-to-br from-primary/10 via-black/[0.03] to-[color:var(--card)] p-3 dark:border-white/8 dark:via-white/[0.03] sm:p-4">
-                      <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" className="rounded-[14px] transition duration-500 hover:scale-[1.02]" />
+                    <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-black/8 bg-gradient-to-br from-primary/10 via-black/[0.03] to-[color:var(--card)] dark:border-white/8 dark:via-white/[0.03]">
+                      <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" className="transition duration-500 hover:scale-[1.02]" />
                       <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
                         {internship.mode?.toUpperCase() || "REMOTE"}
                       </div>
