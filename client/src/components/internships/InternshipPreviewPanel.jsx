@@ -38,9 +38,9 @@ export function InternshipPreviewPanel({ internship, aside, className, scrollDes
   if (!internship) return null;
 
   return (
-    <div className={cn("grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", scrollDescription && "xl:h-full xl:min-h-0", className)}>
+    <div className={cn("grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]", scrollDescription && "xl:h-full xl:min-h-0 xl:grid-rows-[minmax(0,1fr)]", className)}>
       <div className={cn("min-w-0", scrollDescription && "xl:flex xl:min-h-0 xl:flex-col xl:gap-5", !scrollDescription && "space-y-5")}>
-        <div className="aspect-video overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
+        <div className="aspect-video shrink-0 overflow-hidden rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)]">
           <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="contain" />
         </div>
 
@@ -99,7 +99,7 @@ export function InternshipPreviewPanel({ internship, aside, className, scrollDes
             </div>
           </div>
 
-          <div className={cn("rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5", scrollDescription && "xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:pr-4")}>
+          <div className={cn("rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5", scrollDescription && "xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:overscroll-contain xl:pr-4")}>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
               What you will work on
             </p>

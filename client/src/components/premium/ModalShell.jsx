@@ -55,7 +55,7 @@ export function ModalShell({
           className
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border)] px-5 py-4 md:px-6">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[color:var(--border)] px-5 py-4 md:px-6">
           <div className="space-y-1">
             {title ? (
               <h2 className="font-display text-xl font-semibold tracking-[-0.04em] text-[color:var(--text)] md:text-2xl">
