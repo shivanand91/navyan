@@ -76,6 +76,7 @@ export default function Internships() {
             </div>
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+<<<<<<< HEAD
               {internships.map((internship, index) => {
                 const selectedKey = selectedDurations[internship._id] || internship.durations?.[0]?.key;
                 const selectedDuration = internship.durations?.find((duration) => duration.key === selectedKey) || internship.durations?.[0];
@@ -97,6 +98,53 @@ export default function Internships() {
                           </span>
                           <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
                             {internship.mode?.toUpperCase() || "REMOTE"}
+=======
+              {internships.map((internship, index) => (
+                <RevealInView key={internship._id} delay={index * 0.03} className="h-full min-w-0">
+                  <article className="navyan-card flex h-full min-w-0 flex-col overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5">
+                    <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-[color:var(--border)] bg-gradient-to-br from-primary/10 via-[color:var(--card-elevated)] to-[color:var(--card)] p-3 sm:p-4">
+                      {internship.coverImageUrl ? (
+                        <img
+                          src={internship.coverImageUrl}
+                          alt={internship.title}
+                          className="h-full w-full rounded-[10px] object-contain transition duration-500 hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-primary/10 px-6 text-center text-sm text-[color:var(--text-secondary)]">
+                          Navyan internship live
+                        </div>
+                      )}
+                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-[8px] border border-primary/20 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur-md">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Open now
+                      </div>
+                    </div>
+
+                    <div className="flex min-h-0 flex-1 flex-col px-5 py-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                          {internship.role || "Internship track"}
+                        </span>
+                        <span className="rounded-[8px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
+                          {internship.mode?.toUpperCase() || "REMOTE"}
+                        </span>
+                      </div>
+
+                      <div className="mt-4">
+                        <h3 className="break-words font-display text-2xl font-semibold tracking-[-0.04em] text-textPrimary">
+                          {internship.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-7 text-textSecondary">
+                          {internship.shortDescription}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 rounded-[12px] border border-primary/15 bg-primary/10 px-4 py-3">
+                        <div className="flex items-center gap-2 text-primary">
+                          <WalletCards className="h-4 w-4" />
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">
+                            Duration model
+>>>>>>> 873d30d (card responsiveness fix)
                           </span>
                         </div>
 
@@ -143,6 +191,7 @@ export default function Internships() {
                           </div>
                         </div>
 
+<<<<<<< HEAD
                         <div className="mt-auto flex flex-col gap-3 border-t border-[color:var(--border)] pt-4">
                           <Button variant="accent" className="w-full" onClick={() => setActiveInternship(internship)}>Apply Now</Button>
                         </div>
@@ -151,6 +200,28 @@ export default function Internships() {
                   </RevealInView>
                 );
               })}
+=======
+                      <div className="mt-auto flex shrink-0 flex-col gap-3 border-t border-[color:var(--border)] pt-4">
+                        <p className="text-xs text-[color:var(--text-muted)]">
+                          Preview the role first, then move into the full application flow.
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <Button className="w-full" variant="outline" onClick={() => setActiveInternship(internship)}>
+                            Preview role
+                          </Button>
+                          <Link className="block min-w-0" to={`/internships/${internship.slug}`}>
+                            <Button className="w-full" variant="accent">
+                              Apply now
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </RevealInView>
+              ))}
+>>>>>>> 873d30d (card responsiveness fix)
             </div>
           )}
         </div>

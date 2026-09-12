@@ -377,6 +377,7 @@ export default function StudentInternships() {
               </div>
             ) : (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+<<<<<<< HEAD
                 {internships.map((internship) => {
                   const selectedKey = selectedDurations[internship._id] || internship.durations?.[0]?.key;
                   const selectedDuration = internship.durations?.find((duration) => duration.key === selectedKey) || internship.durations?.[0];
@@ -389,12 +390,33 @@ export default function StudentInternships() {
                   >
                     <div className="relative h-52 shrink-0 overflow-hidden border-b border-black/8 bg-black/[0.03] dark:border-white/8 dark:bg-white/[0.03] sm:h-56">
                       <InternshipImage src={internship.coverImageUrl} alt={internship.title} fit="cover" className="transition duration-500 hover:scale-[1.03]" />
+=======
+                {internships.map((internship) => (
+                  <article
+                    key={internship._id}
+                    className={`navyan-card flex h-full min-w-0 flex-col overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5 ${
+                      applyId === internship._id ? "ring-2 ring-primary/30" : ""
+                    }`}
+                  >
+                    <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-black/8 bg-gradient-to-br from-primary/10 via-black/[0.03] to-[color:var(--card)] p-3 dark:border-white/8 dark:via-white/[0.03] sm:p-4">
+                      {internship.coverImageUrl ? (
+                        <img
+                          src={internship.coverImageUrl}
+                          alt={internship.title}
+                          className="h-full w-full rounded-[14px] object-contain transition duration-500 hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-[#7e8794]">
+                          Navyan internship preview
+                        </div>
+                      )}
+>>>>>>> 873d30d (card responsiveness fix)
                       <div className="absolute left-4 top-4 rounded-full border border-primary/18 bg-[color:var(--card)]/88 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary backdrop-blur">
                         {internship.mode?.toUpperCase() || "REMOTE"}
                       </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col px-5 py-5">
+                    <div className="flex min-h-0 flex-1 flex-col px-5 py-5">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-black/8 bg-black/[0.03] px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-white/8 dark:bg-white/5 dark:text-[#b7c0cc]">
                           {internship.role || "Internship track"}
@@ -402,7 +424,11 @@ export default function StudentInternships() {
                       </div>
 
                       <div className="mt-4">
+<<<<<<< HEAD
                         <h2 className="font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+=======
+                        <h2 className="break-words font-display text-2xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-[#f5f7fa]">
+>>>>>>> 873d30d (card responsiveness fix)
                           {internship.title}
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-[#b7c0cc] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
@@ -444,7 +470,7 @@ export default function StudentInternships() {
                         </div>
                       </div>
 
-                      <div className="mt-auto border-t border-black/8 pt-4 dark:border-white/8">
+                      <div className="mt-auto shrink-0 border-t border-black/8 pt-4 dark:border-white/8">
                         <p className="text-xs text-slate-500 dark:text-[#7e8794]">
                           Preview the internship, choose a duration, and submit from the modal.
                         </p>
@@ -455,8 +481,12 @@ export default function StudentInternships() {
                       </div>
                     </div>
                   </article>
+<<<<<<< HEAD
                   );
                 })}
+=======
+                ))}
+>>>>>>> 873d30d (card responsiveness fix)
               </div>
             )}
           </div>
