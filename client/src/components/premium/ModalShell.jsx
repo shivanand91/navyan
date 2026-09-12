@@ -11,7 +11,8 @@ export function ModalShell({
   description,
   children,
   className,
-  contentClassName
+  contentClassName,
+  constrainToViewport = false
 }) {
   useEffect(() => {
     if (!open) return undefined;
@@ -47,7 +48,10 @@ export function ModalShell({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative mx-auto flex min-h-0 max-h-[calc(100vh-1.5rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] text-[color:var(--text)] shadow-[0_30px_120px_rgba(15,23,42,0.24)] dark:shadow-[0_30px_120px_rgba(0,0,0,0.52)] md:max-h-[calc(100vh-3rem)]",
+          "relative mx-auto flex min-h-0 w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[color:var(--card-elevated)] text-[color:var(--text)] shadow-[0_30px_120px_rgba(15,23,42,0.24)] dark:shadow-[0_30px_120px_rgba(0,0,0,0.52)]",
+          constrainToViewport
+            ? "h-[calc(100vh-1.5rem)] md:h-[calc(100vh-3rem)]"
+            : "max-h-[calc(100vh-1.5rem)] md:max-h-[calc(100vh-3rem)]",
           className
         )}
       >

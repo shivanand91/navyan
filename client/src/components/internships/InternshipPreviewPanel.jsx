@@ -134,7 +134,7 @@ export function InternshipPreviewPanel({ internship, aside, className, scrollDes
         </div>
       </div>
 
-      <div className={cn("space-y-4", scrollDescription && "xl:self-start")}>
+      <div className={cn("space-y-4", scrollDescription && "xl:max-h-full xl:self-start xl:overflow-y-auto xl:pr-1")}>
         <div className="rounded-[28px] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
             Internship details
