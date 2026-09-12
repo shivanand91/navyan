@@ -468,10 +468,12 @@ export default function StudentInternships() {
         onClose={() => setActiveInternship(null)}
         title={activeInternship?.title}
         description="Inspect the internship and complete the application workflow from one focused surface."
-        contentClassName="space-y-0"
+        constrainToViewport
+        contentClassName="flex min-h-0 flex-1 overflow-y-auto px-5 py-5 xl:overflow-hidden md:px-6 md:py-6"
       >
         <InternshipPreviewPanel
           internship={activeInternship}
+          scrollDescription
           aside={
             activeInternship && currentDuration ? (
               <div className="space-y-4">
