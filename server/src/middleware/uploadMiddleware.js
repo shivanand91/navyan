@@ -9,3 +9,14 @@ export const upload = multer({
   }
 });
 
+export const uploadResume = multer({
+  storage,
+  limits: {
+    fileSize: Number(process.env.MAX_RESUME_SIZE_MB || 5) * 1024 * 1024
+  },
+  fileFilter: (req, file, callback) => {
+    const allowed = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    if (allowed.includes(file.mimetype) && /\.(pdf|docx)$/i.test(file.originalname || "")) return callback(null, true);
+    callback(Object.assign(new Error("Only PDF and DOCX files are supported."), { statusCode: 400 }));
+  }
+});
