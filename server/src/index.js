@@ -33,6 +33,7 @@ import supportRoutes from "./routes/supportRoutes.js";
 import shareEarnRoutes from "./routes/shareEarnRoutes.js";
 import adminActivityRoutes from "./routes/adminActivityRoutes.js";
 import activityTrackingRoutes from "./routes/activityTrackingRoutes.js";
+import resumeRoutes from "./routes/resumeRoutes.js";
 import { initializeSocketServer } from "./socket.js";
 import { startAutomationWorker } from "./services/automationWorker.js";
 import { runDatabaseMaintenance } from "./services/databaseMaintenanceService.js";
@@ -174,6 +175,7 @@ app.use("/api/support", supportRoutes);
 app.use("/api/share-earn", shareEarnRoutes);
 app.use("/api/admin", adminActivityRoutes);
 app.use("/api/activity", activityTrackingRoutes);
+app.use("/api/resume", resumeRoutes);
 
 // 404 + errors
 app.use(notFound);

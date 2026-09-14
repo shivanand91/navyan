@@ -29,6 +29,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { ModalShell } from "@/components/premium/ModalShell";
 import { RevealInView } from "@/components/premium/RevealInView";
 import { SectionHeading } from "@/components/premium/SectionHeading";
+import { ResumeAnalyzer } from "@/components/resume/ResumeAnalyzer";
 
 const VISITOR_STORAGE_KEY = "navyan_visitor_id";
 const durationFallbackLabels = {
@@ -492,6 +493,8 @@ export default function Home() {
           </div>
 
           <RevealInView delay={0.06}>
+            <ResumeAnalyzer />
+            {/*
             <div className="navyan-panel relative overflow-hidden p-6 md:p-7">
               <div className="relative space-y-5">
                 <div className="flex items-start justify-between gap-4">
@@ -576,7 +579,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </RevealInView>
         </div>
       </section>
