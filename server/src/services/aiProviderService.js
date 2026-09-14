@@ -49,9 +49,9 @@ async function openAiCompatible(input) {
 }
 
 async function gemini(input) {
-  const model = process.env.AI_MODEL || "gemini-1.5-flash";
+  const model = process.env.AI_MODEL || "gemini-2.5-flash";
   const base = (process.env.AI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
-  const response = await timeout(fetch(`${base}/models/${model}:generateContent?key=${encodeURIComponent(process.env.AI_API_KEY)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ generationConfig: { temperature: Number(process.env.AI_TEMPERATURE || 0.2), responseMimeType: "application/json" }, contents: [{ parts: [{ text: `${systemPrompt}\n\nTarget role: ${input.targetRole}\nResume:\n${input.resumeText}` }] }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
+  const response = await timeout(fetch(`${base}/models/${model}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.AI_API_KEY }, body: JSON.stringify({ generationConfig: { temperature: Number(process.env.AI_TEMPERATURE || 0.2), responseMimeType: "application/json" }, contents: [{ parts: [{ text: `${systemPrompt}\n\nTarget role: ${input.targetRole}\nResume:\n${input.resumeText}` }] }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
   if (!response.ok) throw new Error("AI provider request failed");
   const body = await response.json();
   return body.candidates?.[0]?.content?.parts?.[0]?.text;

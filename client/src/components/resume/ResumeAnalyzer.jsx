@@ -34,6 +34,9 @@ export function ResumeAnalyzer() {
     const role = pending ? (await readPending())?.targetRole : targetRole;
     if (!resume) return toast.error("Please choose your resume first.");
     if (!role?.trim()) return toast.error("Please enter the role you are targeting.");
+    // AuthContext may still be restoring the token on a fresh homepage load.
+    // Never treat that transient state as a logged-out user.
+    if (authLoading) return;
     if (!user) {
       await storePending({ file: resume, targetRole: role });
       navigate(`/login?redirect=${encodeURIComponent("/?resume=continue")}`);
@@ -68,7 +71,7 @@ export function ResumeAnalyzer() {
           <input ref={fileInput} className="sr-only" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => chooseFile(event.target.files?.[0])} />
         </div>
         <div><label htmlFor="target-role" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.13em] text-textMuted">Target role</label><Input id="target-role" list="resume-roles" value={targetRole} onChange={(event) => setTargetRole(event.target.value)} placeholder="e.g. Frontend Developer" /><datalist id="resume-roles">{roles.map((role) => <option value={role} key={role} />)}</datalist></div>
-        <Button type="button" variant="accent" size="lg" disabled={loading} onClick={() => analyze()} className="w-full justify-center">{loading ? <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" />Analyzing your resume...</> : "Analyze My Resume"}</Button>
+        <Button type="button" variant="accent" size="lg" disabled={loading || authLoading} onClick={() => analyze()} className="w-full justify-center">{loading ? <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" />Analyzing your resume...</> : authLoading ? "Checking your session..." : "Analyze My Resume"}</Button>
         {loading && <div className="rounded-[12px] bg-backgroundSecondary p-3 text-xs leading-6 text-textSecondary"><p>✓ Reading your resume</p><p>✓ Understanding your skills</p><p>→ Evaluating your target role and finding relevant opportunities</p></div>}
         <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-textMuted"><ShieldCheck className="h-3.5 w-3.5" />Your original resume is not stored.</p>
       </div>
