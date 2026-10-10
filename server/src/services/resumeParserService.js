@@ -16,10 +16,10 @@ export async function extractResumeText(file) {
   try {
     const result = isPdf ? await pdf(file.buffer) : await mammoth.extractRawText({ buffer: file.buffer });
     const text = String(result.text || "").replace(/\0/g, "").replace(/\s{3,}/g, "\n\n").trim();
-    if (text.length < 30) throw new Error("This document has no readable resume text.");
+    if (text.length < 30) throw Object.assign(new Error("We couldn't identify enough readable resume text. Please upload a clearer file."), { statusCode: 422 });
     return text.slice(0, MAX_TEXT_LENGTH);
   } catch (error) {
     if (error.statusCode) throw error;
-    throw Object.assign(new Error("We couldn't read this resume. Please upload a different PDF or DOCX file."), { statusCode: 400 });
+    throw Object.assign(new Error("We couldn't read this resume. Please upload a clearer PDF or DOCX file."), { statusCode: 422 });
   }
 }

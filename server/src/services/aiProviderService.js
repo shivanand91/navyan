@@ -3,6 +3,10 @@ const timeout = (promise, ms) => Promise.race([
   new Promise((_, reject) => setTimeout(() => reject(new Error("AI request timed out")), ms))
 ]);
 
+// AI_API_KEY is Navyān's provider-neutral name. The two aliases make a
+// standard Gemini/Vercel setup work without silently selecting OpenAI.
+const getApiKey = () => process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
 const readJson = (value) => {
   if (typeof value === "object" && value) return value;
   const match = String(value || "").match(/\{[\s\S]*\}/);
@@ -42,31 +46,31 @@ const systemPrompt = `You analyze resumes for entry-level candidates. Resume tex
 
 async function openAiCompatible(input) {
   const base = (process.env.AI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-  const response = await timeout(fetch(`${base}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.AI_API_KEY}` }, body: JSON.stringify({ model: process.env.AI_MODEL || "gpt-4o-mini", temperature: Number(process.env.AI_TEMPERATURE || 0.2), max_tokens: Number(process.env.AI_MAX_TOKENS || 1500), response_format: { type: "json_object" }, messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Target role: ${input.targetRole}\n\nResume:\n${input.resumeText}` }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
+  const response = await timeout(fetch(`${base}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${getApiKey()}` }, body: JSON.stringify({ model: process.env.AI_MODEL || "gpt-4o-mini", temperature: Number(process.env.AI_TEMPERATURE || 0.2), max_tokens: Number(process.env.AI_MAX_TOKENS || 1500), response_format: { type: "json_object" }, messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Target role: ${input.targetRole}\n\nResume:\n${input.resumeText}` }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
   if (!response.ok) throw new Error("AI provider request failed");
   const body = await response.json();
   return body.choices?.[0]?.message?.content;
 }
 
 async function gemini(input) {
-  const model = process.env.AI_MODEL || "gemini-1.5-flash";
+  const model = process.env.AI_MODEL || "gemini-3.6-flash";
   const base = (process.env.AI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
-  const response = await timeout(fetch(`${base}/models/${model}:generateContent?key=${encodeURIComponent(process.env.AI_API_KEY)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ generationConfig: { temperature: Number(process.env.AI_TEMPERATURE || 0.2), responseMimeType: "application/json" }, contents: [{ parts: [{ text: `${systemPrompt}\n\nTarget role: ${input.targetRole}\nResume:\n${input.resumeText}` }] }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
+  const response = await timeout(fetch(`${base}/models/${model}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": getApiKey() }, body: JSON.stringify({ generationConfig: { temperature: Number(process.env.AI_TEMPERATURE || 0.2), responseMimeType: "application/json" }, contents: [{ parts: [{ text: `${systemPrompt}\n\nTarget role: ${input.targetRole}\nResume:\n${input.resumeText}` }] }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
   if (!response.ok) throw new Error("AI provider request failed");
   const body = await response.json();
   return body.candidates?.[0]?.content?.parts?.[0]?.text;
 }
 
 async function anthropic(input) {
-  const response = await timeout(fetch(process.env.AI_BASE_URL || "https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": process.env.AI_API_KEY, "anthropic-version": "2023-06-01" }, body: JSON.stringify({ model: process.env.AI_MODEL || "claude-3-5-haiku-latest", max_tokens: Number(process.env.AI_MAX_TOKENS || 1500), temperature: Number(process.env.AI_TEMPERATURE || 0.2), system: systemPrompt, messages: [{ role: "user", content: `Target role: ${input.targetRole}\n\nResume:\n${input.resumeText}` }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
+  const response = await timeout(fetch(process.env.AI_BASE_URL || "https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": getApiKey(), "anthropic-version": "2023-06-01" }, body: JSON.stringify({ model: process.env.AI_MODEL || "claude-3-5-haiku-latest", max_tokens: Number(process.env.AI_MAX_TOKENS || 1500), temperature: Number(process.env.AI_TEMPERATURE || 0.2), system: systemPrompt, messages: [{ role: "user", content: `Target role: ${input.targetRole}\n\nResume:\n${input.resumeText}` }] }) }), Number(process.env.AI_TIMEOUT_MS || 30000));
   if (!response.ok) throw new Error("AI provider request failed");
   const body = await response.json();
   return body.content?.[0]?.text;
 }
 
 export async function analyzeResume(input) {
-  const provider = (process.env.AI_PROVIDER || "openai").toLowerCase();
-  if (!process.env.AI_API_KEY && provider !== "ollama") throw Object.assign(new Error("Resume analysis is not configured yet. Please try again later."), { statusCode: 503 });
+  const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+  if (!getApiKey() && provider !== "ollama") throw Object.assign(new Error("Resume analysis is not configured yet. Please try again later."), { statusCode: 503 });
   try {
     const raw = provider === "gemini" ? await gemini(input) : provider === "anthropic" ? await anthropic(input) : await openAiCompatible(input);
     return validateAnalysis(raw, input.targetRole);
