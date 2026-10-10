@@ -1,0 +1,1066 @@
+{
+  "schemaVersion": "2.0.0",
+  "name": "Navyan Resume Internship Matching Rules",
+  "description": "Deterministic preset rules for matching extracted resume text to existing published internship records in MongoDB.",
+  "engine": {
+    "type": "rule_based",
+    "externalAiApiRequired": false,
+    "databaseOfTruth": "MongoDB",
+    "internshipDetailsStoredHere": false,
+    "alwaysRecommendWhenPublishedOptionsExist": true,
+    "minimumRecommendations": 3,
+    "maximumRecommendations": 6,
+    "onlyReturnInternshipsFoundInDatabase": true,
+    "onlyReturnPublishedInternships": true,
+    "neverInventResumeEvidence": true,
+    "neverClaimMachineLearning": true
+  },
+  "databaseMapping": {
+    "purpose": "Connect a matching preset to an existing MongoDB internship document. Adapt the lookup field to the existing schema.",
+    "preferredLookupField": "slug",
+    "publishedStatusExpectedValue": "Published",
+    "presetToDatabase": [
+      {
+        "presetId": "CYBER_AI",
+        "slug": "cyber-ai-internship"
+      },
+      {
+        "presetId": "AGENTIC_X",
+        "slug": "agentic-x-internship"
+      },
+      {
+        "presetId": "DATA_ANALYTICS",
+        "slug": "data-analytics"
+      },
+      {
+        "presetId": "FULLSTACK_DEVELOPMENT",
+        "slug": "fullstack-development"
+      },
+      {
+        "presetId": "BACKEND_DEVELOPMENT",
+        "slug": "backend-development"
+      },
+      {
+        "presetId": "MOBILE_APP_DEVELOPMENT",
+        "slug": "mobile-app-development"
+      },
+      {
+        "presetId": "ANDROID_DEVELOPMENT",
+        "slug": "android-development"
+      },
+      {
+        "presetId": "WEB_DEVELOPMENT",
+        "slug": "web-development"
+      },
+      {
+        "presetId": "FRONTEND_DEVELOPMENT",
+        "slug": "frontend-development"
+      },
+      {
+        "presetId": "UI_UX_DESIGN",
+        "slug": "ui-ux-design"
+      }
+    ],
+    "important": "Do not use this mapping to build the displayed internship card. Fetch the actual published MongoDB document and use its current title, pricing, duration, image, description, mode and application URL."
+  },
+  "resumeParsing": {
+    "supportedFormats": [
+      "pdf",
+      "docx"
+    ],
+    "extractSections": [
+      "name",
+      "summary",
+      "skills",
+      "projects",
+      "experience",
+      "internships",
+      "education",
+      "certifications",
+      "coursework"
+    ],
+    "nameExtraction": {
+      "enabled": true,
+      "requireConfidence": true,
+      "fallbackGreeting": "there",
+      "neverGuessName": true
+    },
+    "normalization": {
+      "lowercaseForMatching": true,
+      "collapseWhitespace": true,
+      "removePunctuationForMatching": true,
+      "useTokenAwareMatching": true,
+      "preserveSectionEvidence": true,
+      "deduplicateDetectedSkills": true
+    },
+    "aliases": {
+      "javascript": [
+        "js",
+        "ecmascript"
+      ],
+      "typescript": [
+        "ts"
+      ],
+      "react": [
+        "react.js",
+        "reactjs"
+      ],
+      "node.js": [
+        "node",
+        "nodejs"
+      ],
+      "express.js": [
+        "express",
+        "expressjs"
+      ],
+      "mongodb": [
+        "mongo",
+        "mongo db"
+      ],
+      "postgresql": [
+        "postgres",
+        "postgres db"
+      ],
+      "machine learning": [
+        "ml"
+      ],
+      "artificial intelligence": [
+        "ai"
+      ],
+      "generative ai": [
+        "genai",
+        "gen ai"
+      ],
+      "large language models": [
+        "llm",
+        "llms"
+      ],
+      "retrieval augmented generation": [
+        "rag"
+      ],
+      "natural language processing": [
+        "nlp"
+      ],
+      "cybersecurity": [
+        "cyber security",
+        "information security",
+        "infosec"
+      ],
+      "data analytics": [
+        "data analysis",
+        "analytics"
+      ],
+      "ui/ux": [
+        "user interface",
+        "user experience"
+      ],
+      "android development": [
+        "android app development"
+      ],
+      "mobile app development": [
+        "mobile development"
+      ],
+      "rest api": [
+        "restful api",
+        "REST APIs"
+      ],
+      "power bi": [
+        "powerbi"
+      ],
+      "figma": [
+        "figma design"
+      ]
+    }
+  },
+  "scoring": {
+    "weights": {
+      "requiredSkills": 0.35,
+      "preferredSkills": 0.15,
+      "projectEvidence": 0.2,
+      "experienceEvidence": 0.1,
+      "domainKeywords": 0.1,
+      "learningFit": 0.1
+    },
+    "labels": [
+      {
+        "minScore": 75,
+        "maxScore": 100,
+        "label": "Strong match"
+      },
+      {
+        "minScore": 50,
+        "maxScore": 74,
+        "label": "Good learning match"
+      },
+      {
+        "minScore": 25,
+        "maxScore": 49,
+        "label": "Potential match"
+      },
+      {
+        "minScore": 0,
+        "maxScore": 24,
+        "label": "Recommended starting point"
+      }
+    ],
+    "rankingRules": [
+      "Calculate each category score from distinct matched evidence; do not reward repeated mentions of the same skill multiple times.",
+      "Normalize category scores to a 0-1 range before applying weights.",
+      "Use fallbackPriority only as a tie-breaker or a small configurable learning-fit factor; it must not override strong resume evidence.",
+      "Cap final matchScore at 100.",
+      "Do not award strong-match labels without sufficient positive evidence."
+    ]
+  },
+  "fallbackPolicy": {
+    "noProjectsButSkillsMatch": {
+      "recommend": true,
+      "messageTemplate": "{studentGreeting}, your resume includes skills related to {internshipTitle}, but we could not confidently identify a directly related project. This internship may help you practise these skills and build portfolio evidence.",
+      "showPortfolioProjectSuggestions": true
+    },
+    "noExperience": {
+      "recommendBeginnerFriendlyOptions": true,
+      "doNotExcludeOnlyForLackOfExperience": true
+    },
+    "noExactDomainMatch": {
+      "recommendBestAvailablePublishedOptions": true,
+      "rankBy": [
+        "matchedSkills",
+        "relatedKeywords",
+        "projectEvidence",
+        "learningFit",
+        "fallbackPriority"
+      ],
+      "useTransparentLowMatchLabel": true
+    },
+    "noRecognizedSkills": {
+      "recommendBeginnerOptionsIfAvailable": true,
+      "explainLowConfidence": true,
+      "neverFabricateMatches": true
+    },
+    "noPublishedDatabaseRecords": {
+      "returnEmptyRecommendations": true,
+      "message": "We could not find a currently published internship matching this analysis. Please check again later."
+    },
+    "presetWithoutDatabaseRecord": {
+      "skipRecord": true,
+      "continueToNextRankedCandidate": true
+    }
+  },
+  "internshipRules": [
+    {
+      "presetId": "CYBER_AI",
+      "slug": "cyber-ai-internship",
+      "titleForMatchingOnly": "Cyber AI Internship – Build Skills for the Future",
+      "fallbackPriority": 90,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "python",
+        "networking fundamentals",
+        "linux fundamentals",
+        "security fundamentals"
+      ],
+      "preferredSkills": [
+        "machine learning",
+        "log analysis",
+        "owasp top 10",
+        "web security",
+        "threat modelling",
+        "siem",
+        "incident response",
+        "data analysis"
+      ],
+      "projectEvidence": [
+        "security log analysis",
+        "threat detection",
+        "secure coding review",
+        "anomaly detection",
+        "security dashboard"
+      ],
+      "experienceEvidence": [
+        "cybersecurity intern",
+        "soc trainee",
+        "security project"
+      ],
+      "keywords": [
+        "cyber ai",
+        "cybersecurity",
+        "ethical security",
+        "soc",
+        "threat detection",
+        "ai security",
+        "network security"
+      ],
+      "learningOutcomes": [
+        "security fundamentals",
+        "defensive monitoring",
+        "log analysis",
+        "threat modelling",
+        "responsible security practices"
+      ],
+      "portfolioProjects": [
+        "Security log analysis dashboard using sample logs",
+        "Threat model for a demo web application",
+        "Anomaly detection experiment using synthetic security events"
+      ],
+      "missingSkillGuidance": {
+        "linux": [
+          "Linux CLI",
+          "file permissions",
+          "processes"
+        ],
+        "networking": [
+          "TCP/IP",
+          "DNS",
+          "HTTP/HTTPS"
+        ],
+        "python": [
+          "Python fundamentals",
+          "data handling"
+        ],
+        "webSecurity": [
+          "OWASP Top 10",
+          "secure sessions",
+          "input validation"
+        ]
+      },
+      "safetyScope": "Recommend defensive security, authorized labs and responsible disclosure only."
+    },
+    {
+      "presetId": "AGENTIC_X",
+      "slug": "agentic-x-internship",
+      "titleForMatchingOnly": "Agentic X Internship",
+      "fallbackPriority": 95,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "python or javascript",
+        "programming fundamentals",
+        "api integration"
+      ],
+      "preferredSkills": [
+        "tool calling",
+        "workflow orchestration",
+        "langgraph",
+        "langchain",
+        "state management",
+        "structured outputs",
+        "logging",
+        "human approval gates",
+        "evaluation"
+      ],
+      "projectEvidence": [
+        "ai agent",
+        "multi-step workflow",
+        "tool-using assistant",
+        "workflow automation",
+        "human-in-the-loop system"
+      ],
+      "experienceEvidence": [
+        "ai automation intern",
+        "agentic ai project",
+        "workflow automation project"
+      ],
+      "keywords": [
+        "agentic ai",
+        "ai agents",
+        "langgraph",
+        "langchain",
+        "mcp",
+        "tool calling",
+        "workflow automation"
+      ],
+      "learningOutcomes": [
+        "bounded agent workflows",
+        "tool permissions",
+        "state and checkpoints",
+        "retries and timeouts",
+        "human approval",
+        "traceability and evaluation"
+      ],
+      "portfolioProjects": [
+        "Ticket triage workflow with human approval",
+        "Tool-using assistant with audit logs",
+        "Multi-step workflow with retry limits and state tracking"
+      ],
+      "missingSkillGuidance": {
+        "api": [
+          "HTTP",
+          "REST APIs",
+          "error handling"
+        ],
+        "tools": [
+          "function calling",
+          "JSON schema validation"
+        ],
+        "orchestration": [
+          "workflow graphs",
+          "state transitions",
+          "checkpointing"
+        ],
+        "safety": [
+          "least privilege",
+          "approval gates",
+          "audit logs"
+        ]
+      }
+    },
+    {
+      "presetId": "DATA_ANALYTICS",
+      "slug": "data-analytics",
+      "titleForMatchingOnly": "Data Analytics",
+      "fallbackPriority": 70,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "spreadsheets",
+        "data cleaning",
+        "analytical thinking"
+      ],
+      "preferredSkills": [
+        "sql",
+        "python",
+        "pandas",
+        "power bi",
+        "tableau",
+        "statistics",
+        "data visualization",
+        "dashboard design"
+      ],
+      "projectEvidence": [
+        "analytics dashboard",
+        "sql analysis",
+        "business report",
+        "kpi tracking",
+        "data visualization"
+      ],
+      "experienceEvidence": [
+        "data analyst intern",
+        "reporting analyst",
+        "business intelligence intern"
+      ],
+      "keywords": [
+        "data analytics",
+        "data analysis",
+        "excel",
+        "sql",
+        "power bi",
+        "tableau",
+        "dashboard",
+        "business intelligence"
+      ],
+      "learningOutcomes": [
+        "data quality",
+        "SQL querying",
+        "KPI definition",
+        "dashboard storytelling",
+        "reproducible analysis"
+      ],
+      "portfolioProjects": [
+        "Recruitment funnel dashboard using synthetic data",
+        "SQL analysis with documented queries",
+        "KPI dashboard with clear metric definitions"
+      ],
+      "missingSkillGuidance": {
+        "sql": [
+          "SELECT",
+          "JOIN",
+          "GROUP BY"
+        ],
+        "dashboard": [
+          "Power BI or Tableau",
+          "chart selection",
+          "KPI definitions"
+        ],
+        "python": [
+          "Pandas",
+          "data cleaning"
+        ]
+      }
+    },
+    {
+      "presetId": "FULLSTACK_DEVELOPMENT",
+      "slug": "fullstack-development",
+      "titleForMatchingOnly": "Full Stack Development",
+      "fallbackPriority": 100,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "html",
+        "css",
+        "javascript",
+        "frontend fundamentals",
+        "backend fundamentals",
+        "database",
+        "git"
+      ],
+      "preferredSkills": [
+        "react",
+        "node.js",
+        "express.js",
+        "mongodb",
+        "rest api",
+        "authentication",
+        "authorization",
+        "typescript",
+        "testing",
+        "deployment"
+      ],
+      "projectEvidence": [
+        "full stack web application",
+        "crud application",
+        "authentication system",
+        "admin dashboard",
+        "e-commerce application",
+        "booking system"
+      ],
+      "experienceEvidence": [
+        "full stack developer",
+        "web developer",
+        "frontend intern",
+        "backend intern"
+      ],
+      "keywords": [
+        "full stack",
+        "fullstack",
+        "mern",
+        "web application",
+        "frontend",
+        "backend",
+        "react",
+        "node.js",
+        "mongodb"
+      ],
+      "learningOutcomes": [
+        "responsive interfaces",
+        "REST APIs",
+        "database modelling",
+        "authentication",
+        "validation",
+        "testing",
+        "deployment and security basics"
+      ],
+      "portfolioProjects": [
+        "Role-based job portal",
+        "E-commerce application with admin panel",
+        "Booking system with authenticated APIs"
+      ],
+      "missingSkillGuidance": {
+        "frontend": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ],
+        "backend": [
+          "Node.js",
+          "Express.js",
+          "REST APIs"
+        ],
+        "database": [
+          "MongoDB or SQL",
+          "data modelling"
+        ],
+        "deployment": [
+          "environment variables",
+          "deployment",
+          "logging"
+        ]
+      }
+    },
+    {
+      "presetId": "BACKEND_DEVELOPMENT",
+      "slug": "backend-development",
+      "titleForMatchingOnly": "Backend Development",
+      "fallbackPriority": 85,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "programming fundamentals",
+        "rest api",
+        "database",
+        "git"
+      ],
+      "preferredSkills": [
+        "node.js",
+        "express.js",
+        "python",
+        "django",
+        "fastapi",
+        "postgresql",
+        "mongodb",
+        "jwt",
+        "testing",
+        "docker",
+        "caching"
+      ],
+      "projectEvidence": [
+        "rest api",
+        "authentication api",
+        "crud service",
+        "booking system",
+        "payment simulation",
+        "pagination and filters"
+      ],
+      "experienceEvidence": [
+        "backend developer",
+        "api developer",
+        "backend intern"
+      ],
+      "keywords": [
+        "backend",
+        "api",
+        "server-side",
+        "node.js",
+        "express",
+        "django",
+        "fastapi",
+        "database"
+      ],
+      "learningOutcomes": [
+        "API design",
+        "validation",
+        "authentication",
+        "database indexes",
+        "logging",
+        "testing",
+        "rate limiting"
+      ],
+      "portfolioProjects": [
+        "JWT-protected lead management API",
+        "Booking and mock-payment backend",
+        "Search API with pagination and filters"
+      ],
+      "missingSkillGuidance": {
+        "api": [
+          "HTTP methods",
+          "REST conventions",
+          "status codes"
+        ],
+        "database": [
+          "SQL or document databases",
+          "indexes"
+        ],
+        "security": [
+          "password hashing",
+          "authorization",
+          "rate limiting"
+        ]
+      }
+    },
+    {
+      "presetId": "MOBILE_APP_DEVELOPMENT",
+      "slug": "mobile-app-development",
+      "titleForMatchingOnly": "Mobile App Development",
+      "fallbackPriority": 68,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "programming fundamentals",
+        "api integration",
+        "git"
+      ],
+      "preferredSkills": [
+        "react native",
+        "flutter",
+        "javascript",
+        "typescript",
+        "dart",
+        "firebase",
+        "mobile ui",
+        "app testing"
+      ],
+      "projectEvidence": [
+        "mobile app",
+        "cross-platform app",
+        "mobile authentication",
+        "push notifications",
+        "offline-first app"
+      ],
+      "experienceEvidence": [
+        "mobile developer intern",
+        "mobile app developer"
+      ],
+      "keywords": [
+        "mobile app",
+        "mobile development",
+        "react native",
+        "flutter",
+        "ios",
+        "android",
+        "app development"
+      ],
+      "learningOutcomes": [
+        "mobile navigation",
+        "API integration",
+        "secure storage",
+        "responsive mobile UI",
+        "device testing",
+        "release workflow"
+      ],
+      "portfolioProjects": [
+        "Habit tracker with local persistence",
+        "Campus events app with API",
+        "Expense tracker with charts"
+      ],
+      "missingSkillGuidance": {
+        "framework": [
+          "React Native or Flutter"
+        ],
+        "testing": [
+          "emulator testing",
+          "device permissions",
+          "release builds"
+        ]
+      }
+    },
+    {
+      "presetId": "ANDROID_DEVELOPMENT",
+      "slug": "android-development",
+      "titleForMatchingOnly": "Android Development",
+      "fallbackPriority": 62,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "programming fundamentals",
+        "object-oriented programming"
+      ],
+      "preferredSkills": [
+        "kotlin",
+        "java",
+        "android studio",
+        "jetpack compose",
+        "android sdk",
+        "rest api",
+        "room database",
+        "firebase",
+        "unit testing"
+      ],
+      "projectEvidence": [
+        "android app",
+        "kotlin app",
+        "java android project",
+        "room database app",
+        "android api integration"
+      ],
+      "experienceEvidence": [
+        "android developer intern",
+        "android app developer"
+      ],
+      "keywords": [
+        "android",
+        "kotlin",
+        "java",
+        "android studio",
+        "jetpack compose",
+        "android sdk"
+      ],
+      "learningOutcomes": [
+        "Android project structure",
+        "lifecycle concepts",
+        "UI development",
+        "local persistence",
+        "API integration",
+        "testing and release"
+      ],
+      "portfolioProjects": [
+        "Campus events Android app",
+        "Offline notes app with Room",
+        "Weather app using a public API"
+      ],
+      "missingSkillGuidance": {
+        "language": [
+          "Kotlin or Java fundamentals"
+        ],
+        "tools": [
+          "Android Studio",
+          "emulator setup"
+        ],
+        "persistence": [
+          "Room database or another local persistence option"
+        ]
+      }
+    },
+    {
+      "presetId": "WEB_DEVELOPMENT",
+      "slug": "web-development",
+      "titleForMatchingOnly": "Web Development",
+      "fallbackPriority": 78,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "html",
+        "css",
+        "javascript",
+        "git"
+      ],
+      "preferredSkills": [
+        "responsive design",
+        "react",
+        "node.js",
+        "rest api",
+        "accessibility",
+        "web performance",
+        "testing",
+        "deployment"
+      ],
+      "projectEvidence": [
+        "website",
+        "landing page",
+        "portfolio website",
+        "web application",
+        "responsive website"
+      ],
+      "experienceEvidence": [
+        "web developer",
+        "web development intern"
+      ],
+      "keywords": [
+        "web development",
+        "website",
+        "html",
+        "css",
+        "javascript",
+        "responsive design"
+      ],
+      "learningOutcomes": [
+        "semantic HTML",
+        "responsive CSS",
+        "JavaScript interactions",
+        "API usage",
+        "accessibility",
+        "performance",
+        "deployment"
+      ],
+      "portfolioProjects": [
+        "Responsive portfolio website",
+        "API-powered search interface",
+        "Accessible multi-page website"
+      ],
+      "missingSkillGuidance": {
+        "javascript": [
+          "JavaScript fundamentals",
+          "DOM",
+          "async/await"
+        ],
+        "responsiveDesign": [
+          "Flexbox",
+          "Grid",
+          "mobile-first CSS"
+        ],
+        "deployment": [
+          "Git workflow",
+          "deployment basics"
+        ]
+      }
+    },
+    {
+      "presetId": "FRONTEND_DEVELOPMENT",
+      "slug": "frontend-development",
+      "titleForMatchingOnly": "Frontend Development",
+      "fallbackPriority": 88,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "html",
+        "css",
+        "javascript"
+      ],
+      "preferredSkills": [
+        "react",
+        "typescript",
+        "tailwind css",
+        "responsive design",
+        "accessibility",
+        "vite",
+        "next.js",
+        "testing",
+        "web performance"
+      ],
+      "projectEvidence": [
+        "portfolio website",
+        "dashboard ui",
+        "responsive interface",
+        "component library",
+        "landing page"
+      ],
+      "experienceEvidence": [
+        "frontend developer",
+        "frontend intern",
+        "ui developer"
+      ],
+      "keywords": [
+        "frontend",
+        "front end",
+        "react",
+        "javascript",
+        "css",
+        "responsive ui",
+        "web interface"
+      ],
+      "learningOutcomes": [
+        "component architecture",
+        "state management",
+        "routing",
+        "API integration",
+        "accessibility",
+        "testing and performance"
+      ],
+      "portfolioProjects": [
+        "Responsive portfolio",
+        "Analytics dashboard consuming an API",
+        "Reusable accessible component library"
+      ],
+      "missingSkillGuidance": {
+        "javascript": [
+          "JavaScript fundamentals",
+          "DOM",
+          "async/await"
+        ],
+        "framework": [
+          "React components",
+          "state",
+          "routing"
+        ],
+        "accessibility": [
+          "semantic HTML",
+          "keyboard navigation",
+          "ARIA basics"
+        ]
+      }
+    },
+    {
+      "presetId": "UI_UX_DESIGN",
+      "slug": "ui-ux-design",
+      "titleForMatchingOnly": "UI/UX Designer",
+      "fallbackPriority": 45,
+      "levels": [
+        "beginner",
+        "intermediate"
+      ],
+      "requiredSkills": [
+        "design fundamentals",
+        "visual communication"
+      ],
+      "preferredSkills": [
+        "figma",
+        "wireframing",
+        "prototyping",
+        "user research",
+        "usability testing",
+        "accessibility",
+        "design systems"
+      ],
+      "projectEvidence": [
+        "figma prototype",
+        "wireframe",
+        "design system",
+        "user journey",
+        "usability report"
+      ],
+      "experienceEvidence": [
+        "ui/ux designer",
+        "product design intern",
+        "ux project"
+      ],
+      "keywords": [
+        "ui/ux",
+        "ui design",
+        "ux design",
+        "figma",
+        "wireframe",
+        "prototype",
+        "product design"
+      ],
+      "learningOutcomes": [
+        "user flows",
+        "wireframes",
+        "interactive prototypes",
+        "accessibility",
+        "design handoff",
+        "usability testing"
+      ],
+      "portfolioProjects": [
+        "Internship discovery flow prototype",
+        "Accessible dashboard design system",
+        "Mobile onboarding prototype with usability notes"
+      ],
+      "missingSkillGuidance": {
+        "tools": [
+          "Figma basics",
+          "frames and components"
+        ],
+        "research": [
+          "user interviews",
+          "personas",
+          "task analysis"
+        ],
+        "prototyping": [
+          "interactive prototypes",
+          "handoff specifications"
+        ]
+      }
+    }
+  ],
+  "personalizedMessages": {
+    "welcomeWithName": "Hi {studentName}, we've reviewed the skills and experience identified in your resume.",
+    "welcomeWithoutName": "Hi there, we've reviewed the skills and experience identified in your resume.",
+    "strongMatch": "{studentGreeting}, your resume contains relevant evidence for {internshipTitle}. Matching areas include {matchedSkills}. This internship may help you deepen those skills.",
+    "skillsWithoutProjects": "{studentGreeting}, your resume includes skills related to {internshipTitle}, but we could not confidently identify a directly related project. This internship may help you practise those skills and build portfolio evidence.",
+    "projectMatch": "{studentGreeting}, the project evidence identified in your resume relates to {internshipTitle}. This internship may help you build on that foundation.",
+    "skillGap": "{studentGreeting}, {internshipTitle} may be a useful learning option based on {matchedSkills}. Suggested areas to strengthen include {missingSkills}.",
+    "fallback": "{studentGreeting}, based on the information identified in your resume, {internshipTitle} is a potential starting point. Review the suggested skills and projects to decide whether it fits your goals.",
+    "notice": "These recommendations are based on predefined resume-matching rules. They are learning suggestions, not a guarantee of employment or job eligibility."
+  },
+  "privacy": {
+    "persistOriginalResume": false,
+    "persistExtractedResumeText": false,
+    "deleteTemporaryUploadAfterParsing": true,
+    "avoidLoggingResumeText": true,
+    "returnFullResumeTextToFrontend": false
+  },
+  "responseContract": {
+    "analysisMethod": "rule_based",
+    "fields": [
+      "studentName",
+      "personalizedMessage",
+      "detectedSkills",
+      "detectedProjects",
+      "detectedExperience",
+      "recommendations"
+    ],
+    "recommendationFields": [
+      "internshipId",
+      "title",
+      "slug",
+      "matchScore",
+      "matchLabel",
+      "matchedSkills",
+      "matchedProjects",
+      "matchedExperience",
+      "missingSkills",
+      "reason",
+      "portfolioProjectSuggestions",
+      "internship"
+    ],
+    "internshipFieldSource": "MongoDB only"
+  }
+}
